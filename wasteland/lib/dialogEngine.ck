@@ -29,8 +29,12 @@ public class Prompt {
     0 => static int Style_None;
     1 => static int Style_Italic;
 
+    0 => static int Speaker_Player;
+    1 => static int Speaker_NPC;
+
     int type;
     int style;
+    int speaker;
 
     string tag;      // user-set tag of this prompt
     string next_tag; // set if this prompt redirects to another prompt
@@ -56,6 +60,7 @@ public class Prompt {
         int idx;
         int style;
         Prompt.Type_Prose => int type;
+        Prompt.Speaker_Player => int speaker;
         string tag;
         Prompt@ last_prompt;
 
@@ -84,6 +89,20 @@ public class Prompt {
                 if (prompts.isInMap(tag)) <<< "warning, duplicate tag: ", tag >>>;
                 continue;
             }
+            // check for speaker designation
+            else if (char == '(') {
+                 ++idx;
+                // make sure there's a closing paranthesis
+                s.find(')', idx) => int close_spk_idx;
+                if (close_spk_idx == -1) {
+                    <<< "missing closing tag ) to match with tag at index ", idx >>>; 
+                    return null;
+                }
+                s.substring(idx, close_spk_idx - idx) => string spk;
+                spk == "Player" ? Prompt.Speaker_Player => speaker : Prompt.Speaker_NPC => speaker;
+                if (log) <<< "parsed speaker", spk >>>;
+                close_spk_idx + 1 => idx;
+            }
             // ignore comments
             else if (char == '#' || (char == '/' && s.charAt(idx + 1) == '/')) {
                 s.find('\n', idx+1) => int end_comment_idx;
@@ -108,6 +127,7 @@ public class Prompt {
                 Prompt p;
                 type => p.type; Prompt.Type_Prose => type;
                 style => p.style; Prompt.Style_None => style;
+                speaker => p.speaker; Prompt.Speaker_Player => speaker;
                 tag => p.tag; "" => tag;
 
                 // prompt is text up to newline or [] redirect
@@ -186,7 +206,7 @@ public class Prompt {
 }
 
 "
-{begin} this is the start of dialog 
+{begin} this is the start of dialog
 
 then we go here
 
