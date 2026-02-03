@@ -117,8 +117,7 @@ public class RadioMechanic {
     }
 }
 
-
-// graphics 
+// graphics
 
 ChuGUI gui --> GG.scene();
 gui.debugEnabled(true);
@@ -127,8 +126,6 @@ RadioMechanic r(3, 2);
 r.init();
 
 GG.camera().orthographic();
-
-
 
 // main loop
 while(true) {
