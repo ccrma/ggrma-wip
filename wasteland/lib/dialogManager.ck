@@ -1,20 +1,18 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
-@import "camera.ck"
 @import "player.ck"
 @import "npc.ck"
+@import "dialogEngine.ck"
 @import "../ui/dialogBox.ck"
 
 public class DialogManager {
-    -1 => static int SPEAKER_NONE;
-    0 => static int SPEAKER_PLAYER;
-    1 => static int SPEAKER_NPC;
-
-    int _currentSpeaker;
-
     Player @ _player;
     NPC @ _npc;
 
     DialogBox dialogBox;
+
+    // Prompt state
+    Prompt @ _currentPrompt;
+    int _responseIndex;
 
     fun DialogManager() {
         dialogBox.scale(1.0);
@@ -30,14 +28,6 @@ public class DialogManager {
     }
 
     fun void update(ChuGUI gui) {
-        if (_player != null) {
-            _player.update(gui);
-        }
-
-        if (_npc != null) {
-            _npc.update(gui);
-        }
-
         dialogBox.update(gui);
     }
 
@@ -82,52 +72,106 @@ public class DialogManager {
         return _npc;
     }
 
-    fun void setSpeaker(int speaker) {
-        speaker => _currentSpeaker;
-        updateHighlights();
-    }
-
     fun void playerSays(string text) {
-        setSpeaker(SPEAKER_PLAYER);
         if (_player != null) {
             dialogBox.speakerName(_player.name());
+            _player.highlight();
         }
+        if (_npc != null) _npc.dim();
         dialogBox.text(text);
     }
 
     fun void npcSays(string text) {
-        setSpeaker(SPEAKER_NPC);
         if (_npc != null) {
             dialogBox.speakerName(_npc.name());
+            _npc.highlight();
         }
+        if (_player != null) _player.dim();
         dialogBox.text(text);
     }
 
-    fun void updateHighlights() {
-        if (_player != null) {
-            if (_currentSpeaker == SPEAKER_PLAYER) {
-                _player.highlight();
-            } else if (_currentSpeaker != SPEAKER_NONE) {
-                _player.dim();
-            }
-        }
-
-        if (_npc != null) {
-            if (_currentSpeaker == SPEAKER_NPC) {
-                _npc.highlight();
-            } else if (_currentSpeaker != SPEAKER_NONE) {
-                _npc.dim();
-            }
-        }
-    }
-
     fun void clearSpeaker() {
-        SPEAKER_NONE => _currentSpeaker;
         if (_player != null) _player.highlight();
         if (_npc != null) _npc.highlight();
     }
 
-    fun int currentSpeaker() {
-        return _currentSpeaker;
+    // Prompt handling
+
+    fun void startDialogue(Prompt prompts[]) {
+        prompts[0] @=> _currentPrompt;
+        0 => _responseIndex;
+        showCurrentPrompt();
+    }
+
+    fun void showCurrentPrompt() {
+        if (_currentPrompt == null) {
+            clearSpeaker();
+            setDialog("", "End of dialogue.");
+            return;
+        }
+
+        if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
+            npcSays(_currentPrompt.text);
+        } else {
+            playerSays(_currentPrompt.text);
+        }
+
+        0 => _responseIndex;
+    }
+
+    fun void advanceDialogue() {
+        if (_currentPrompt == null) return;
+
+        if (_currentPrompt.responses.size() > 0) {
+            _currentPrompt.responses[_responseIndex].next @=> _currentPrompt;
+        } else {
+            _currentPrompt.next @=> _currentPrompt;
+        }
+
+        0 => _responseIndex;
+        showCurrentPrompt();
+    }
+
+    fun void selectResponse(int delta) {
+        if (_currentPrompt == null) return;
+        if (_currentPrompt.responses.size() == 0) return;
+
+        _responseIndex + delta => _responseIndex;
+        Math.clampi(_responseIndex, 0, _currentPrompt.responses.size() - 1) => _responseIndex;
+    }
+
+    fun int responseCount() {
+        if (_currentPrompt == null) return 0;
+        return _currentPrompt.responses.size();
+    }
+
+    fun int selectedResponse() {
+        return _responseIndex;
+    }
+
+    fun Prompt @ getResponse(int idx) {
+        if (_currentPrompt == null) return null;
+        if (idx < 0 || idx >= _currentPrompt.responses.size()) return null;
+        return _currentPrompt.responses[idx];
+    }
+
+    fun void renderResponses(ChuGUI gui) {
+        if (_currentPrompt == null || _currentPrompt.responses.size() == 0) return;
+
+        @(0, 0) => vec2 pos;
+        for (int i; i < _currentPrompt.responses.size(); i++) {
+            -.15 +=> pos.y;
+
+            Color.WHITE => vec3 color;
+            if (i == _responseIndex) Color.BLACK => color;
+
+            string prefix;
+            if (i == _responseIndex) "> " => prefix;
+            UIStyle.pushColor(UIStyle.COL_LABEL, color);
+            UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.05);
+            gui.label(prefix + _currentPrompt.responses[i].text, pos);
+            UIStyle.popVar();
+            UIStyle.popColor();
+        }
     }
 }

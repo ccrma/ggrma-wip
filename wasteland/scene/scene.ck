@@ -1,5 +1,4 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
-@import "../lib/camera.ck"
 @import "../lib/dialogManager.ck"
 
 public class Scene {
