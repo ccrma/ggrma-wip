@@ -1,4 +1,4 @@
-@import "C:/Users/banhq/Documents/Projects/ChuGUI/src/ChuGUI.ck"
+@import "../../ChuGUI/src/ChuGUI.ck"
 @import "../lib/camera.ck"
 
 public class Portrait {

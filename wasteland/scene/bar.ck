@@ -1,4 +1,4 @@
-@import "C:/Users/banhq/Documents/Projects/ChuGUI/src/ChuGUI.ck"
+@import "../../ChuGUI/src/ChuGUI.ck"
 @import "scene.ck"
 @import "../lib/player.ck"
 @import "../lib/npc.ck"
