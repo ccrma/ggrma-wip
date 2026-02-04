@@ -15,10 +15,19 @@ public class Game {
 
     BarScene scene;
 
+    // Radio mechanic for dialogue choices
     RadioMechanic radio;
 
     fun void init() {
+        // Initialize radio
+        radio.scale(1.5);
+        radio.setPosition(@(0, -0.3));
+        radio.setAudioBasePath(me.dir() + "assets/audio/");
+        radio.init();
+
+        // Pass radio to scene/dialog manager
         scene.init(player, prompts);
+        scene.dialogManager().setRadio(radio);
     }
 
     fun void run() {
@@ -32,15 +41,19 @@ public class Game {
             scene.update(gui);
             radio.update(gui);
 
-            if (GWindow.keyDown(GWindow.KEY_UP)) {
-                scene.dialogManager().selectResponse(-1);
-            }
-            if (GWindow.keyDown(GWindow.KEY_DOWN)) {
-                scene.dialogManager().selectResponse(1);
+            // ENTER advances dialogue (for both choices and regular dialogue)
+            // For choices, only advances if slider is on a dot (has selection)
+            if (GWindow.keyDown(GWindow.KEY_ENTER)) {
+                if (scene.dialogManager().canAdvance()) {
+                    scene.dialogManager().advanceDialogue();
+                }
             }
 
-            if (GWindow.keyDown(GWindow.KEY_SPACE) || GWindow.keyDown(GWindow.KEY_ENTER)) {
-                scene.dialogManager().advanceDialogue();
+            // SPACE only advances non-choice dialogue
+            if (GWindow.keyDown(GWindow.KEY_SPACE)) {
+                if (scene.dialogManager().responseCount() == 0) {
+                    scene.dialogManager().advanceDialogue();
+                }
             }
         }
     }

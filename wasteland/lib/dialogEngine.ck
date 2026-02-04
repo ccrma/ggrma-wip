@@ -39,6 +39,7 @@ public class Prompt {
     string tag;      // user-set tag of this prompt
     string next_tag; // set if this prompt redirects to another prompt
     string text;
+    string responseTemplate;  // template for player response
 
     Prompt@ parent;       // for response prompts, the prose they are tied to
     Prompt@ next;         // a prompt either goes directly into another prompt
@@ -116,10 +117,26 @@ public class Prompt {
                 ++idx;
                 continue;
             }
-            // push prompt stack 
+            // push prompt stack
             else if (char == '-') {
                 Prompt.Type_Response => type;
                 ++idx;
+                continue;
+            }
+            // response template (? My name is ___.)
+            else if (char == '?') {
+                ++idx;
+                // consume whitespace after ?
+                while (idx < s.length() && (s.charAt(idx) == ' ' || s.charAt(idx) == '\t')) ++idx;
+                // find end of line
+                idx => int start_template_idx;
+                while (idx < s.length() && s.charAt(idx) != '\n') ++idx;
+                s.substring(start_template_idx, idx - start_template_idx) => string template;
+                // attach to last prompt
+                if (last_prompt != null) {
+                    template => last_prompt.responseTemplate;
+                    if (log) <<< "parsed response template:", template >>>;
+                }
                 continue;
             }
             // consume prompt
@@ -204,71 +221,3 @@ public class Prompt {
         return prompts;
     }
 }
-
-"
-{begin} this is the start of dialog
-
-then we go here
-
-what is your name?
-- Audrey [Audrey]
-- Ben [Ben]
-- Andrew [Andrew]
-
-{Audrey} Hi Audrey! [resume]
-
-{Ben} Hi Ben! [resume]
-
-{Andrew} Hi Andrew! [resume]
-
-
-{resume} reconnect dialog here [begin]
-" => string demo_prompt2;
-
-
-// e.g.
-/*
-G2D g;
-Prompt.parse(demo_prompt2, false) @=> Prompt prompts[];
-prompts[0] @=> Prompt@ curr_prompt;
-int response_idx;
-while (1) {
-    GG.nextFrame() => now;
-
-    { // input
-        if (g.mouseLeftDown()) {
-            // no responses, move on
-            if (!curr_prompt.responses.size()) curr_prompt.next @=> curr_prompt;
-            else {
-                curr_prompt.responses[response_idx].next @=> curr_prompt;
-            }
-            0 => response_idx;
-        }
-
-        if (GWindow.keyDown(GWindow.KEY_DOWN)) 1 +=> response_idx;
-        if (GWindow.keyDown(GWindow.KEY_RIGHT)) 1 +=> response_idx;
-        if (GWindow.keyDown(GWindow.KEY_UP)) 1 -=> response_idx;
-        if (GWindow.keyDown(GWindow.KEY_LEFT)) 1 -=> response_idx;
-        Math.clampi(response_idx, 0, curr_prompt.responses.size()-1) => response_idx;
-
-    }
-
-    if (curr_prompt != null) {
-        g.CENTER => vec2 pos;
-        g.text(curr_prompt.text, pos, .2);
-
-        @(0, -4) => pos;
-        for (int i; i < curr_prompt.responses.size(); i++) {
-            .2 -=> pos.y;
-
-            Color.WHITE => vec3 color;
-            if (i == response_idx) Color.RED => color;
-
-            g.pushColor(color);
-            g.text(curr_prompt.responses[i].text, pos, .2);
-            g.popColor();
-        }
-    }
-
-}
-*/

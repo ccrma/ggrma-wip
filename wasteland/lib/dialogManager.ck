@@ -2,6 +2,7 @@
 @import "player.ck"
 @import "npc.ck"
 @import "dialogEngine.ck"
+@import "radio.ck"
 @import "../ui/dialogBox.ck"
 
 public class DialogManager {
@@ -10,6 +11,9 @@ public class DialogManager {
 
     DialogBox dialogBox;
 
+    // Radio mechanic for dialogue choices
+    RadioMechanic @ _radio;
+
     // Prompt state
     Prompt @ _currentPrompt;
     int _responseIndex;
@@ -17,6 +21,10 @@ public class DialogManager {
     fun DialogManager() {
         dialogBox.scale(1.0);
         dialogBox.text("...");
+    }
+
+    fun void setRadio(RadioMechanic @ radio) {
+        radio @=> _radio;
     }
 
     fun void setPlayer(Player @ p) {
@@ -107,6 +115,7 @@ public class DialogManager {
         if (_currentPrompt == null) {
             clearSpeaker();
             setDialog("", "End of dialogue.");
+            if (_radio != null) _radio.deactivate();
             return;
         }
 
@@ -117,19 +126,61 @@ public class DialogManager {
         }
 
         0 => _responseIndex;
+
+        // Configure radio if there are responses
+        if (_radio != null) {
+            if (_currentPrompt.responses.size() > 0) {
+                // Extract response labels
+                string labels[0];
+                for (int i; i < _currentPrompt.responses.size(); i++) {
+                    labels << _currentPrompt.responses[i].text;
+                }
+                _radio.setOptions(labels);
+                _radio.activate();
+
+                // Show response template in dialogue box (player speaking)
+                if (_currentPrompt.responseTemplate.length() > 0) {
+                    playerSays(_currentPrompt.responseTemplate);
+                }
+            } else {
+                _radio.deactivate();
+            }
+        }
     }
 
     fun void advanceDialogue() {
         if (_currentPrompt == null) return;
 
         if (_currentPrompt.responses.size() > 0) {
-            _currentPrompt.responses[_responseIndex].next @=> _currentPrompt;
+            // Use radio selection if available, otherwise fall back to _responseIndex
+            if (_radio != null && _radio.hasSelection()) {
+                _radio.getSelectedIndex() => int selectedIdx;
+                _currentPrompt.responses[selectedIdx].next @=> _currentPrompt;
+            } else if (_radio == null) {
+                // Fallback for when radio is not set
+                _currentPrompt.responses[_responseIndex].next @=> _currentPrompt;
+            } else {
+                // Radio is active but no selection - don't advance
+                return;
+            }
         } else {
             _currentPrompt.next @=> _currentPrompt;
         }
 
         0 => _responseIndex;
         showCurrentPrompt();
+    }
+
+    fun int canAdvance() {
+        if (_currentPrompt == null) return 0;
+        // If there are responses, need a radio selection
+        if (_currentPrompt.responses.size() > 0) {
+            if (_radio != null) {
+                return _radio.hasSelection();
+            }
+            return 1; // Fallback
+        }
+        return 1; // No responses, can always advance
     }
 
     fun void selectResponse(int delta) {
@@ -156,22 +207,8 @@ public class DialogManager {
     }
 
     fun void renderResponses(ChuGUI gui) {
-        if (_currentPrompt == null || _currentPrompt.responses.size() == 0) return;
-
-        @(0, 0) => vec2 pos;
-        for (int i; i < _currentPrompt.responses.size(); i++) {
-            -.15 +=> pos.y;
-
-            Color.WHITE => vec3 color;
-            if (i == _responseIndex) Color.BLACK => color;
-
-            string prefix;
-            if (i == _responseIndex) "> " => prefix;
-            UIStyle.pushColor(UIStyle.COL_LABEL, color);
-            UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.05);
-            gui.label(prefix + _currentPrompt.responses[i].text, pos);
-            UIStyle.popVar();
-            UIStyle.popColor();
-        }
+        // Radio mechanic now handles response rendering
+        // This method is kept for backwards compatibility but does nothing
+        // The radio is updated directly in the game loop
     }
 }

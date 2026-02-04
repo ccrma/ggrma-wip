@@ -7,25 +7,39 @@ public class RadioMechanic {
     vec2 sliderSize;
 
     int numOptions;
+    string optionLabels[0];
 
     ["4", "6", "7", "8", "10", "12", "14", "16"] @=> string radioNumbers[];
 
     float dotX[0];
 
+    // Selection threshold - how close slider needs to be to a dot to "select" it
+    0.05 => float selectThreshold;
+
+    // Currently selected option index (-1 if none)
+    -1 => int _selectedIndex;
+
+    // Whether the radio is active (for dialogue choices)
+    0 => int _active;
+
+    // Position offset for rendering
+    vec2 _position;
+
     // audio
+    SndBuf audio[0];
+    string audioFiles[0];
+    string _audioBasePath;
 
-    SndBuf fear(me.dir() + "../assets/audio/fear.wav") => dac;
-    SndBuf hate(me.dir() + "../assets/audio/hate.wav") => dac;
-    SndBuf love(me.dir() + "../assets/audio/love.wav") => dac;
-    fear.loop(1);
-    hate.loop(1);
-    love.loop(1);
-
-    // CNoise noise => dac;
+    fun RadioMechanic() {
+        0 => numOptions;
+        @(0.5, 0.01) => sliderSize;
+    }
 
     fun RadioMechanic(int numOptions) {
         numOptions => this.numOptions;
+        @(0.5, 0.01) => sliderSize;
     }
+
     fun RadioMechanic(int numOptions, int scale) {
         numOptions => this.numOptions;
         scale => _scale;
@@ -34,103 +48,183 @@ public class RadioMechanic {
 
     fun void init() {
         spork ~ keyboardHandler();
+    }
 
-        // randomize dot positions based on number of options, where each dot is in a different segment
+    fun void setAudioBasePath(string path) {
+        path => _audioBasePath;
+    }
+
+    fun void loadAudioForLabels(string labels[]) {
+        // Clear existing audio
+        for (int i; i < audio.size(); i++) {
+            audio[i] =< dac;
+        }
+        audio.clear();
+        audioFiles.clear();
+
+        // Load audio files based on labels (trimmed, lowercase label + .wav)
+        for (int i; i < labels.size(); i++) {
+            labels[i].trim().lower() + ".wav" => string filename;
+            _audioBasePath + filename => string filepath;
+            audioFiles << filepath;
+            audio << new SndBuf(filepath);
+            audio[i] => dac;
+            audio[i].loop(1);
+            0 => audio[i].gain;
+        }
+    }
+
+    fun void setOptions(string labels[]) {
+        optionLabels.clear();
+        dotX.clear();
+
+        labels.size() => numOptions;
+        @(0.5, 0.01) * _scale => sliderSize;
+
+        for (int i; i < numOptions; i++) {
+            optionLabels << labels[i];
+        }
+
+        // Randomize dot positions - each dot in its own segment
         for (int i; i < numOptions; i++) {
             dotX << Math.random2f(-sliderSize.x / 2 + (i * 1.0) / numOptions * sliderSize.x,
                           -sliderSize.x / 2 + ((i + 1) * 1.0) / numOptions * sliderSize.x);
         }
+
+        // Load audio files based on the labels
+        loadAudioForLabels(labels);
+
+        // Reset slider to middle
+        0.5 => val;
+        -1 => _selectedIndex;
+    }
+
+    fun void setPosition(vec2 pos) {
+        pos => _position;
+    }
+
+    fun void activate() {
+        1 => _active;
+    }
+
+    fun void deactivate() {
+        0 => _active;
+        // Mute all audio when deactivated
+        for (int i; i < audio.size(); i++) {
+            0 => audio[i].gain;
+        }
+    }
+
+    fun int isActive() {
+        return _active;
     }
 
     fun void update(ChuGUI gui) {
-        audio();
+        if (!_active || numOptions == 0) return;
+        updateSelection();
+        updateAudio();
         render(gui);
     }
 
-    fun float trunc_fallof( float x, float m )
-    {
-        if( x>m ) return 0.0;
+    fun float trunc_fallof(float x, float m) {
+        if (x > m) return 0.0;
         m /=> x;
-        return (x-2.0)*x+1.0;
+        return (x - 2.0) * x + 1.0;
     }
 
-    fun void audio() {
-        val => float pos;
-        
-        Math.remap(dotX[0], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float fearPos;
-        Math.remap(dotX[1], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float hatePos;
-        Math.remap(dotX[2], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float lovePos;
+    fun void updateSelection() {
+        -1 => _selectedIndex;
 
-        trunc_fallof(Math.fabs(pos - fearPos), 0.2) => fear.gain;
-        trunc_fallof(Math.fabs(pos - hatePos), 0.2) => hate.gain;
-        trunc_fallof(Math.fabs(pos - lovePos), 0.2) => love.gain;
+        for (int i; i < numOptions; i++) {
+            Math.remap(dotX[i], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float dotPos;
+            Math.fabs(val - dotPos) => float dist;
+
+            if (dist < selectThreshold) {
+                i => _selectedIndex;
+                break;
+            }
+        }
+    }
+
+    fun void updateAudio() {
+        for (int i; i < audio.size() && i < numOptions; i++) {
+            Math.remap(dotX[i], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float dotPos;
+            trunc_fallof(Math.fabs(val - dotPos), 0.2) => audio[i].gain;
+        }
+    }
+
+    fun int getSelectedIndex() {
+        return _selectedIndex;
+    }
+
+    fun int hasSelection() {
+        return _selectedIndex >= 0;
     }
 
     fun void render(ChuGUI gui) {
-        // dots
-        UIStyle.pushColor(UIStyle.COL_RECT, Color.PURPLE);
-        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01, 0.01) * _scale);
-        for (int i; i < dotX.size(); i++) {
-            gui.rect(@(dotX[i], -0.01));
-        }
+        // black background rectangle
+        UIStyle.pushColor(UIStyle.COL_RECT, Color.BLACK);
+        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.6, 0.15) * _scale);
+        gui.rect(@(_position.x, _position.y + 0.0175));
         UIStyle.popVar();
         UIStyle.popColor();
 
-        // numbers
-        UIStyle.pushColor(UIStyle.COL_LABEL, Color.WHITE);
-        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.02 * _scale);
+        // dots with option labels
+        for (int i; i < dotX.size(); i++) {
+            // Highlight selected dot
+            if (i == _selectedIndex) {
+                UIStyle.pushColor(UIStyle.COL_RECT, Color.GREEN);
+            } else {
+                UIStyle.pushColor(UIStyle.COL_RECT, Color.RED);
+            }
+            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01, 0.01) * _scale);
+            gui.rect(@(dotX[i] + _position.x, -0.01 + _position.y));
+            UIStyle.popVar();
+            UIStyle.popColor();
+        }
+
+        // numbers (radio dial markings)
+        UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
+        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.015 * _scale);
 
         for (int i; i < radioNumbers.size(); i++) {
             -sliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * sliderSize.x => float xPos;
-            gui.label(radioNumbers[i], @(xPos, 0.035 * _scale));
+            gui.label(radioNumbers[i], @(xPos + _position.x, 0.035 * _scale + _position.y));
         }
 
         UIStyle.popVar();
         UIStyle.popColor();
 
         // slider
-        UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.RED);
+        if (_selectedIndex >= 0) {
+            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.GREEN);
+        } else {
+            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.RED);
+        }
         UIStyle.pushVar(UIStyle.VAR_SLIDER_TRACK_SIZE, @(0.5, 0.01) * _scale);
-        UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005, 0.15) * _scale);
-        gui.slider("radio", @(0, 0), 0, 1, val) => val;
+        UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005, 0.08) * _scale);
+        gui.slider("radio", @(_position.x, _position.y), 0, 1, val) => val;
         UIStyle.popVar(2);
         UIStyle.popColor();
-
-        gui.debugAdd();
     }
 
     fun void keyboardHandler() {
-        while(true) {
+        while (true) {
             GG.nextFrame() => now;
 
-            if (GWindow.key(GWindow.KEY_LEFT)) {
-                0.0025 -=> val;
-            }
-            if (GWindow.key(GWindow.KEY_RIGHT)) {
-                0.0025 +=> val;
+            if (_active) {
+                if (GWindow.key(GWindow.KEY_LEFT)) {
+                    0.0025 -=> val;
+                }
+                if (GWindow.key(GWindow.KEY_RIGHT)) {
+                    0.0025 +=> val;
+                }
             }
         }
     }
 
     fun void scale(float s) {
         s => _scale;
+        @(0.5, 0.01) * _scale => sliderSize;
     }
-}
-
-// graphics
-
-ChuGUI gui --> GG.scene();
-gui.debugEnabled(true);
-
-RadioMechanic r(3, 2);
-r.init();
-
-GG.camera().orthographic();
-
-// main loop
-while(true) {
-    GG.nextFrame() => now;
-    r.update(gui);
-
-    gui.debug();
 }

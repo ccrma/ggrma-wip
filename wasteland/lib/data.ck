@@ -3,13 +3,14 @@ public class Data {
     (NPC) The Wasteland is a place full of adventure and danger.
     (NPC) You will meet many characters along the way.
     (Player) ... where am I???
-    (NPC) what is your name?
-    - Audrey [Audrey]
-    - Ben [Ben]
-    - Andrew [Andrew]
-    {Audrey} (NPC) Hi Audrey! [resume]
-    {Ben} (NPC) Hi Ben! [resume]
-    {Andrew} (NPC) Hi Andrew! [resume]
-    {resume} (Player) Hi NPC! [begin]
+    (NPC) What do you feel?
+    ? I feel ___.
+    - fear [fear]
+    - hate [hate]
+    - love [love]
+    {fear} (NPC) Fear is natural here. [resume]
+    {hate} (NPC) Hate will consume you. [resume]
+    {love} (NPC) Love is rare in the Wasteland. [resume]
+    {resume} (Player) I see... [begin]
     " => static string script;
 }
