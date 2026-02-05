@@ -55,7 +55,7 @@ public class Game {
             if (GWindow.keyDown(GWindow.KEY_SPACE)) {
                 if (scene.dialogManager().isTyping()) {
                     scene.dialogManager().skipTypewriter();
-                } else if (scene.dialogManager().responseCount() == 0) {
+                } else if (scene.dialogManager().responseCount() == 0 || scene.dialogManager().selectionShown) {
                     scene.dialogManager().advanceDialogue();
                 }
             }

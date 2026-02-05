@@ -127,6 +127,12 @@ public class RadioMechanic {
 
     fun void activate() {
         1 => _active;
+        // Unmute all audio when activated
+        for (int i; i < audio.size(); i++) {
+            0.5 => audio[i].gain;
+        }
+        0.2 => radio_left.gain;
+        0.2 => radio_right.gain;
     }
 
     fun void deactivate() {
@@ -135,6 +141,8 @@ public class RadioMechanic {
         for (int i; i < audio.size(); i++) {
             0 => audio[i].gain;
         }
+        0 => radio_left.gain;
+        0 => radio_right.gain;
     }
 
     fun int isActive() {

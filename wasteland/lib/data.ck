@@ -11,6 +11,17 @@ public class Data {
     {fear} (NPC) Fear is natural here. [resume]
     {hate} (NPC) Hate will consume you. [resume]
     {love} (NPC) Love is rare in the Wasteland. [resume]
-    {resume} (Player) I see... [begin]
+    {resume} (Player) I see...
+    (NPC) Good luck on your journey!
+    ? Now I feel ...
+    - brave [brave]
+    - cautious [cautious]
+    - lonely [lonely]
+    - excited [excited]
+    {brave} (NPC) Bravery will serve you well. [end]
+    {cautious} (NPC) Caution is wise in these parts. [end]
+    {lonely} (NPC) You are not alone here. [end]
+    {excited} (NPC) Excitement fuels adventure! [end]
+    {end} (NPC) Farewell, traveler. [begin]
     " => static string script;
 }
