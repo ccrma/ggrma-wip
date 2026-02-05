@@ -1,4 +1,5 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
+@import "radioFilter.ck"
 
 public class RadioMechanic {
     float val;
@@ -27,8 +28,16 @@ public class RadioMechanic {
 
     // audio
     SndBuf audio[0];
+    Pan2   pan[0];
+    RadioFilter radio_left => dac.left;
+    RadioFilter radio_right => dac.right;
+    CNoise n => LPF noise(600, 1); noise => radio_left; noise => radio_right; 0 => noise.gain;
+    // CNoise noise; noise => radio_left; noise => radio_right; 0 => noise.gain;
+    // noise.mode("pink");
     string audioFiles[0];
     string _audioBasePath;
+    time loop_time[0];
+    1::second => dur LOOP_DUR;  // how many seconds before looping each sample
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -56,21 +65,34 @@ public class RadioMechanic {
 
     fun void loadAudioForLabels(string labels[]) {
         // Clear existing audio
-        for (int i; i < audio.size(); i++) {
-            audio[i] =< dac;
+        for (int i; i < pan.size(); i++) {
+            pan[i].left =< radio_left;
+            pan[i].right =< radio_right;
         }
-        audio.clear();
         audioFiles.clear();
+
+        // add more sndbufs and pans as needed
+        while (pan.size() < labels.size()) {
+            audio << new SndBuf;
+            pan << new Pan2;
+            loop_time << now;
+        }
 
         // Load audio files based on labels (trimmed, lowercase label + .wav)
         for (int i; i < labels.size(); i++) {
             labels[i].trim().lower() + ".wav" => string filename;
             _audioBasePath + filename => string filepath;
             audioFiles << filepath;
-            audio << new SndBuf(filepath);
-            audio[i] => dac;
-            audio[i].loop(1);
+            audio[i] => pan[i];
+            pan[i].left => radio_left;
+            pan[i].right => radio_right;
+
+            audio[i].read(filepath);
+            audio[i].loop(0);
             0 => audio[i].gain;
+
+            // set loop point
+            now + audio[i].length() + LOOP_DUR => loop_time[i];
         }
     }
 
@@ -146,11 +168,29 @@ public class RadioMechanic {
         }
     }
 
+    0.2 => float SAMPLE_RADIUS; // max dist threshold (on a normalized scale 0-1) for hearing a sample
     fun void updateAudio() {
+        float total_sample_gain;
         for (int i; i < audio.size() && i < numOptions; i++) {
             Math.remap(dotX[i], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float dotPos;
-            trunc_fallof(Math.fabs(val - dotPos), 0.2) => audio[i].gain;
+            (val - dotPos) => float sample_dist;
+
+            // gain falloff
+            trunc_fallof(Math.fabs(sample_dist), SAMPLE_RADIUS) => audio[i].gain;
+            audio[i].gain() +=> total_sample_gain;
+
+            // panning
+            Math.remap(sample_dist, -SAMPLE_RADIUS, SAMPLE_RADIUS, 1, -1) => pan[i].pan;
+
+            // loop audio if needed
+            if (now > loop_time[i]) {
+                0 => audio[i].pos;
+                now + LOOP_DUR + audio[i].length() => loop_time[i];
+            }
         }
+
+        // radio static
+        .25 * Math.pow(Math.max(0, 1 - total_sample_gain), 2) => noise.gain;
     }
 
     fun int getSelectedIndex() {

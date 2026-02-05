@@ -8,6 +8,6 @@ public class RadioFilter extends Chugraph
           => outlet;
 
     3 => hpf.gain;
-    7 => bc.bits;
+    12 => bc.bits;
     12 => bc.downsample;
 }
