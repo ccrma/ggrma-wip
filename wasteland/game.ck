@@ -44,14 +44,18 @@ public class Game {
             // ENTER advances dialogue (for both choices and regular dialogue)
             // For choices, only advances if slider is on a dot (has selection)
             if (GWindow.keyDown(GWindow.KEY_ENTER)) {
-                if (scene.dialogManager().canAdvance()) {
+                if (scene.dialogManager().isTyping()) {
+                    scene.dialogManager().skipTypewriter();
+                } else if (scene.dialogManager().canAdvance()) {
                     scene.dialogManager().advanceDialogue();
                 }
             }
 
-            // SPACE only advances non-choice dialogue
+            // SPACE skips typewriter or advances non-choice dialogue
             if (GWindow.keyDown(GWindow.KEY_SPACE)) {
-                if (scene.dialogManager().responseCount() == 0) {
+                if (scene.dialogManager().isTyping()) {
+                    scene.dialogManager().skipTypewriter();
+                } else if (scene.dialogManager().responseCount() == 0) {
                     scene.dialogManager().advanceDialogue();
                 }
             }

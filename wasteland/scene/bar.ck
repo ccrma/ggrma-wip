@@ -25,6 +25,5 @@ public class BarScene extends Scene {
         super.render(gui);
         stranger.update(gui);
         dm.update(gui);
-        dm.renderResponses(gui);
     }
 }

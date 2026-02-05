@@ -11,7 +11,15 @@ public class DialogBox {
     1.5 => float _leftMargin;
     1.5 => float _rightMargin;
 
+    float _charCount;
+    int _targetCharCount;
+    0.5 => float _charsPerFrame;
+
     fun void update(ChuGUI gui) {
+        if (_charCount < _targetCharCount) {
+            _charCount + _charsPerFrame => _charCount;
+            if (_charCount > _targetCharCount) _targetCharCount => _charCount;
+        }
         render(gui);
     }
 
@@ -63,8 +71,9 @@ public class DialogBox {
         UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 1.0);
         UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.14 * s);
         UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, textMaxWidth);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_CHARACTERS, _charCount $ int);
         gui.label(_text, @(textLeftX, textY));
-        UIStyle.popVar(4);
+        UIStyle.popVar(5);
         UIStyle.popColor();
 
         gui.units(ChuGUI.NDC);
@@ -72,10 +81,27 @@ public class DialogBox {
 
     fun void text(string text) {
         text => _text;
+        0 => _charCount;
+        _text.length() => _targetCharCount;
+    }
+
+    // Set text but start typewriter from a specific character position
+    fun void text(string text, int startFrom) {
+        text => _text;
+        startFrom => _charCount;
+        _text.length() => _targetCharCount;
     }
 
     fun string text() {
         return _text;
+    }
+
+    fun void skipTypewriter() {
+        _targetCharCount => _charCount;
+    }
+
+    fun int isTyping() {
+        return _charCount < _targetCharCount;
     }
 
     fun void speakerName(string name) {

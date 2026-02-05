@@ -4,7 +4,7 @@ public class Data {
     (NPC) You will meet many characters along the way.
     (Player) ... where am I???
     (NPC) What do you feel?
-    ? I feel ___.
+    ? I feel ... towards robots.
     - fear [fear]
     - hate [hate]
     - love [love]

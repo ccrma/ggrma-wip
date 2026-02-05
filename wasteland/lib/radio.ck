@@ -190,7 +190,7 @@ public class RadioMechanic {
         }
 
         // radio static
-        .25 * Math.pow(Math.max(0, 1 - total_sample_gain), 2) => noise.gain;
+        .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
     }
 
     fun int getSelectedIndex() {

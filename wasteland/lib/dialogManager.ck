@@ -18,6 +18,8 @@ public class DialogManager {
     Prompt @ _currentPrompt;
     int _responseIndex;
 
+    int selectionShown;
+
     fun DialogManager() {
         dialogBox.scale(1.0);
         dialogBox.text("...");
@@ -140,12 +142,30 @@ public class DialogManager {
 
                 // Show response template in dialogue box (player speaking)
                 if (_currentPrompt.responseTemplate.length() > 0) {
-                    playerSays(_currentPrompt.responseTemplate);
+                    _currentPrompt.responseTemplate.rfind("...") => int ellipsisIdx;
+                    playerSays(_currentPrompt.responseTemplate.substring(0, ellipsisIdx) + "...");
                 }
             } else {
                 _radio.deactivate();
             }
         }
+    }
+
+    fun void revealSelected() {
+        if (_currentPrompt == null) return;
+        if (_currentPrompt.responses.size() == 0) return;
+        true => selectionShown;
+
+        _radio.getSelectedIndex() => int selectedIdx;
+        _currentPrompt.responses[selectedIdx].text => string responseText;
+
+        // Insert selection after "..."
+        _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
+        _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
+            responseText.rtrim() +
+            _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string fullText;
+
+        dialogBox.text(fullText, ellipsisIdx + 3);
     }
 
     fun void advanceDialogue() {
@@ -155,7 +175,16 @@ public class DialogManager {
             // Use radio selection if available, otherwise fall back to _responseIndex
             if (_radio != null && _radio.hasSelection()) {
                 _radio.getSelectedIndex() => int selectedIdx;
-                _currentPrompt.responses[selectedIdx].next @=> _currentPrompt;
+
+                if (!selectionShown) {
+                    // show selection in dialog box
+                    _radio.deactivate();
+                    spork ~ revealSelected();
+                    return;
+                } else {
+                    _currentPrompt.responses[selectedIdx].next @=> _currentPrompt;
+                    false => selectionShown;
+                }
             } else if (_radio == null) {
                 // Fallback for when radio is not set
                 _currentPrompt.responses[_responseIndex].next @=> _currentPrompt;
@@ -206,9 +235,11 @@ public class DialogManager {
         return _currentPrompt.responses[idx];
     }
 
-    fun void renderResponses(ChuGUI gui) {
-        // Radio mechanic now handles response rendering
-        // This method is kept for backwards compatibility but does nothing
-        // The radio is updated directly in the game loop
+    fun void skipTypewriter() {
+        dialogBox.skipTypewriter();
+    }
+
+    fun int isTyping() {
+        return dialogBox.isTyping();
     }
 }
