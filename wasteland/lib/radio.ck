@@ -1,5 +1,6 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
 @import "radioFilter.ck"
+@import "waveform.ck"
 
 public class RadioMechanic {
     float val;
@@ -38,6 +39,25 @@ public class RadioMechanic {
     string _audioBasePath;
     time loop_time[0];
     1::second => dur LOOP_DUR;  // how many seconds before looping each sample
+
+    // sfx
+    SndBuf radio_on(me.dir() + "../assets/audio/radio-on.wav") => dac; 
+    0 => radio_on.rate;
+    SndBuf radio_static(me.dir() + "../assets/audio/radio-static.wav") => dac;
+    0 => radio_static.rate; 1 => radio_static.loop;
+    SndBuf radio_hum(me.dir() + "../assets/audio/radio-hum.wav") => dac;
+    0 => radio_hum.rate; 1 => radio_hum.loop;
+
+    // audio visualizers
+    Waveform waveform_ana;
+    GLines waveform; waveform.width(.01);
+    waveform.color(Color.WHITE);
+    vec2 waveform_positions[waveform_ana.WINDOW_SIZE];
+    2.0 => float WAVEFORM_WIDTH;
+
+
+
+
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -126,13 +146,26 @@ public class RadioMechanic {
     }
 
     fun void activate() {
+        spork ~ activateShred();
+    }
+
+    fun void activateShred() {
         1 => _active;
+        waveform --> GG.scene();
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
             0.5 => audio[i].gain;
         }
         0.2 => radio_left.gain;
         0.2 => radio_right.gain;
+
+        { // sfx
+            0 => radio_on.pos;
+            1 => radio_on.rate;
+            .12::second => now;
+            1 => radio_static.rate;
+            1 => radio_hum.rate;
+        }
     }
 
     fun void deactivate() {
@@ -143,6 +176,8 @@ public class RadioMechanic {
         }
         0 => radio_left.gain;
         0 => radio_right.gain;
+
+        waveform --< GG.scene();
     }
 
     fun int isActive() {
@@ -198,7 +233,21 @@ public class RadioMechanic {
         }
 
         // radio static
-        .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
+        // .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
+        1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
+
+        { // waveform viz
+            waveform_ana.update();
+            // mapping to xyz coordinate
+            for (int i; i < waveform_ana.samples.size(); i++)
+            {
+                // space evenly in X
+                @(
+                    -WAVEFORM_WIDTH/2 + WAVEFORM_WIDTH/waveform_ana.WINDOW_SIZE *i, // x
+                    waveform_ana.samples[i]                          // y
+                ) => waveform_positions[i];
+            }
+        }
     }
 
     fun int getSelectedIndex() {
