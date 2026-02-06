@@ -22,9 +22,10 @@ public class RadioMechanic {
 
     // Whether the radio is active (for dialogue choices)
     0 => int _active;
+    time _activate_time;
 
     // Position offset for rendering
-    vec2 _position;
+    vec2 _position;    // target pos
 
     // audio
     SndBuf audio[0];
@@ -171,13 +172,38 @@ public class RadioMechanic {
         pos => _position;
     }
 
+    fun float easeOutElastic(float x) {
+        (2 * Math.PI) / 3 => float c4;
+
+        if (x < 0) return 0;
+        if (x >= 1) return 1;
+        return Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+    }
+
+    fun float easeOutBounce(float x) {
+        7.5625 => float n1;
+        2.75 => float d1;
+        if (x > 1) return 1;
+        if (x < 1 / d1) {
+            return n1 * x * x;
+        } else if (x < 2 / d1) {
+            return n1 * (1.5 / d1 -=> x) * x + 0.75;
+        } else if (x < 2.5 / d1) {
+            return n1 * (2.25 / d1 -=> x) * x + 0.9375;
+        } else {
+            return n1 * (2.625 / d1 -=> x) * x + 0.984375;
+        }
+    }
+
     fun void activate() {
         spork ~ activateShred();
     }
 
     fun void activateShred() {
         1 => _active;
+        now => _activate_time;
         waveform --> GG.scene();
+
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
             0.5 => audio[i].gain;
@@ -185,13 +211,14 @@ public class RadioMechanic {
         0.2 => radio_left.gain;
         0.2 => radio_right.gain;
 
-        1 => radio_on.gain;
         1 => radio_static.gain;
         1 => radio_hum.gain;
 
         { // sfx
+            1::second => now;
             0 => radio_on.pos;
             1 => radio_on.rate;
+            1 => radio_on.gain;
             .12::second => now;
             1 => radio_static.rate;
             1 => radio_hum.rate;
@@ -349,13 +376,28 @@ public class RadioMechanic {
         UIStyle.popColor();
     }
 
+
     fun void render(ChuGUI gui) {
+        // tween between actual and target pos
+        // 2::second => dur ANIM_TIME;
+        // easeOutElastic((now - _activate_time) / ANIM_TIME) => float t;
+        1.2::second => dur ANIM_TIME;
+        easeOutBounce((now - _activate_time) / ANIM_TIME) => float t;
+        // set pos to above screen so we can animate the fall downwards
+        @(  
+            0,
+            .25 * GG.camera().viewSize()
+        ) => vec2 start_pos;
+
+        @(0, 0) => vec2 target_pos;
+        start_pos + t * (target_pos - start_pos) => vec2 pos;
+
         slider(gui, "radio", _scale, _position, 3.0);
-        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), @(0, 0), 4.1);
+        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
-        gui.icon(me.dir() + "../assets/radio_box.png", @(0, 0));
+        gui.icon(me.dir() + "../assets/radio_box.png", pos); 
         UIStyle.popVar(2);
     }
 
