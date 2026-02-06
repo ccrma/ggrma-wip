@@ -38,11 +38,12 @@ public class RadioMechanic {
     1::second => dur LOOP_DUR;
 
     256 => int WINDOW_SIZE;
-    1 => float WAVEFORM_Y;
-    1 => float DISPLAY_WIDTH;
+    3 => float WAVEFORM_Y;
+    2.2 => float DISPLAY_WIDTH;
     GLines waveform; waveform.width(.025);
     waveform.posY( WAVEFORM_Y );
-    waveform.color(Color.BLACK);
+    waveform.posX(-3.6);
+    waveform.color(Color.GREEN);
 
     dac => Gain input;
     input => Flip accum => blackhole;
@@ -348,17 +349,27 @@ public class RadioMechanic {
         UIStyle.popColor();
     }
 
+    // 1 => int dir;
+    float curr_vel;
+    UI_Float a(.015);
     fun void keyboardHandler() {
         while (true) {
             GG.nextFrame() => now;
+            GG.dt() => float dt;
+
+            UI.slider("acceleration", a, 0, .1);
 
             if (_active) {
-                if (GWindow.key(GWindow.KEY_LEFT)) {
-                    0.0025 -=> val;
-                }
-                if (GWindow.key(GWindow.KEY_RIGHT)) {
-                    0.0025 +=> val;
-                }
+                float dir;
+                if (GWindow.key(GWindow.KEY_LEFT)) -1 => dir;
+                if (GWindow.key(GWindow.KEY_RIGHT)) 1 => dir;
+
+                Math.random2f(0, 1) * dir * dt * a.val() => float dv;
+                dv +=> curr_vel;
+                curr_vel +=> val;
+
+                // hit edge
+                if (val < 0 || val > 1) 0 => curr_vel;
             }
         }
     }
