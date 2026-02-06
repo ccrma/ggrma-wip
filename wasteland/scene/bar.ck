@@ -10,12 +10,18 @@ public class BarScene extends Scene {
 
     fun void init(Player @ player, Prompt prompts[]) {
         dm.dialog().leftMargin(3.5);
+        dm.dialog().rightMargin(3);
         dm.setPlayer(player);
 
-        // Create scene NPC
-        new NPC("Stranger", me.dir() + "../assets/sommelier-bot.png") @=> stranger;
+        // Create scene NPC (identity set by dialogue script)
+        new NPC("", "") @=> stranger;
         dm.setNpc(stranger);
-        dm.showNpc();
+
+        // Register NPC identities
+        dm.registerNpc("Cleaner", me.dir() + "../assets/cleaning-bot.png");
+        dm.registerNpc("Media", me.dir() + "../assets/media-bot.png");
+        dm.registerNpc("Sommelier", me.dir() + "../assets/sommelier-bot.png");
+        dm.registerNpc("Tsundere", me.dir() + "../assets/tsundere-bot.png");
 
         // Start dialogue
         dm.startDialogue(prompts);
