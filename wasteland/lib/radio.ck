@@ -247,6 +247,7 @@ public class RadioMechanic {
     }
 
     fun void update(ChuGUI gui) {
+        slider(gui, "radio", _scale, _position, 3.0);
         if (!_active || numOptions == 0) return;
         updateSelection();
         updateAudio();
@@ -392,7 +393,6 @@ public class RadioMechanic {
         @(0, 0) => vec2 target_pos;
         start_pos + t * (target_pos - start_pos) => vec2 pos;
 
-        slider(gui, "radio", _scale, _position, 3.0);
         slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
