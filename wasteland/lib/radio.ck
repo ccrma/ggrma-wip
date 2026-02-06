@@ -28,7 +28,17 @@ public class RadioMechanic {
     time _activate_time;
 
     // Position offset for rendering
-    vec2 _position;    // target pos
+    vec2 _position;    // position of radio inside player character
+
+        // positions of zoomed-in radio
+    @(0, 2 * GG.camera().viewSize()) => vec2 start_pos;
+    start_pos => vec2 target_pos;
+
+    // tween animation time (for entry/exit of zoomed radio)
+    1.0::second => dur ANIM_TIME;
+
+    // render options
+    int render_slider;
 
     // audio
     SndBuf audio[0];
@@ -90,12 +100,17 @@ public class RadioMechanic {
     }
 
     // sfx
-    SndBuf radio_on(me.dir() + "../assets/audio/radio-on.wav") => dac; 
+    // SndBuf radio_on(me.dir() + "../assets/audio/radio-on.wav") => dac;  // crt sound
+    SndBuf radio_on(me.dir() + "../assets/audio/radio-on-button.wav") => dac;     // button sound
     0 => radio_on.rate;
     SndBuf radio_static(me.dir() + "../assets/audio/radio-static.wav") => dac;
     0 => radio_static.rate; 1 => radio_static.loop;
     SndBuf radio_hum(me.dir() + "../assets/audio/radio-hum.wav") => dac;
     0 => radio_hum.rate; 1 => radio_hum.loop;
+    SndBuf radio_button_click(me.dir() + "../assets/audio/radio-button-click.wav") => dac; 
+    0 => radio_button_click.rate;
+    SndBuf radio_off_button(me.dir() + "../assets/audio/radio-off-button.wav") => dac; 
+    0 => radio_off_button.rate; 0 => radio_off_button.loop;
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -193,6 +208,12 @@ public class RadioMechanic {
         return Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
     }
 
+    fun float easeInBack(float x) {
+        1.70158 => float c1;
+        c1 + 1 => float c3;
+        return c3 * x * x * x - c1 * x * x;
+    }
+
     fun float easeOutBounce(float x) {
         7.5625 => float n1;
         2.75 => float d1;
@@ -215,7 +236,13 @@ public class RadioMechanic {
     fun void activateShred() {
         1 => _active;
         now => _activate_time;
-        waveform --> GG.scene();
+
+        // set start and end pos
+        @(  
+            0,
+            .25 * GG.camera().viewSize()
+        ) => start_pos;
+        @(0, 0) => target_pos;
 
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
@@ -228,18 +255,46 @@ public class RadioMechanic {
         1 => radio_hum.gain;
 
         { // sfx
-            1::second => now;
+            ANIM_TIME => now;
             0 => radio_on.pos;
             1 => radio_on.rate;
             1 => radio_on.gain;
             .12::second => now;
+            waveform --> GG.scene();
             1 => radio_static.rate;
             1 => radio_hum.rate;
+            true => render_slider;
         }
     }
 
     fun void deactivate() {
+        spork ~ deactivateShred();
+    }
+
+    fun void deactivateShred() {
+        if (!_active) return;
+
+        .5::second => now;
+
         0 => _active;
+
+        // flip start and end pos to lerp back up
+        start_pos => vec2 tmp;
+        target_pos => start_pos;
+        tmp => target_pos;
+        <<< start_pos, target_pos >>>;
+        // update start time
+        now => _activate_time;
+
+
+        // radio off sfx
+        <<< "deactivateShred" >>>;
+        0 => radio_off_button.pos;
+        1 => radio_off_button.rate;
+
+        .2::second => now;
+        false => render_slider;
+
         // Mute all audio when deactivated
         for (int i; i < audio.size(); i++) {
             0 => audio[i].gain;
@@ -268,13 +323,15 @@ public class RadioMechanic {
         gui.rect(@(-0.575, 0.4));
         UIStyle.popVar(3);
         UIStyle.popColor();
-        if (!_active || numOptions == 0) return;
-        updateSelection();
-        updateAudio();
+        if (_active && numOptions > 0) {
+            updateSelection();
+            map2waveform( samples, positions );
+            // set the mesh position
+            waveform.positions( positions );
+            updateAudio();
+        }
+        // always draw
         render();
-        map2waveform( samples, positions );
-        // set the mesh position
-        waveform.positions( positions );
     }
 
     fun float trunc_fallof(float x, float m) {
@@ -349,6 +406,11 @@ public class RadioMechanic {
 
     fun int getSelectedIndex() {
         return _selectedIndex;
+    }
+
+    fun void playSelectionSfx() {
+        0 => radio_button_click.pos;
+        1 => radio_button_click.rate;
     }
 
     fun int hasSelection() {
@@ -441,20 +503,15 @@ public class RadioMechanic {
 
     fun void render() {
         // tween between actual and target pos
-        // 2::second => dur ANIM_TIME;
         // easeOutElastic((now - _activate_time) / ANIM_TIME) => float t;
-        1.2::second => dur ANIM_TIME;
-        easeOutBounce((now - _activate_time) / ANIM_TIME) => float t;
-        // set pos to above screen so we can animate the fall downwards
-        @(  
-            0,
-            .25 * GG.camera().viewSize()
-        ) => vec2 start_pos;
+        float t;
+        if (_active) easeOutBounce((now - _activate_time) / ANIM_TIME) => t;
+        else easeInBack((now - _activate_time) / ANIM_TIME) => t;
 
-        @(0, 0) => vec2 target_pos;
         start_pos + t * (target_pos - start_pos) => vec2 pos;
+        // <<< pos >>>;
 
-        slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
+        if (render_slider) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
@@ -498,5 +555,30 @@ public class RadioMechanic {
 
     fun void scale(vec2 s) {
         s => _scale;
+    }
+}
+
+// unit test
+if (1) {
+    ChuGUI gui --> GG.scene();
+    RadioMechanic radio(gui);
+
+    GG.camera().orthographic();
+    GG.camera().aspect(16./9);
+
+    // Initialize radio
+    radio.scale(@(0.525, 1.5));
+    radio.setPosition(@(-0.575, 0.4));
+    radio.setAudioBasePath(me.dir() + "assets/audio/");
+    radio.init();
+
+    radio.setOptions(["A", "B", "C"]);
+
+    while (1) {
+        GG.nextFrame() => now;
+        radio.update();
+
+        if (UI.button("activate")) radio.activate(); 
+        if (UI.button("deactivate")) radio.deactivate(); 
     }
 }

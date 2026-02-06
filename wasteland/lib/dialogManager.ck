@@ -182,6 +182,7 @@ public class DialogManager {
 
                 if (!selectionShown) {
                     // show selection in dialog box
+                    _radio.playSelectionSfx();
                     _radio.deactivate();
                     spork ~ revealSelected();
                     return;
