@@ -4,13 +4,13 @@
 public class RadioMechanic {
     float val;
 
-    1.0 => float _scale;
+    @(1., 1.) => vec2 _scale;
     vec2 sliderSize;
 
     int numOptions;
     string optionLabels[0];
 
-    ["4", "6", "7", "8", "10", "12", "14", "16"] @=> string radioNumbers[];
+    ["4", "8", "12", "16"] @=> string radioNumbers[];
 
     float dotX[0];
 
@@ -98,10 +98,9 @@ public class RadioMechanic {
         @(0.5, 0.01) => sliderSize;
     }
 
-    fun RadioMechanic(int numOptions, int scale) {
+    fun RadioMechanic(int numOptions, vec2 scale) {
         numOptions => this.numOptions;
         scale => _scale;
-        @(0.5, 0.01) * _scale => sliderSize;
     }
 
     fun void init() {
@@ -147,7 +146,7 @@ public class RadioMechanic {
         dotX.clear();
 
         labels.size() => numOptions;
-        @(0.5, 0.01) * _scale => sliderSize;
+        @(0.5 * _scale.x, 0.01 * _scale.y) => sliderSize;
 
         for (int i; i < numOptions; i++) {
             optionLabels << labels[i];
@@ -301,14 +300,8 @@ public class RadioMechanic {
         return _selectedIndex >= 0;
     }
 
-    fun void render(ChuGUI gui) {
-        // black background rectangle
-        UIStyle.pushColor(UIStyle.COL_RECT, Color.BLACK);
-        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.6, 0.15) * _scale);
-        gui.rect(@(_position.x, _position.y + 0.0175));
-        UIStyle.popVar();
-        UIStyle.popColor();
-
+    fun void slider(ChuGUI gui, string id, vec2 scale, vec2 pos, float z_index) {
+        @(0.5 * scale.x, 0.01 * scale.y) => sliderSize;
         // dots with option labels
         for (int i; i < dotX.size(); i++) {
             // Highlight selected dot
@@ -317,22 +310,24 @@ public class RadioMechanic {
             } else {
                 UIStyle.pushColor(UIStyle.COL_RECT, Color.RED);
             }
-            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01, 0.01) * _scale);
-            gui.rect(@(dotX[i] + _position.x, -0.01 + _position.y));
-            UIStyle.popVar();
+            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
+            UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
+            gui.rect(@(dotX[i] + pos.x, -0.01 + pos.y));
+            UIStyle.popVar(2);
             UIStyle.popColor();
         }
 
         // numbers (radio dial markings)
         UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
-        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.015 * _scale);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.04 * scale.x);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
 
         for (int i; i < radioNumbers.size(); i++) {
             -sliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * sliderSize.x => float xPos;
-            gui.label(radioNumbers[i], @(xPos + _position.x, 0.035 * _scale + _position.y));
+            gui.label(radioNumbers[i], @(xPos + pos.x, 0.03 * scale.y + pos.y));
         }
 
-        UIStyle.popVar();
+        UIStyle.popVar(2);
         UIStyle.popColor();
 
         // slider
@@ -341,11 +336,22 @@ public class RadioMechanic {
         } else {
             UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.RED);
         }
-        UIStyle.pushVar(UIStyle.VAR_SLIDER_TRACK_SIZE, @(0.5, 0.01) * _scale);
-        UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005, 0.08) * _scale);
-        gui.slider("radio", @(_position.x, _position.y), 0, 1, val) => val;
-        UIStyle.popVar(2);
+        UIStyle.pushVar(UIStyle.VAR_SLIDER_TRACK_SIZE, @(0.5 * scale.x , 0.01 * scale.y));
+        UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005 * scale.x, 0.08 * scale.y));
+        UIStyle.pushVar(UIStyle.VAR_SLIDER_Z_INDEX, z_index);
+        gui.slider(id, @(pos.x, pos.y), 0, 1, val) => val;
+        UIStyle.popVar(3);
         UIStyle.popColor();
+    }
+
+    fun void render(ChuGUI gui) {
+        slider(gui, "radio", _scale, _position, 3.0);
+        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), @(0, 0), 4.1);
+
+        UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
+        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
+        gui.icon(me.dir() + "../assets/radio_box.png", @(0, 0));
+        UIStyle.popVar(2);
     }
 
     fun void keyboardHandler() {
@@ -363,8 +369,7 @@ public class RadioMechanic {
         }
     }
 
-    fun void scale(float s) {
+    fun void scale(vec2 s) {
         s => _scale;
-        @(0.5, 0.01) * _scale => sliderSize;
     }
 }

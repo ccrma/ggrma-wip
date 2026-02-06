@@ -20,8 +20,8 @@ public class Game {
 
     fun void init() {
         // Initialize radio
-        radio.scale(1.5);
-        radio.setPosition(@(0, -0.3));
+        radio.scale(@(0.525, 1.5));
+        radio.setPosition(@(-0.575, 0.4));
         radio.setAudioBasePath(me.dir() + "assets/audio/");
         radio.init();
 
