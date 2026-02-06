@@ -16,7 +16,7 @@ public class Game {
     BarScene scene;
 
     // Radio mechanic for dialogue choices
-    RadioMechanic radio;
+    RadioMechanic radio(gui);
 
     fun void init() {
         // Initialize radio
@@ -39,7 +39,7 @@ public class Game {
 
             player.update(gui);
             scene.update(gui);
-            radio.update(gui);
+            radio.update();
 
             // ENTER advances dialogue (for both choices and regular dialogue)
             // For choices, only advances if slider is on a dot (has selection)

@@ -57,7 +57,7 @@ public class DialogBox {
 
             UIStyle.pushColor(UIStyle.COL_LABEL, @(0.9, 0.8, 0.5));
             UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0, 0.5));
-            UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 1.0);
+            UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 3.75);
             UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.18 * s);
             gui.label(_speakerName, @(textLeftX, nameY));
             UIStyle.popVar(3);
@@ -68,7 +68,7 @@ public class DialogBox {
 
         UIStyle.pushColor(UIStyle.COL_LABEL, Color.WHITE);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0, 1));
-        UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 1.0);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 3.75);
         UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.14 * s);
         UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, textMaxWidth);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CHARACTERS, _charCount $ int);

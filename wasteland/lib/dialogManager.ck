@@ -88,6 +88,7 @@ public class DialogManager {
             _player.highlight();
         }
         if (_npc != null) _npc.dim();
+        if (_radio != null) spork ~ _radio.highlight();
         dialogBox.text(text);
     }
 
@@ -97,6 +98,7 @@ public class DialogManager {
             _npc.highlight();
         }
         if (_player != null) _player.dim();
+        if (_radio != null) spork ~ _radio.dim();
         dialogBox.text(text);
     }
 
@@ -121,10 +123,12 @@ public class DialogManager {
             return;
         }
 
-        if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
-            npcSays(_currentPrompt.text);
-        } else {
-            playerSays(_currentPrompt.text);
+        if (_currentPrompt.responses.size() <= 0) {
+            if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
+                npcSays(_currentPrompt.text);
+            } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
+                playerSays(_currentPrompt.text);
+            }
         }
 
         0 => _responseIndex;

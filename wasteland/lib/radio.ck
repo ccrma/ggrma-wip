@@ -2,6 +2,8 @@
 @import "radioFilter.ck"
 
 public class RadioMechanic {
+    ChuGUI gui;
+
     float val;
 
     @(1., 1.) => vec2 _scale;
@@ -58,6 +60,10 @@ public class RadioMechanic {
     float samples[0];
     complex response[0];
     vec2 positions[WINDOW_SIZE];
+
+    fun RadioMechanic(ChuGUI gui) {
+        gui @=> this.gui;
+    }
 
     // map audio buffer to 3D positions
     fun void map2waveform( float in[], vec2 out[] )
@@ -246,12 +252,20 @@ public class RadioMechanic {
         return _active;
     }
 
-    fun void update(ChuGUI gui) {
-        slider(gui, "radio", _scale, _position, 3.0);
+    fun void update() {
+        slider("radio", _scale, _position, 3.0);
+        UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, _brightness));
+        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.3, 0.175));
+        UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+        UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 3.5);
+        gui.rect(@(-0.575, 0.4));
+        UIStyle.popVar(3);
+        UIStyle.popColor();
+
         if (!_active || numOptions == 0) return;
         updateSelection();
         updateAudio();
-        render(gui);
+        render();
         map2waveform( samples, positions );
         // set the mesh position
         waveform.positions( positions );
@@ -328,8 +342,28 @@ public class RadioMechanic {
     fun int hasSelection() {
         return _selectedIndex >= 0;
     }
+    
+    0.8 => float _brightness;
+    fun void dim() {
+        while(_brightness < 0.799) {
+            GG.nextFrame() => now;
+            0.15 => float lerpSpeed;
+            _brightness + (0.8 - _brightness) * lerpSpeed => _brightness;
+        }
+        0.8 => _brightness;
+    }
 
-    fun void slider(ChuGUI gui, string id, vec2 scale, vec2 pos, float z_index) {
+    fun void highlight() {
+        while(_brightness > 0.01) {
+            GG.nextFrame() => now;
+            0.15 => float lerpSpeed;
+            _brightness + (0.0 - _brightness) * lerpSpeed => _brightness;
+            <<< _brightness >>>;
+        }
+        0.0 => _brightness;
+    }
+
+    fun void slider(string id, vec2 scale, vec2 pos, float z_index) {
         @(0.5 * scale.x, 0.01 * scale.y) => vec2 localSliderSize;
 
         // Scale factor from base sliderSize to this slider's size
@@ -378,7 +412,7 @@ public class RadioMechanic {
     }
 
 
-    fun void render(ChuGUI gui) {
+    fun void render() {
         // tween between actual and target pos
         // 2::second => dur ANIM_TIME;
         // easeOutElastic((now - _activate_time) / ANIM_TIME) => float t;
@@ -393,12 +427,20 @@ public class RadioMechanic {
         @(0, 0) => vec2 target_pos;
         start_pos + t * (target_pos - start_pos) => vec2 pos;
 
-        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1);
+        slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
         gui.icon(me.dir() + "../assets/radio_box.png", pos); 
         UIStyle.popVar(2);
+
+        UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, 0.6));
+        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
+        UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+        UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 3.5);
+        gui.rect(@(0, 0));
+        UIStyle.popVar(3);
+        UIStyle.popColor();
     }
 
     fun void keyboardHandler() {
