@@ -302,7 +302,11 @@ public class RadioMechanic {
     }
 
     fun void slider(ChuGUI gui, string id, vec2 scale, vec2 pos, float z_index) {
-        @(0.5 * scale.x, 0.01 * scale.y) => sliderSize;
+        @(0.5 * scale.x, 0.01 * scale.y) => vec2 localSliderSize;
+
+        // Scale factor from base sliderSize to this slider's size
+        scale.x / _scale.x => float scaleRatio;
+
         // dots with option labels
         for (int i; i < dotX.size(); i++) {
             // Highlight selected dot
@@ -313,7 +317,7 @@ public class RadioMechanic {
             }
             UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
             UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
-            gui.rect(@(dotX[i] + pos.x, -0.01 + pos.y));
+            gui.rect(@(dotX[i] * scaleRatio + pos.x, -0.01 + pos.y));
             UIStyle.popVar(2);
             UIStyle.popColor();
         }
@@ -324,7 +328,7 @@ public class RadioMechanic {
         UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
 
         for (int i; i < radioNumbers.size(); i++) {
-            -sliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * sliderSize.x => float xPos;
+            -localSliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * localSliderSize.x => float xPos;
             gui.label(radioNumbers[i], @(xPos + pos.x, 0.03 * scale.y + pos.y));
         }
 
