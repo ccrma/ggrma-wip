@@ -370,7 +370,6 @@ public class RadioMechanic {
             GG.nextFrame() => now;
             0.15 => float lerpSpeed;
             _brightness + (0.0 - _brightness) * lerpSpeed => _brightness;
-            <<< _brightness >>>;
         }
         0.0 => _brightness;
     }
