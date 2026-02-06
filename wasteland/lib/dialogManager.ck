@@ -22,6 +22,7 @@ public class DialogManager {
     int _responseIndex;
 
     int selectionShown;
+    int _awaitingChoiceReveal;
 
     fun DialogManager() {
         dialogBox.scale(1.0);
@@ -122,6 +123,30 @@ public class DialogManager {
         showCurrentPrompt();
     }
 
+    // Blocking: transitions NPC portrait then shows text. Call via spork.
+    fun void switchNpcAndSpeak(string assetPath, string text) {
+        _npc.transition(assetPath);
+        npcSays(text);
+    }
+
+    // Activates radio and shows response template for current prompt.
+    fun void showChoices() {
+        if (_radio == null || _currentPrompt == null) return;
+        if (_currentPrompt.responses.size() <= 0) return;
+
+        string labels[0];
+        for (int i; i < _currentPrompt.responses.size(); i++) {
+            labels << _currentPrompt.responses[i].text;
+        }
+        _radio.setOptions(labels);
+        _radio.activate();
+
+        if (_currentPrompt.responseTemplate.length() > 0) {
+            _currentPrompt.responseTemplate.rfind("...") => int ellipsisIdx;
+            playerSays(_currentPrompt.responseTemplate.substring(0, ellipsisIdx) + "...");
+        }
+    }
+
     fun void showCurrentPrompt() {
         if (_currentPrompt == null) {
             clearSpeaker();
@@ -130,43 +155,32 @@ public class DialogManager {
             return;
         }
 
-        if (_currentPrompt.responses.size() <= 0) {
-            if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
-                // Check if NPC identity needs to switch
-                if (_currentPrompt.speakerName.length() > 0 && _currentPrompt.speakerName != _currentNpcName) {
-                    _currentPrompt.speakerName => _currentNpcName;
-                    if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
-                        _npc.setName(_currentNpcName);
-                        spork ~ _npc.transition(_npcAssets[_currentNpcName]);
-                    }
+        // Always show prompt text (even when prompt has responses)
+        if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
+            // Check if NPC identity needs to switch
+            if (_currentPrompt.speakerName.length() > 0 && _currentPrompt.speakerName != _currentNpcName) {
+                _currentPrompt.speakerName => _currentNpcName;
+                if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
+                    _npc.setName(_currentNpcName);
+                    spork ~ switchNpcAndSpeak(_npcAssets[_currentNpcName], _currentPrompt.text);
+                } else {
+                    npcSays(_currentPrompt.text);
                 }
+            } else {
                 npcSays(_currentPrompt.text);
-            } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
-                playerSays(_currentPrompt.text);
             }
+        } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
+            playerSays(_currentPrompt.text);
         }
 
         0 => _responseIndex;
 
-        // Configure radio if there are responses
-        if (_radio != null) {
-            if (_currentPrompt.responses.size() > 0) {
-                // Extract response labels
-                string labels[0];
-                for (int i; i < _currentPrompt.responses.size(); i++) {
-                    labels << _currentPrompt.responses[i].text;
-                }
-                _radio.setOptions(labels);
-                _radio.activate();
-
-                // Show response template in dialogue box (player speaking)
-                if (_currentPrompt.responseTemplate.length() > 0) {
-                    _currentPrompt.responseTemplate.rfind("...") => int ellipsisIdx;
-                    playerSays(_currentPrompt.responseTemplate.substring(0, ellipsisIdx) + "...");
-                }
-            } else {
-                _radio.deactivate();
-            }
+        // If there are responses, wait for user to advance before showing choices
+        if (_currentPrompt.responses.size() > 0) {
+            true => _awaitingChoiceReveal;
+        } else {
+            false => _awaitingChoiceReveal;
+            if (_radio != null) _radio.deactivate();
         }
     }
 
@@ -180,15 +194,28 @@ public class DialogManager {
 
         // Insert selection after "..."
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
+        _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string afterEllipsis;
         _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
             responseText.rtrim() +
-            _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string fullText;
+            afterEllipsis => string fullText;
+
+        // Add period if choice is the last word in the sentence
+        if (afterEllipsis.rtrim().length() == 0) {
+            fullText + "." => fullText;
+        }
 
         dialogBox.text(fullText, ellipsisIdx + 3);
     }
 
     fun void advanceDialogue() {
         if (_currentPrompt == null) return;
+
+        // If NPC line was shown before choices, reveal choices now
+        if (_awaitingChoiceReveal) {
+            false => _awaitingChoiceReveal;
+            showChoices();
+            return;
+        }
 
         if (_currentPrompt.responses.size() > 0) {
             // Use radio selection if available, otherwise fall back to _responseIndex
@@ -221,6 +248,8 @@ public class DialogManager {
 
     fun int canAdvance() {
         if (_currentPrompt == null) return 0;
+        // Can always advance past NPC line to reveal choices
+        if (_awaitingChoiceReveal) return 1;
         // If there are responses, need a radio selection
         if (_currentPrompt.responses.size() > 0) {
             if (_radio != null) {
