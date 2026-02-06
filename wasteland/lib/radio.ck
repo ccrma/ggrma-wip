@@ -32,12 +32,53 @@ public class RadioMechanic {
     RadioFilter radio_left => dac.left;
     RadioFilter radio_right => dac.right;
     CNoise n => LPF noise(600, 1); noise => radio_left; noise => radio_right; 0 => noise.gain;
-    // CNoise noise; noise => radio_left; noise => radio_right; 0 => noise.gain;
-    // noise.mode("pink");
     string audioFiles[0];
     string _audioBasePath;
     time loop_time[0];
-    1::second => dur LOOP_DUR;  // how many seconds before looping each sample
+    1::second => dur LOOP_DUR;
+
+    256 => int WINDOW_SIZE;
+    1 => float WAVEFORM_Y;
+    1 => float DISPLAY_WIDTH;
+    GLines waveform --> GG.scene(); waveform.width(.025);
+    waveform.posY( WAVEFORM_Y );
+    waveform.color(Color.BLACK);
+
+    dac => Gain input;
+    input => Flip accum => blackhole;
+    input => PoleZero dcbloke => FFT fft => blackhole;
+    .95 => dcbloke.blockZero;
+    WINDOW_SIZE => accum.size;
+    Windowing.hann(WINDOW_SIZE) => fft.window;
+    WINDOW_SIZE*2 => fft.size;
+    Windowing.hann(WINDOW_SIZE) @=> float window[];
+
+    float samples[0];
+    complex response[0];
+    vec2 positions[WINDOW_SIZE];
+
+    // map audio buffer to 3D positions
+    fun void map2waveform( float in[], vec2 out[] )
+    {
+        if( in.size() != out.size() )
+        {
+            <<< "size mismatch in map2waveform()", "" >>>;
+            return;
+        }
+        
+        // mapping to xyz coordinate
+        int i;
+        DISPLAY_WIDTH => float width;
+        for( auto s : in )
+        {
+            // space evenly in X
+            -width/2 + width/WINDOW_SIZE*i => out[i].x;
+            // map y, using window function to taper the ends
+            s*8 * window[i] => out[i].y;
+            // increment
+            i++;
+        }
+    }
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -71,14 +112,12 @@ public class RadioMechanic {
         }
         audioFiles.clear();
 
-        // add more sndbufs and pans as needed
         while (pan.size() < labels.size()) {
             audio << new SndBuf;
             pan << new Pan2;
             loop_time << now;
         }
 
-        // Load audio files based on labels (trimmed, lowercase label + .wav)
         for (int i; i < labels.size(); i++) {
             labels[i].trim().lower() + ".wav" => string filename;
             _audioBasePath + filename => string filepath;
@@ -91,7 +130,6 @@ public class RadioMechanic {
             audio[i].loop(0);
             0 => audio[i].gain;
 
-            // set loop point
             now + audio[i].length() + LOOP_DUR => loop_time[i];
         }
     }
@@ -154,6 +192,9 @@ public class RadioMechanic {
         updateSelection();
         updateAudio();
         render(gui);
+        map2waveform( samples, positions );
+        // set the mesh position
+        waveform.positions( positions );
     }
 
     fun float trunc_fallof(float x, float m) {
@@ -200,6 +241,24 @@ public class RadioMechanic {
         // radio static
         .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
     }
+
+    // do audio stuff
+    fun void doAudio()
+    {
+        while( true )
+        {
+            // upchuck to process accum
+            accum.upchuck();
+            // get the last window size samples (waveform)
+            accum.output( samples );
+            // upchuck to take FFT, get magnitude reposne
+            fft.upchuck();
+            // get spectrum (as complex values)
+            fft.spectrum( response );
+            // jump by samples
+            WINDOW_SIZE::samp/2 => now;
+        }
+    } spork ~ doAudio();
 
     fun int getSelectedIndex() {
         return _selectedIndex;
