@@ -60,7 +60,7 @@ public class Portrait {
         UIStyle.pushColor(UIStyle.COL_ICON, @(_brightness, _brightness, _brightness, _alpha));
         UIStyle.pushVar(UIStyle.VAR_ICON_CONTROL_POINTS, @(0.5, 0));
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, _zIndex);
-        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(scaledWidth, scaledHeight));
+        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(_size.x, _size.y));
         gui.icon(_assetPath, @(_pos.x + slideX, bottomY + _pos.y));
         UIStyle.popVar(3);
         UIStyle.popColor();

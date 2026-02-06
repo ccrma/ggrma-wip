@@ -9,9 +9,10 @@ public class NPC {
     fun NPC(string name, string assetPath) {
         name => _name;
 
-        Camera.worldWidth() / 2 - 1.5 => float rightX;
+        Camera.worldWidth() / 2 - 2 => float rightX;
         portrait.assetPath(assetPath);
         portrait.pos(@(rightX, 0));
+        portrait.size(@(1640./1640, 2360./1640) * 4.5);
         portrait.zIndex(1.4);
     }
 

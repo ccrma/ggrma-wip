@@ -11,7 +11,7 @@ public class Game {
     Prompt.parse(Data.script, false) @=> Prompt prompts[];
 
     // Player persists across all scenes
-    Player player("You", me.dir() + "assets/robot.png");
+    Player player("You", me.dir() + "assets/human.png");
 
     BarScene scene;
 

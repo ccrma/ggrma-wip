@@ -1,6 +1,5 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
 @import "radioFilter.ck"
-@import "waveform.ck"
 
 public class RadioMechanic {
     float val;
@@ -41,7 +40,7 @@ public class RadioMechanic {
     256 => int WINDOW_SIZE;
     1 => float WAVEFORM_Y;
     1 => float DISPLAY_WIDTH;
-    GLines waveform --> GG.scene(); waveform.width(.025);
+    GLines waveform; waveform.width(.025);
     waveform.posY( WAVEFORM_Y );
     waveform.color(Color.BLACK);
 
@@ -88,17 +87,6 @@ public class RadioMechanic {
     0 => radio_static.rate; 1 => radio_static.loop;
     SndBuf radio_hum(me.dir() + "../assets/audio/radio-hum.wav") => dac;
     0 => radio_hum.rate; 1 => radio_hum.loop;
-
-    // audio visualizers
-    Waveform waveform_ana;
-    GLines waveform; waveform.width(.01);
-    waveform.color(Color.WHITE);
-    vec2 waveform_positions[waveform_ana.WINDOW_SIZE];
-    2.0 => float WAVEFORM_WIDTH;
-
-
-
-
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -197,6 +185,10 @@ public class RadioMechanic {
         0.2 => radio_left.gain;
         0.2 => radio_right.gain;
 
+        1 => radio_on.gain;
+        1 => radio_static.gain;
+        1 => radio_hum.gain;
+
         { // sfx
             0 => radio_on.pos;
             1 => radio_on.rate;
@@ -214,8 +206,13 @@ public class RadioMechanic {
         }
         0 => radio_left.gain;
         0 => radio_right.gain;
+        0 => radio_on.gain;
+        0 => radio_static.gain;
+        0 => radio_hum.gain;
 
-        waveform --< GG.scene();
+        if (waveform.parent() != null) {
+            waveform --< GG.scene();
+        }
     }
 
     fun int isActive() {
@@ -276,19 +273,6 @@ public class RadioMechanic {
         // radio static
         // .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
         1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
-
-        { // waveform viz
-            waveform_ana.update();
-            // mapping to xyz coordinate
-            for (int i; i < waveform_ana.samples.size(); i++)
-            {
-                // space evenly in X
-                @(
-                    -WAVEFORM_WIDTH/2 + WAVEFORM_WIDTH/waveform_ana.WINDOW_SIZE *i, // x
-                    waveform_ana.samples[i]                          // y
-                ) => waveform_positions[i];
-            }
-        }
     }
 
     // do audio stuff

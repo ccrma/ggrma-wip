@@ -10,9 +10,10 @@ public class Player {
         name => _name;
 
         // Set up portrait on left side
-        Camera.worldWidth() / -2 + 1.5 => float leftX;
+        Camera.worldWidth() / -2 + 2.5 => float leftX;
         portrait.assetPath(assetPath);
-        portrait.pos(@(leftX, 0));
+        portrait.size(@(1640./1640, 2360./1640) * 5);
+        portrait.pos(@(leftX, -0.5));
         portrait.zIndex(1.5);
         portrait.visible(true);
     }
