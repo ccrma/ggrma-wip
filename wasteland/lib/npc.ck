@@ -39,4 +39,22 @@ public class NPC {
     fun void dim() {
         portrait.dim();
     }
+
+    fun void setName(string name) {
+        name => _name;
+    }
+
+    fun void setAssetPath(string assetPath) {
+        portrait.assetPath(assetPath);
+    }
+
+    // Blocking transition: hide current, swap asset, show new.
+    // Call via spork.
+    fun void transition(string assetPath) {
+        if (portrait.visible()) {
+            portrait.hide();
+        }
+        portrait.assetPath(assetPath);
+        portrait.show();
+    }
 }

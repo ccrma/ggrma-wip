@@ -9,6 +9,9 @@ public class DialogManager {
     Player @ _player;
     NPC @ _npc;
 
+    string _npcAssets[0]; // NPC name -> asset path mapping
+    string _currentNpcName;
+
     DialogBox dialogBox;
 
     // Radio mechanic for dialogue choices
@@ -35,6 +38,10 @@ public class DialogManager {
 
     fun void setNpc(NPC @ n) {
         n @=> _npc;
+    }
+
+    fun void registerNpc(string name, string assetPath) {
+        assetPath => _npcAssets[name];
     }
 
     fun void update(ChuGUI gui) {
@@ -125,6 +132,14 @@ public class DialogManager {
 
         if (_currentPrompt.responses.size() <= 0) {
             if (_currentPrompt.speaker == Prompt.Speaker_NPC) {
+                // Check if NPC identity needs to switch
+                if (_currentPrompt.speakerName.length() > 0 && _currentPrompt.speakerName != _currentNpcName) {
+                    _currentPrompt.speakerName => _currentNpcName;
+                    if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
+                        _npc.setName(_currentNpcName);
+                        spork ~ _npc.transition(_npcAssets[_currentNpcName]);
+                    }
+                }
                 npcSays(_currentPrompt.text);
             } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
                 playerSays(_currentPrompt.text);

@@ -39,6 +39,7 @@ public class Prompt {
     string tag;      // user-set tag of this prompt
     string next_tag; // set if this prompt redirects to another prompt
     string text;
+    string speakerName; // NPC identity name (e.g., "Cleaner", "Media")
     string responseTemplate;  // template for player response
 
     Prompt@ parent;       // for response prompts, the prose they are tied to
@@ -63,6 +64,7 @@ public class Prompt {
         Prompt.Type_Prose => int type;
         Prompt.Speaker_Player => int speaker;
         string tag;
+        string speakerName;
         Prompt@ last_prompt;
 
         while (idx < s.length()) {
@@ -100,7 +102,16 @@ public class Prompt {
                     return null;
                 }
                 s.substring(idx, close_spk_idx - idx) => string spk;
-                spk == "Player" ? Prompt.Speaker_Player => speaker : Prompt.Speaker_NPC => speaker;
+                if (spk == "Player") {
+                    Prompt.Speaker_Player => speaker;
+                } else {
+                    Prompt.Speaker_NPC => speaker;
+                    // Check for NPC:Name syntax (e.g., "NPC:Cleaner")
+                    spk.find(':', 0) => int colonIdx;
+                    if (colonIdx >= 0) {
+                        spk.substring(colonIdx + 1) => speakerName;
+                    }
+                }
                 if (log) <<< "parsed speaker", spk >>>;
                 close_spk_idx + 1 => idx;
             }
@@ -145,6 +156,7 @@ public class Prompt {
                 type => p.type; Prompt.Type_Prose => type;
                 style => p.style; Prompt.Style_None => style;
                 speaker => p.speaker; Prompt.Speaker_Player => speaker;
+                speakerName => p.speakerName;
                 tag => p.tag; "" => tag;
 
                 // prompt is text up to newline or [] redirect
