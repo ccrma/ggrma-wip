@@ -9,6 +9,7 @@ public class RadioMechanic {
 
     int numOptions;
     string optionLabels[0];
+    int optionNumListens[0];
 
     ["4", "8", "12", "16"] @=> string radioNumbers[];
 
@@ -145,6 +146,7 @@ public class RadioMechanic {
 
     fun void setOptions(string labels[]) {
         optionLabels.clear();
+        optionNumListens.clear();
         dotX.clear();
 
         labels.size() => numOptions;
@@ -152,12 +154,17 @@ public class RadioMechanic {
 
         for (int i; i < numOptions; i++) {
             optionLabels << labels[i];
+            optionNumListens << 0;
         }
 
         // Randomize dot positions - each dot in its own segment
+        // dotX contains normalized positions [0, 1]
+        .12 => float PAD;  // min pad between options to prevent overlap
+        (1 - numOptions * PAD) / numOptions => float range; // range for each dot
+        .5*PAD => float base;
         for (int i; i < numOptions; i++) {
-            dotX << Math.random2f(-sliderSize.x / 2 + (i * 1.0) / numOptions * sliderSize.x,
-                          -sliderSize.x / 2 + ((i + 1) * 1.0) / numOptions * sliderSize.x);
+            dotX << base + Math.random2f(0, range);
+            range + PAD +=> base;
         }
 
         // Load audio files based on the labels
@@ -247,7 +254,7 @@ public class RadioMechanic {
     }
 
     fun void update(ChuGUI gui) {
-        slider(gui, "radio", _scale, _position, 3.0);
+        slider(gui, "radio", _scale, _position, 3.0, false);
         if (!_active || numOptions == 0) return;
         updateSelection();
         updateAudio();
@@ -267,7 +274,7 @@ public class RadioMechanic {
         -1 => _selectedIndex;
 
         for (int i; i < numOptions; i++) {
-            Math.remap(dotX[i], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float dotPos;
+            dotX[i] => float dotPos;
             Math.fabs(val - dotPos) => float dist;
 
             if (dist < selectThreshold) {
@@ -281,7 +288,7 @@ public class RadioMechanic {
     fun void updateAudio() {
         float total_sample_gain;
         for (int i; i < audio.size() && i < numOptions; i++) {
-            Math.remap(dotX[i], -sliderSize.x / 2, sliderSize.x / 2, 0, 1) => float dotPos;
+            dotX[i] => float dotPos;
             (val - dotPos) => float sample_dist;
 
             // gain falloff
@@ -295,6 +302,12 @@ public class RadioMechanic {
             if (now > loop_time[i]) {
                 0 => audio[i].pos;
                 now + LOOP_DUR + audio[i].length() => loop_time[i];
+
+                // check if the cursor is on this one
+                if (_selectedIndex == i) {
+                    optionNumListens[i]++;
+                    <<< optionNumListens[i], i>>>;
+                }
             }
         }
 
@@ -329,7 +342,7 @@ public class RadioMechanic {
         return _selectedIndex >= 0;
     }
 
-    fun void slider(ChuGUI gui, string id, vec2 scale, vec2 pos, float z_index) {
+    fun void slider(ChuGUI gui, string id, vec2 scale, vec2 pos, float z_index, int show_text) {
         @(0.5 * scale.x, 0.01 * scale.y) => vec2 localSliderSize;
 
         // Scale factor from base sliderSize to this slider's size
@@ -337,6 +350,8 @@ public class RadioMechanic {
 
         // dots with option labels
         for (int i; i < dotX.size(); i++) {
+            Math.remap(dotX[i], 0, 1, -sliderSize.x / 2, sliderSize.x / 2) => float dot_x;
+            dot_x * scaleRatio + pos.x => float label_x;
             // Highlight selected dot
             if (i == _selectedIndex) {
                 UIStyle.pushColor(UIStyle.COL_RECT, Color.GREEN);
@@ -345,23 +360,37 @@ public class RadioMechanic {
             }
             UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
             UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
-            gui.rect(@(dotX[i] * scaleRatio + pos.x, -0.01 + pos.y));
+            gui.rect(@(label_x, -0.01 + pos.y));
+            UIStyle.popVar(2);
+            UIStyle.popColor();
+
+            if (show_text && optionNumListens[i] > 0) { // text labels
+                UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
+                UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.02 * scale.x);
+                UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
+
+                Math.max(1, 400 / Math.pow(2, optionNumListens[i])) => float antialias;
+
+                UIStyle.pushVar(UIStyle.VAR_LABEL_ANTIALIAS, antialias);
+                gui.label(optionLabels[i], @(label_x, pos.y - .05 * scale.y));
+                UIStyle.popVar(3);
+                UIStyle.popColor();
+            }
+        }
+
+        { // numbers (radio dial markings)
+            UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
+            UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.04 * scale.x);
+            UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
+
+            for (int i; i < radioNumbers.size(); i++) {
+                -localSliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * localSliderSize.x => float xPos;
+                gui.label(radioNumbers[i], @(xPos + pos.x, 0.03 * scale.y + pos.y));
+            }
+
             UIStyle.popVar(2);
             UIStyle.popColor();
         }
-
-        // numbers (radio dial markings)
-        UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
-        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.04 * scale.x);
-        UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
-
-        for (int i; i < radioNumbers.size(); i++) {
-            -localSliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * localSliderSize.x => float xPos;
-            gui.label(radioNumbers[i], @(xPos + pos.x, 0.03 * scale.y + pos.y));
-        }
-
-        UIStyle.popVar(2);
-        UIStyle.popColor();
 
         // slider
         if (_selectedIndex >= 0) {
@@ -393,7 +422,7 @@ public class RadioMechanic {
         @(0, 0) => vec2 target_pos;
         start_pos + t * (target_pos - start_pos) => vec2 pos;
 
-        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1);
+        slider(gui, "zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
