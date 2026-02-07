@@ -10,22 +10,22 @@ Improvement (if time)
 
 public class TextSonifier extends Chugraph {
     ADSR adsr(5::ms, 45::ms, 0, 0::ms) => outlet;
-    adsr.gain(.5);
+    adsr.gain(.1);
     UGen@ curr;
 
     SinOsc sin;
     SinOsc sin2; .5 => sin2.gain;
 
     PulseOsc pulse;
-    SawOsc saw; .5 => saw.gain;
-    Blit blit;
+    SawOsc saw; 1.0 => saw.gain;
+    Blit blit; 1.25 => blit.gain;
 
     // TODO remove if sticking with granular synth
-    CNoise noise => BPF bpf(440, .5); 6 => bpf.gain;
+    CNoise noise => BPF bpf(440, .5); 4 => bpf.gain;
     // noise.mode("pink");
 
     TriOsc lfo_tri => blackhole;
-    LiSa lisa; 2.5 => lisa.gain;
+    LiSa lisa; 1 => lisa.gain;
     lisa.chan(0) => PoleZero blocker; .99 => blocker.blockZero;
     lisa.play( false );
     lisa.loop( false );
