@@ -52,36 +52,36 @@ public class DialogBox {
         gui.posUnits(ChuGUI.NDC);
         
         UIStyle.pushVar(UIStyle.VAR_ICON_CONTROL_POINTS, @(0.5, 0));
-        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1730./1730 * 8, 490./1730 * 6));
+        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1730./1730 * 12, 490./1730 * 8));
         gui.icon(me.dir() + "../assets/dialogue_box.png", @(0.15, -1));
         UIStyle.popVar(2);
 
         gui.posUnits(ChuGUI.WORLD);
 
-        scaledWidth / -2 + _leftMargin + 1.2 => float textLeftX;
+        scaledWidth / -2 + _leftMargin + 1.375 => float textLeftX;
         scaledWidth - _leftMargin - _rightMargin - 0.4 => float textMaxWidth;
 
         if (_speakerName != "") {
-            yPos + scaledHeight / 2 - 0.2 => float nameY;
+            yPos + scaledHeight / 2 + 0.165 => float nameY;
 
             UIStyle.pushColor(UIStyle.COL_LABEL, @(0.9, 0.8, 0.5));
             UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0.5, 0.5));
             UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 3.75);
-            UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.18 * s);
+            UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.24 * s);
             gui.label(_speakerName, @(textLeftX, nameY));
             UIStyle.popVar(3);
             UIStyle.popColor();
         }
 
-        yPos + scaledHeight / 2 - 0.5 => float textY;
+        yPos + scaledHeight / 2 - 0.18 => float textY;
 
         UIStyle.pushColor(UIStyle.COL_LABEL, Color.WHITE);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0, 1));
         UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 3.75);
-        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.18 * s);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.19 * s);
         UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, textMaxWidth);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CHARACTERS, _charCount $ int);
-        gui.label(_text.trim(), @(textLeftX - 0.8, textY));
+        gui.label(_text.trim(), @(textLeftX - 0.9, textY));
         UIStyle.popVar(5);
         UIStyle.popColor();
 
