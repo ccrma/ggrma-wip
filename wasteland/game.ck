@@ -37,6 +37,8 @@ public class Game {
         while (true) {
             GG.nextFrame() => now;
 
+            UIStyle.pushVar(UIStyle.VAR_LABEL_FONT, me.dir() + "assets/fonts/GiantRobotArmy.ttf");
+
             player.update(gui);
             scene.update(gui);
             radio.update();
@@ -61,6 +63,8 @@ public class Game {
                     }
                 }
             }
+
+            UIStyle.popVar();
         }
     }
 }

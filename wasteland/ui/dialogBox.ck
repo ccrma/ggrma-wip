@@ -78,10 +78,10 @@ public class DialogBox {
         UIStyle.pushColor(UIStyle.COL_LABEL, Color.WHITE);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0, 1));
         UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 3.75);
-        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.14 * s);
+        UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.18 * s);
         UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, textMaxWidth);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CHARACTERS, _charCount $ int);
-        gui.label(_text, @(textLeftX - 0.8, textY));
+        gui.label(_text.trim(), @(textLeftX - 0.8, textY));
         UIStyle.popVar(5);
         UIStyle.popColor();
 
