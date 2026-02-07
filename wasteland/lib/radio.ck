@@ -77,6 +77,7 @@ public class RadioMechanic {
     }
 
     // map audio buffer to 3D positions
+    UI_Float waveform_zeno(.3);
     fun void map2waveform( float in[], vec2 out[] )
     {
         if( in.size() != out.size() )
@@ -93,7 +94,7 @@ public class RadioMechanic {
             // space evenly in X
             -width/2 + width/WINDOW_SIZE*i => out[i].x;
             // map y, using window function to taper the ends
-            s*8 * window[i] => out[i].y;
+            waveform_zeno.val() * (s*8 * window[i] - out[i].y) +=> out[i].y;
             // increment
             i++;
         }
@@ -580,5 +581,6 @@ if (1) {
 
         if (UI.button("activate")) radio.activate(); 
         if (UI.button("deactivate")) radio.deactivate(); 
+        UI.slider("waveform zeno", radio.waveform_zeno, 0, 1);
     }
 }
