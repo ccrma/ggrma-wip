@@ -128,6 +128,10 @@ public class DialogManager {
 
     fun void startDialogue(Prompt prompts[]) {
         prompts[0] @=> _currentPrompt;
+
+        // nocheckin azaday
+        // prompts[10] @=> _currentPrompt;
+
         showCurrentPrompt();
     }
 

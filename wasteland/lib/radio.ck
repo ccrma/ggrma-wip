@@ -325,6 +325,8 @@ public class RadioMechanic {
     fun void deactivateShred() {
         if (!_active) return;
 
+        0 => curr_vel; // lock selection bar
+
         .5::second => now;
 
         0 => _active;
@@ -382,7 +384,7 @@ public class RadioMechanic {
 
             // update response time limit
             (now - _activate_time) / REPSONSE_TIME_LIMIT => mark.fill;
-            if (mark.fill() > .5) {
+            if (mark.fill() > .5 && mark.fill() < 1.0) {
                 dt -=> response_warn_curr;
                 if (response_warn_curr < 0) {
                     response_warn_cd => response_warn_curr;
@@ -391,6 +393,10 @@ public class RadioMechanic {
             }
         }
         render();
+    }
+
+    fun int outOfTime() {
+        return _active && mark.fill() > 1;
     }
 
     fun float trunc_fallof(float x, float m) {
@@ -576,7 +582,6 @@ public class RadioMechanic {
         start_pos + t * (target_pos - start_pos) => vec2 pos;
 
         mark_start_pos + mark_t * (mark_target_pos - mark_start_pos) => mark.pos;
-        <<< mark.pos(), mark_t, t >>>;
 
         if (_powered_on) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
 
@@ -597,8 +602,8 @@ public class RadioMechanic {
         }
     }
 
+    float curr_vel;
     fun void keyboardHandler() {
-        float curr_vel;
         0.015 => float accel;
 
         while (true) {

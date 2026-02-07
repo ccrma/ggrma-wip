@@ -2,6 +2,7 @@
 @import "lib/player.ck"
 @import "lib/radio.ck"
 @import "lib/data.ck"
+@import "lib/deathMusic.ck"
 @import "lib/dialogEngine.ck"
 @import "scene/bar.ck"
 
@@ -17,6 +18,12 @@ public class Game {
 
     // Radio mechanic for dialogue choices
     RadioMechanic radio(gui);
+
+    // death state stuff
+    int dead;
+    time dead_time;
+    3 => float FADE_TIME_SECS;
+    DeathMusic death_music;
 
     fun void init() {
         // Initialize radio
@@ -43,8 +50,8 @@ public class Game {
             scene.update(gui);
             radio.update();
 
-            // Disable all input during NPC transitions
-            if (!scene.dialogManager().inTransition()) {
+            // Disable all input during NPC transitions and death
+            if (!scene.dialogManager().inTransition() && !dead) {
                 // ENTER advances dialogue and confirms radio selections
                 if (GWindow.keyDown(GWindow.KEY_ENTER)) {
                     if (scene.dialogManager().isTyping()) {
@@ -65,6 +72,48 @@ public class Game {
             }
 
             UIStyle.popVar();
+
+            // death
+            {
+                if (radio.outOfTime() && !dead) {
+                    true => dead;
+                    now => dead_time;
+                    radio.mark.alert();
+                    spork ~ deathScreenShred();
+                }
+                
+                if (dead) {
+                    (now - dead_time) / second => float secs_since_death;
+
+                    Math.clampf(secs_since_death / FADE_TIME_SECS, 0, 1) => float alpha;
+                    UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, alpha));
+                    UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
+                    UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+                    UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 4.5);
+                    gui.rect(@(0, 0));
+                    UIStyle.popVar(3);
+                    UIStyle.popColor();
+
+
+                    Math.clampf((secs_since_death - FADE_TIME_SECS) / FADE_TIME_SECS, 0, 1) => float t;
+                    UIStyle.pushColor(UIStyle.COL_LABEL, t * @(1.0, 0.0, 0.0));
+                    UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0.5, 0.5));
+                    UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 4.51);
+                    UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, t*0.24);
+                    gui.label("YOU DIED BRO", @(0, 0));
+                    UIStyle.popVar(3);
+                    UIStyle.popColor();
+                }
+            }
         }
+    }
+
+    fun void deathScreenShred() {
+        FADE_TIME_SECS::second => now;
+        radio.deactivate();
+
+        FADE_TIME_SECS::second => now;
+        death_music.play(65);
+        1::second => now;
     }
 }

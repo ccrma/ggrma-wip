@@ -47,6 +47,7 @@ public class QuestionMark extends GGen {
 
     SndBuf tick(me.dir() + "../assets/audio/tick.wav") => dac; tick.samples() => tick.pos;
     SndBuf tock(me.dir() + "../assets/audio/tock.wav") => dac; tock.samples() => tock.pos;
+    SndBuf alarm(me.dir() + "../assets/audio/alarm.wav") => dac; alarm.samples() => alarm.pos;
 
     if (fill_shader == null) {
         ShaderDesc shader_desc;
@@ -82,7 +83,22 @@ public class QuestionMark extends GGen {
     }
     fun float fill() { return _last_percentage; }
     fun void color(vec3 color) { material.uniformFloat3(0, color); }
-    fun void alert() { spring.pull(.5); }
+    fun void alert() { 
+        spring.pull(.5); 
+        spork ~ _alarmShred();
+    }
+
+    fun void _alarmShred() {
+        0 => alarm.pos;
+        1 => alarm.gain;
+        // linearly ramp down volume
+        now + alarm.length() => time later;
+        now => time start;
+        while (now < later) {
+            Math.pow(1 - ((now - start) / alarm.length()), 2) => alarm.gain;
+            second => now;
+        }
+    }
 
     int warn_count;
     fun void warn() { 
