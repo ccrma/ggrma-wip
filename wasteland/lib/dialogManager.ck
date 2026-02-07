@@ -19,14 +19,17 @@ public class DialogManager {
 
     // Prompt state
     Prompt @ _currentPrompt;
-    int _responseIndex;
 
-    int selectionShown;
+    int _selectionShown;
+    int _confirmedSelectionIdx;
     int _awaitingChoiceReveal;
+    int _inTransition;
+    int _pendingRadioActivation;
 
     fun DialogManager() {
         dialogBox.scale(1.0);
         dialogBox.text("...");
+        -1 => _confirmedSelectionIdx;
     }
 
     fun void setRadio(RadioMechanic @ radio) {
@@ -47,6 +50,12 @@ public class DialogManager {
 
     fun void update(ChuGUI gui) {
         dialogBox.update(gui);
+
+        // Activate radio once typewriter finishes showing the choice template
+        if (_pendingRadioActivation && !dialogBox.isTyping()) {
+            false => _pendingRadioActivation;
+            if (_radio != null) _radio.activate();
+        }
     }
 
     fun void showPlayer() {
@@ -119,7 +128,6 @@ public class DialogManager {
 
     fun void startDialogue(Prompt prompts[]) {
         prompts[0] @=> _currentPrompt;
-        0 => _responseIndex;
         showCurrentPrompt();
     }
 
@@ -127,14 +135,7 @@ public class DialogManager {
     fun void switchNpcAndSpeak(string assetPath, string text) {
         _npc.transition(assetPath);
         npcSays(text);
-    }
-
-    // Waits for typewriter to finish, then activates radio. Call via spork.
-    fun void activateRadioAfterTyping() {
-        while (dialogBox.isTyping()) {
-            GG.nextFrame() => now;
-        }
-        _radio.activate();
+        false => _inTransition;
     }
 
     // Activates radio and shows response template for current prompt.
@@ -153,12 +154,12 @@ public class DialogManager {
             playerSays(_currentPrompt.responseTemplate.substring(0, ellipsisIdx) + "...");
         }
 
-        // Activate radio only after typewriter finishes
-        spork ~ activateRadioAfterTyping();
+        // Radio will be activated by update() once typewriter finishes
+        true => _pendingRadioActivation;
     }
 
-    fun int awaitingChoiceReveal() {
-        return _awaitingChoiceReveal;
+    fun int inTransition() {
+        return _inTransition;
     }
 
     fun void showCurrentPrompt() {
@@ -176,6 +177,7 @@ public class DialogManager {
                 _currentPrompt.speakerName => _currentNpcName;
                 if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
                     _npc.setName(_currentNpcName);
+                    true => _inTransition;
                     spork ~ switchNpcAndSpeak(_npcAssets[_currentNpcName], _currentPrompt.text);
                 } else {
                     npcSays(_currentPrompt.text);
@@ -186,8 +188,6 @@ public class DialogManager {
         } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
             playerSays(_currentPrompt.text);
         }
-
-        0 => _responseIndex;
 
         // If there are responses, wait for user to advance before showing choices
         if (_currentPrompt.responses.size() > 0) {
@@ -201,11 +201,11 @@ public class DialogManager {
     fun void revealSelected() {
         if (_currentPrompt == null) return;
         if (_currentPrompt.responses.size() == 0) return;
-        true => selectionShown;
+        true => _selectionShown;
 
         _radio.getSelectedIndex() => int selectedIdx;
+        selectedIdx => _confirmedSelectionIdx;
         _currentPrompt.responses[selectedIdx].text => string responseText;
-
 
         // Insert selection after "..."
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
@@ -234,70 +234,51 @@ public class DialogManager {
         }
 
         if (_currentPrompt.responses.size() > 0) {
-            // Use radio selection if available, otherwise fall back to _responseIndex
-            if (_radio != null && _radio.hasSelection()) {
-                _radio.getSelectedIndex() => int selectedIdx;
-
-                if (!selectionShown) {
-                    // show selection in dialog box
-                    _radio.playSelectionSfx();
-                    _radio.deactivate();
-                    spork ~ revealSelected();
-                    return;
-                } else {
-                    _currentPrompt.responses[selectedIdx].next @=> _currentPrompt;
-                    false => selectionShown;
-                }
-            } else if (_radio == null) {
-                // Fallback for when radio is not set
-                _currentPrompt.responses[_responseIndex].next @=> _currentPrompt;
+            if (_selectionShown) {
+                // Selection already confirmed — advance using saved index
+                _currentPrompt.responses[_confirmedSelectionIdx].next @=> _currentPrompt;
+                false => _selectionShown;
+                -1 => _confirmedSelectionIdx;
+            } else if (_radio != null && _radio.hasSelection()) {
+                // Show selection in dialog box, don't advance yet
+                _radio.playSelectionSfx();
+                _radio.deactivate();
+                spork ~ revealSelected();
+                return;
             } else {
-                // Radio is active but no selection - don't advance
+                // Radio active but no selection — don't advance
                 return;
             }
         } else {
             _currentPrompt.next @=> _currentPrompt;
         }
 
-        0 => _responseIndex;
         showCurrentPrompt();
     }
 
+    // For Enter key: can advance including confirming radio selections
     fun int canAdvance() {
         if (_currentPrompt == null) return 0;
-        // Can always advance past NPC line to reveal choices
+        if (_inTransition) return 0;
         if (_awaitingChoiceReveal) return 1;
-        // If there are responses, need a radio selection
+        if (_selectionShown) return 1;
         if (_currentPrompt.responses.size() > 0) {
             if (_radio != null) {
                 return _radio.hasSelection();
             }
-            return 1; // Fallback
+            return 1;
         }
-        return 1; // No responses, can always advance
+        return 1;
     }
 
-    fun void selectResponse(int delta) {
-        if (_currentPrompt == null) return;
-        if (_currentPrompt.responses.size() == 0) return;
-
-        _responseIndex + delta => _responseIndex;
-        Math.clampi(_responseIndex, 0, _currentPrompt.responses.size() - 1) => _responseIndex;
-    }
-
-    fun int responseCount() {
+    // For Space key: can advance everything except confirming radio selections
+    fun int canAdvanceNonChoice() {
         if (_currentPrompt == null) return 0;
-        return _currentPrompt.responses.size();
-    }
-
-    fun int selectedResponse() {
-        return _responseIndex;
-    }
-
-    fun Prompt @ getResponse(int idx) {
-        if (_currentPrompt == null) return null;
-        if (idx < 0 || idx >= _currentPrompt.responses.size()) return null;
-        return _currentPrompt.responses[idx];
+        if (_inTransition) return 0;
+        if (_awaitingChoiceReveal) return 1;
+        if (_selectionShown) return 1;
+        if (_currentPrompt.responses.size() == 0) return 1;
+        return 0;
     }
 
     fun void skipTypewriter() {
