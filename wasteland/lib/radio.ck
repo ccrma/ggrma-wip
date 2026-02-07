@@ -326,8 +326,8 @@ public class RadioMechanic {
             // set the mesh position
             waveform.positions( positions );
             updateAudio();
-            render();
         }
+        render();
     }
 
     fun float trunc_fallof(float x, float m) {
@@ -510,13 +510,16 @@ public class RadioMechanic {
         gui.icon(me.dir() + "../assets/radio_box.png", pos); 
         UIStyle.popVar(2);
 
-        UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, 0.6));
-        UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
-        UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
-        UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 3.5);
-        gui.rect(@(0, 0));
-        UIStyle.popVar(3);
-        UIStyle.popColor();
+
+        if (_active) {
+            UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, 0.6));
+            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
+            UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+            UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 3.5);
+            gui.rect(@(0, 0));
+            UIStyle.popVar(3);
+            UIStyle.popColor();
+        }
     }
 
     fun void keyboardHandler() {
@@ -548,7 +551,7 @@ public class RadioMechanic {
 }
 
 // unit test
-if (0) {
+if (1) {
     ChuGUI gui --> GG.scene();
     RadioMechanic radio(gui);
 

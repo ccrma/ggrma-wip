@@ -211,7 +211,7 @@ public class DialogManager {
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
         _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
             responseText.rtrim() +
-            _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string fullText;
+            _currentPrompt.responseTemplate.substring(ellipsisIdx + 2) => string fullText;
         fullText.rtrim() => fullText;
 
         // Add period if choice ends the sentence (no trailing punctuation)
