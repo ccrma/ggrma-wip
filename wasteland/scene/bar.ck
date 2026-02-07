@@ -14,7 +14,7 @@ public class BarScene extends Scene {
 
     SndBuf robot_noises(me.dir() + "../assets/audio/robot-noises.wav") => dac;
     1 => robot_noises.loop;
-    0.1 => robot_noises.gain;
+    0.05 => robot_noises.gain;
 
 
     fun BarScene() {
