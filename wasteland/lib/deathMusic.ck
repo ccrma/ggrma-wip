@@ -90,7 +90,7 @@ public class DeathMusic {
         noise => dac;
         1 => noise.rate;
         0 => noise.pos;
-        3::second => now;
+        1::second => now;
         for (auto note : score) {
             if (note.x == REST) adsr.keyOff();
             else {
