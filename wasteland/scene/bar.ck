@@ -5,7 +5,7 @@ public class BarScene extends Scene {
     NPC @ stranger;
 
     fun BarScene() {
-        me.dir() + "../assets/background.jpg" => assetPath;
+        me.dir() + "../assets/background.png" => assetPath;
     }
 
     fun void init(Player @ player, Prompt prompts[]) {
