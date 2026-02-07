@@ -39,10 +39,10 @@ public class BarScene extends Scene {
         new NPC("", "") @=> stranger;
         dm.setNpc(stranger);
 
-        dm.registerNpc("Cleaner", me.dir() + "../assets/cleaning-bot.png");
-        dm.registerNpc("Media", me.dir() + "../assets/media-bot.png");
-        dm.registerNpc("Sommelier", me.dir() + "../assets/sommelier-bot.png");
-        dm.registerNpc("Tsundere", me.dir() + "../assets/tsundere-bot.png");
+        dm.registerNpc("Daisun", me.dir() + "../assets/cleaning-bot.png");
+        dm.registerNpc("Dolbi", me.dir() + "../assets/media-bot.png");
+        dm.registerNpc("Doju", me.dir() + "../assets/sommelier-bot.png");
+        dm.registerNpc("Doshiba", me.dir() + "../assets/tsundere-bot.png");
 
         dm.startDialogue(prompts);
 
