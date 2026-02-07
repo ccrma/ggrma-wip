@@ -12,7 +12,7 @@ public class Data {
     (NPC:Cleaner) But barkeep, you gotta control them! We got too many people coming in looking for love!
     (NPC:Sommelier) ...Anyways, can I get you started with anything?
     // Choice
-    ? I'll have a ...
+    ? I'll have a ....
     - beer [beer]
     - shot [shot]
     - cocktail [cocktail]
