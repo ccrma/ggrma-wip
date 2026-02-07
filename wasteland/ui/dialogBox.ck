@@ -58,7 +58,7 @@ public class DialogBox {
 
         gui.posUnits(ChuGUI.WORLD);
 
-        scaledWidth / -2 + _leftMargin + 1.18 => float textLeftX;
+        scaledWidth / -2 + _leftMargin + 1.2 => float textLeftX;
         scaledWidth - _leftMargin - _rightMargin - 0.4 => float textMaxWidth;
 
         if (_speakerName != "") {

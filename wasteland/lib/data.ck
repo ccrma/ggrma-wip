@@ -48,7 +48,7 @@ public class Data {
     - am [am]
     - am not [am not]
     // Choice: Am
-    {am} (NPC:Sommelier) You little... No wonder you have no idea how much damage you'e done! WE HAVE AN INTRUDER! [end]
+    {am} (NPC:Sommelier) You little... No wonder you have no idea how much damage you've done! WE HAVE AN INTRUDER! [end]
     // Choice: Am Not
     {am not} (NPC) ...Maybe you just need to have a few things reconfigured... I'll hold off on your drink, so why don't you try talking to someone and regaining your bearings?
     (Player) (I almost blew my cover there... I need to be more careful and blend in.)
