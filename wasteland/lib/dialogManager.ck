@@ -206,6 +206,7 @@ public class DialogManager {
         _radio.getSelectedIndex() => int selectedIdx;
         _currentPrompt.responses[selectedIdx].text => string responseText;
 
+
         // Insert selection after "..."
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
         _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
@@ -239,6 +240,7 @@ public class DialogManager {
 
                 if (!selectionShown) {
                     // show selection in dialog box
+                    _radio.playSelectionSfx();
                     _radio.deactivate();
                     spork ~ revealSelected();
                     return;
