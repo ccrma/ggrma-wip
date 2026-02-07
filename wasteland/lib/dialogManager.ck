@@ -19,7 +19,10 @@ public class DialogManager {
 
     // Prompt state
     Prompt @ _currentPrompt;
+    Prompt @ _firstPrompt; // saved for restart
+    Prompt @ _lastChoicePrompt; // saved for continue
 
+    int _deathTriggered;
     int _selectionShown;
     int _confirmedSelectionIdx;
     int _awaitingChoiceReveal;
@@ -119,6 +122,13 @@ public class DialogManager {
         dialogBox.text(text);
     }
 
+    fun void narratorSays(string text) {
+        if (_npc != null) _npc.dim();
+        if (_player != null) _player.dim();
+        if (_radio != null) spork ~ _radio.dim();
+        dialogBox.text(text);
+    }
+
     fun void clearSpeaker() {
         if (_player != null) _player.highlight();
         if (_npc != null) _npc.highlight();
@@ -127,7 +137,10 @@ public class DialogManager {
     // Prompt handling
 
     fun void startDialogue(Prompt prompts[]) {
+        prompts[0] @=> _firstPrompt;
         prompts[0] @=> _currentPrompt;
+        false => _deathTriggered;
+        null @=> _lastChoicePrompt;
 
         // nocheckin azaday
         // prompts[10] @=> _currentPrompt;
@@ -146,6 +159,8 @@ public class DialogManager {
     fun void showChoices() {
         if (_radio == null || _currentPrompt == null) return;
         if (_currentPrompt.responses.size() <= 0) return;
+
+        _currentPrompt @=> _lastChoicePrompt;
 
         string labels[0];
         for (int i; i < _currentPrompt.responses.size(); i++) {
@@ -233,6 +248,13 @@ public class DialogManager {
 
         if (_currentPrompt.responses.size() > 0) {
             if (_selectionShown) {
+                // Check for death trigger on selected response
+                if (_currentPrompt.responses[_confirmedSelectionIdx].next_tag == "die") {
+                    true => _deathTriggered;
+                    false => _selectionShown;
+                    -1 => _confirmedSelectionIdx;
+                    return;
+                }
                 // Selection already confirmed — advance using saved index
                 _currentPrompt.responses[_confirmedSelectionIdx].next @=> _currentPrompt;
                 false => _selectionShown;
@@ -248,6 +270,11 @@ public class DialogManager {
                 return;
             }
         } else {
+            // Check for death trigger
+            if (_currentPrompt.next_tag == "die") {
+                true => _deathTriggered;
+                return;
+            }
             _currentPrompt.next @=> _currentPrompt;
         }
 
@@ -259,7 +286,11 @@ public class DialogManager {
         if (_currentPrompt == null) return 0;
         if (_inTransition) return 0;
         if (_awaitingChoiceReveal) return 1;
-        if (_selectionShown) return 1;
+        if (_selectionShown) {
+            // Block until radio finishes deactivating to prevent spam advance
+            if (_radio != null && _radio.isActive()) return 0;
+            return 1;
+        }
         if (_currentPrompt.responses.size() > 0) {
             if (_radio != null) {
                 return _radio.hasSelection();
@@ -274,7 +305,10 @@ public class DialogManager {
         if (_currentPrompt == null) return 0;
         if (_inTransition) return 0;
         if (_awaitingChoiceReveal) return 1;
-        if (_selectionShown) return 1;
+        if (_selectionShown) {
+            if (_radio != null && _radio.isActive()) return 0;
+            return 1;
+        }
         if (_currentPrompt.responses.size() == 0) return 1;
         return 0;
     }
@@ -285,5 +319,35 @@ public class DialogManager {
 
     fun int isTyping() {
         return dialogBox.isTyping();
+    }
+
+    fun int deathTriggered() {
+        return _deathTriggered;
+    }
+
+    fun void resetState() {
+        false => _selectionShown;
+        -1 => _confirmedSelectionIdx;
+        false => _awaitingChoiceReveal;
+        false => _inTransition;
+        false => _pendingRadioActivation;
+        false => _deathTriggered;
+        "" => _currentNpcName;
+    }
+
+    fun void restartDialogue() {
+        resetState();
+        _firstPrompt @=> _currentPrompt;
+        showCurrentPrompt();
+    }
+
+    fun void continueFromLastChoice() {
+        resetState();
+        if (_lastChoicePrompt != null) {
+            _lastChoicePrompt @=> _currentPrompt;
+        } else {
+            _firstPrompt @=> _currentPrompt;
+        }
+        showCurrentPrompt();
     }
 }

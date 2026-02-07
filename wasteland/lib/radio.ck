@@ -7,6 +7,7 @@ public class RadioMechanic {
 
     QuestionMark mark;
     mark.sca(1.5);
+    mark.posZ(3.5);
     15::second => dur REPSONSE_TIME_LIMIT;
     1 => float response_warn_cd;
     0 => float response_warn_curr;
@@ -334,6 +335,7 @@ public class RadioMechanic {
         .5::second => now;
 
         0 => _active;
+        rot_spring.pull(.12);
 
         // flip start and end pos to lerp back up
         start_pos => vec2 tmp;
@@ -369,7 +371,7 @@ public class RadioMechanic {
     }
 
     fun void update() {
-        GG.dt() => float dt; 
+        GG.dt() => float dt;
         rot_spring.update(dt);
 
         slider("radio", _scale, _position, 3.0, false, false);
@@ -383,7 +385,6 @@ public class RadioMechanic {
         if (_active && numOptions > 0) {
             updateSelection();
             map2waveform( samples, positions );
-            // set the mesh position
             waveform.positions( positions );
             updateAudio();
 
@@ -451,8 +452,9 @@ public class RadioMechanic {
         }
 
         // radio static
-        if (_powered_on)
+        if (_powered_on && _active) {
             1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
+        }
     }
 
     // do audio stuff
@@ -575,7 +577,6 @@ public class RadioMechanic {
         UIStyle.popColor();
     }
 
-
     fun void render() {
         // tween between actual and target pos
         (now - _activate_time) / ANIM_TIME => float x;
@@ -599,7 +600,7 @@ public class RadioMechanic {
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
         UIStyle.pushVar(UIStyle.VAR_ICON_ROTATE, rot_spring.x);
-        gui.icon(me.dir() + "../assets/radio_box.png", pos); 
+        gui.icon(me.dir() + "../assets/radio_box.png", pos);
         UIStyle.popVar(3);
 
         if (_active) {
@@ -641,28 +642,172 @@ public class RadioMechanic {
     }
 }
 
-// unit test
-if (1) {
-    ChuGUI gui --> GG.scene();
-    RadioMechanic radio(gui);
+public class TitleRadioMechanic extends RadioMechanic {
 
-    GG.camera().orthographic();
-    GG.camera().aspect(16./9);
+    fun TitleRadioMechanic(ChuGUI gui) {
+        gui @=> this.gui;
+    }
 
-    // Initialize radio
-    radio.scale(@(0.525, 1.5));
-    radio.setPosition(@(-0.575, 0.4));
-    radio.setAudioBasePath(me.dir() + "assets/audio/");
-    radio.init();
+    fun void activate() {
+        if (_active) return;
+        1 => _active;
+        true => _powered_on;
+        now => _activate_time;
+        @(0, 0) => start_pos;
+        @(0, 0) => target_pos;
 
-    radio.setOptions(["A", "B", "C"]);
+        for (int i; i < audio.size(); i++) {
+            0.5 => audio[i].gain;
+        }
+        0.2 => radio_left.gain;
+        0.2 => radio_right.gain;
+        1 => radio_static.rate;
+        1 => radio_hum.rate;
+    }
 
-    while (1) {
-        GG.nextFrame() => now;
-        radio.update();
+    fun void deactivate() {
+        if (!_active) return;
+        0 => curr_vel;
+        0 => _active;
+        false => _powered_on;
+        for (int i; i < audio.size(); i++) {
+            0 => audio[i].gain;
+        }
+        0 => radio_left.gain;
+        0 => radio_right.gain;
+        0 => radio_static.gain;
+        0 => radio_hum.gain;
+    }
 
-        if (UI.button("activate")) radio.activate(); 
-        if (UI.button("deactivate")) radio.deactivate(); 
-        UI.slider("waveform zeno", radio.waveform_zeno, 0, 1);
+    fun void update() {
+        if (_active && numOptions > 0) {
+            updateSelection();
+            updateAudio();
+        }
+        render();
+    }
+
+    fun void render() {
+        if (_powered_on) slider("zoomed_radio", @(_scale.x * 2.5, _scale.y * 1.5), @(0, 0.25), 4.1, true, false);
+        UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, -0.5);
+        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
+        gui.icon(me.dir() + "../assets/title_radio_box.png", _position);
+        UIStyle.popVar(2);
     }
 }
+
+public class DeathRadioMechanic extends RadioMechanic {
+
+    fun DeathRadioMechanic(ChuGUI gui) {
+        gui @=> this.gui;
+    }
+
+    fun void activate() {
+        if (_active) return;
+        1 => _active;
+        true => _powered_on;
+        now => _activate_time;
+
+        // Animate from bottom of screen
+        @(0, -0.25 * GG.camera().viewSize()) => start_pos;
+        @(0, -0.75) => target_pos;
+
+        // Unmute audio
+        for (int i; i < audio.size(); i++) {
+            0.5 => audio[i].gain;
+        }
+        1 => radio_static.rate;
+        1 => radio_hum.rate;
+        0.2 => radio_left.gain;
+        0.2 => radio_right.gain;
+    }
+
+    fun void deactivate() {
+        if (!_active) return;
+        0 => curr_vel;
+        0 => _active;
+        false => _powered_on;
+
+        // Flip start/end to animate back down
+        start_pos => vec2 tmp;
+        target_pos => start_pos;
+        tmp => target_pos;
+        now => _activate_time;
+
+        // Mute and stop all audio immediately
+        for (int i; i < audio.size(); i++) {
+            0 => audio[i].gain;
+            0 => audio[i].rate;
+        }
+        for (int i; i < pan.size(); i++) {
+            pan[i].left =< radio_left;
+            pan[i].right =< radio_right;
+        }
+        0 => radio_left.gain;
+        0 => radio_right.gain;
+        0 => radio_on.gain;
+        0 => radio_on.rate;
+        0 => radio_static.rate;
+        0 => radio_static.gain;
+        0 => radio_hum.rate;
+        0 => radio_hum.gain;
+    }
+
+    fun void update() {
+        GG.dt() => float dt;
+        rot_spring.update(dt);
+
+        if (_active && numOptions > 0) {
+            updateSelection();
+            updateAudio();
+        }
+        render();
+    }
+
+    fun void render() {
+        // Tween between start and target pos (same as parent)
+        (now - _activate_time) / ANIM_TIME => float x;
+        float t;
+        if (_active) {
+            easeOutBounce(x) => t;
+        } else {
+            easeInBack(x) => t;
+        }
+
+        start_pos + t * (target_pos - start_pos) => vec2 pos;
+
+        if (_powered_on) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.75, true, true);
+
+        UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.6);
+        UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
+        UIStyle.pushVar(UIStyle.VAR_ICON_ROTATE, rot_spring.x);
+        gui.icon(me.dir() + "../assets/radio_box.png", pos);
+        UIStyle.popVar(3);
+    }
+}
+
+// // unit test
+// if (1) {
+//     ChuGUI gui --> GG.scene();
+//     RadioMechanic radio(gui);
+
+//     GG.camera().orthographic();
+//     GG.camera().aspect(16./9);
+
+//     // Initialize radio
+//     radio.scale(@(0.525, 1.5));
+//     radio.setPosition(@(-0.575, 0.4));
+//     radio.setAudioBasePath(me.dir() + "assets/audio/");
+//     radio.init();
+
+//     radio.setOptions(["A", "B", "C"]);
+
+//     while (1) {
+//         GG.nextFrame() => now;
+//         radio.update();
+
+//         if (UI.button("activate")) radio.activate(); 
+//         if (UI.button("deactivate")) radio.deactivate(); 
+//         UI.slider("waveform zeno", radio.waveform_zeno, 0, 1);
+//     }
+// }

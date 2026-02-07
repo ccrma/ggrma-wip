@@ -137,10 +137,10 @@ public class DialogBox {
         name => _speakerName;
         // update text sonifier mode
         // TODO update to new robot names here
-        if      (name == "Media") textSon.mode(TextSonifier.Mode_MediaBot);
-        else if (name == "Sommelier") textSon.mode(TextSonifier.Mode_SommelierBot);
-        else if (name == "Tsundere") textSon.mode(TextSonifier.Mode_TsundereBot);
-        else if (name == "Cleaner") textSon.mode(TextSonifier.Mode_VaccuumBot);
+        if      (name == "Dolbi") textSon.mode(TextSonifier.Mode_MediaBot);
+        else if (name == "Doju") textSon.mode(TextSonifier.Mode_SommelierBot);
+        else if (name == "Doshiba") textSon.mode(TextSonifier.Mode_TsundereBot);
+        else if (name == "Daisun") textSon.mode(TextSonifier.Mode_VaccuumBot);
         else                        textSon.mode(TextSonifier.Mode_None);
     }
 
