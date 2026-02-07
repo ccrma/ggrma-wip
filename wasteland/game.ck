@@ -37,28 +37,34 @@ public class Game {
         while (true) {
             GG.nextFrame() => now;
 
+            UIStyle.pushVar(UIStyle.VAR_LABEL_FONT, me.dir() + "assets/fonts/GiantRobotArmy.ttf");
+
             player.update(gui);
             scene.update(gui);
             radio.update();
 
-            // ENTER advances dialogue (for both choices and regular dialogue)
-            // For choices, only advances if slider is on a dot (has selection)
-            if (GWindow.keyDown(GWindow.KEY_ENTER)) {
-                if (scene.dialogManager().isTyping()) {
-                    scene.dialogManager().skipTypewriter();
-                } else if (scene.dialogManager().canAdvance()) {
-                    scene.dialogManager().advanceDialogue();
+            // Disable all input during NPC transitions
+            if (!scene.dialogManager().inTransition()) {
+                // ENTER advances dialogue and confirms radio selections
+                if (GWindow.keyDown(GWindow.KEY_ENTER)) {
+                    if (scene.dialogManager().isTyping()) {
+                        scene.dialogManager().skipTypewriter();
+                    } else if (scene.dialogManager().canAdvance()) {
+                        scene.dialogManager().advanceDialogue();
+                    }
+                }
+
+                // SPACE skips typewriter or advances non-choice dialogue
+                if (GWindow.keyDown(GWindow.KEY_SPACE)) {
+                    if (scene.dialogManager().isTyping()) {
+                        scene.dialogManager().skipTypewriter();
+                    } else if (scene.dialogManager().canAdvanceNonChoice()) {
+                        scene.dialogManager().advanceDialogue();
+                    }
                 }
             }
 
-            // SPACE skips typewriter or advances non-choice dialogue
-            if (GWindow.keyDown(GWindow.KEY_SPACE)) {
-                if (scene.dialogManager().isTyping()) {
-                    scene.dialogManager().skipTypewriter();
-                } else if (scene.dialogManager().responseCount() == 0 || scene.dialogManager().selectionShown) {
-                    scene.dialogManager().advanceDialogue();
-                }
-            }
+            UIStyle.popVar();
         }
     }
 }

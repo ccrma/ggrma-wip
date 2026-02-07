@@ -101,8 +101,7 @@ public class RadioMechanic {
     }
 
     // sfx
-    // SndBuf radio_on(me.dir() + "../assets/audio/radio-on.wav") => dac;  // crt sound
-    SndBuf radio_on(me.dir() + "../assets/audio/radio-on-button.wav") => dac;     // button sound
+    SndBuf radio_on(me.dir() + "../assets/audio/radio-on-button.wav") => dac;
     0 => radio_on.rate;
     SndBuf radio_static(me.dir() + "../assets/audio/radio-static.wav") => dac;
     0 => radio_static.rate; 1 => radio_static.loop;
@@ -283,13 +282,10 @@ public class RadioMechanic {
         start_pos => vec2 tmp;
         target_pos => start_pos;
         tmp => target_pos;
-        <<< start_pos, target_pos >>>;
         // update start time
         now => _activate_time;
 
-
         // radio off sfx
-        <<< "deactivateShred" >>>;
         0 => radio_off_button.pos;
         1 => radio_off_button.rate;
 
@@ -330,9 +326,8 @@ public class RadioMechanic {
             // set the mesh position
             waveform.positions( positions );
             updateAudio();
+            render();
         }
-        // always draw
-        render();
     }
 
     fun float trunc_fallof(float x, float m) {
@@ -377,13 +372,11 @@ public class RadioMechanic {
                 // check if the cursor is on this one
                 if (_selectedIndex == i) {
                     optionNumListens[i]++;
-                    <<< optionNumListens[i], i>>>;
                 }
             }
         }
 
         // radio static
-        // .25 * Math.pow(Math.max(0.5, 1 - total_sample_gain), 2) => noise.gain;
         1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
     }
 
@@ -504,13 +497,11 @@ public class RadioMechanic {
 
     fun void render() {
         // tween between actual and target pos
-        // easeOutElastic((now - _activate_time) / ANIM_TIME) => float t;
         float t;
         if (_active) easeOutBounce((now - _activate_time) / ANIM_TIME) => t;
         else easeInBack((now - _activate_time) / ANIM_TIME) => t;
 
         start_pos + t * (target_pos - start_pos) => vec2 pos;
-        // <<< pos >>>;
 
         if (render_slider) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
 
@@ -529,22 +520,19 @@ public class RadioMechanic {
     }
 
     fun void keyboardHandler() {
-        // 1 => int dir;
         float curr_vel;
-        UI_Float a(.015);
+        0.015 => float accel;
 
         while (true) {
             GG.nextFrame() => now;
             GG.dt() => float dt;
-
-            UI.slider("acceleration", a, 0, .1);
 
             if (_active) {
                 float dir;
                 if (GWindow.key(GWindow.KEY_LEFT)) -1 => dir;
                 if (GWindow.key(GWindow.KEY_RIGHT)) 1 => dir;
 
-                Math.random2f(0, 1) * dir * dt * a.val() => float dv;
+                Math.random2f(0, 1) * dir * dt * accel => float dv;
                 dv +=> curr_vel;
                 curr_vel +=> val;
 
@@ -560,7 +548,7 @@ public class RadioMechanic {
 }
 
 // unit test
-if (1) {
+if (0) {
     ChuGUI gui --> GG.scene();
     RadioMechanic radio(gui);
 

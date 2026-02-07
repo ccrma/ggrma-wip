@@ -1,9 +1,9 @@
 public class Data {
-    " {begin} (Player) I heard a tip that they're in this bar. Surely, they're one of these robots, right? I've checked so many other buildings in the vicinity already...
-    (Player) Since they uploaded their memory before they passed away, their robot counterpart must act like them, too.
-    (Player) They say the best way to identify a robot clone is by replicating some interactions you both had together... Particularly, first interactions.
-    (Player) I have to be careful, though. Robots are known to be predisposed to violence. This could get ugly for me if my cover is blown.
-    (Player) So... who will be my first victim?
+    " {begin} (Player) (I heard a tip that they're in this bar. Surely, they're one of these robots, right? I've checked so many other buildings in the vicinity already...)
+    (Player) (Since they uploaded their memory before they passed away, their robot counterpart must act like them, too.)
+    (Player) (They say the best way to identify a robot clone is by replicating some interactions you both had together... Particularly, first interactions.)
+    (Player) (I have to be careful, though. Robots are known to be predisposed to violence. This could get ugly for me if my cover is blown.)
+    (Player) (So... who will be my first victim?)
     // End Exposition
     (NPC:Sommelier) Oh, a new face. Are you new to the area? It's rare to see models like you around here.
     (NPC) Come right in. The patrons here are a motley crew, but they don't bite.
@@ -48,12 +48,12 @@ public class Data {
     - am [am]
     - am not [am not]
     // Choice: Am
-    {am} (NPC:Sommelier) You little… No wonder you have no idea how much damage you'e done! WE HAVE AN INTRUDER! [end]
+    {am} (NPC:Sommelier) You little... No wonder you have no idea how much damage you've done! WE HAVE AN INTRUDER! [end]
     // Choice: Am Not
-    {am not} (NPC) ...Maybe you just need to have a few things reconfigured… I'll hold off on your drink, so why don't you try talking to someone and regaining your bearings?
-    (Player) I almost blew my cover there... I need to be more careful and blend in.
+    {am not} (NPC) ...Maybe you just need to have a few things reconfigured... I'll hold off on your drink, so why don't you try talking to someone and regaining your bearings?
+    (Player) (I almost blew my cover there... I need to be more careful and blend in.)
     // Choice
-    ? Let's try doing some recon. I feel like my partner acted the most like...
+    ? (Let's try doing some recon. I feel like my partner acted the most like...)
     - Tsundere [Tsundere]
     - Media [Media]
     - Cleaner [Cleaner]
@@ -73,6 +73,8 @@ public class Data {
     // Tsundere - Resume
     (NPC) What's even wrong with you anyways? Did someone try to brainwash you by rewriting your memory about the war?
     (NPC) Honestly, I got nothing against humans. And didn't some of them try to become robots, too? Robots with human-like memories injected in them. Those ones always gave me the creeps.
+    (NPC) (It takes a long sip of its cocktail, brown shimmering liquid slowly slipping down whichever robotic equivalent of an esophagus.)
+    (NPC) (Its empathy reminded you of a certain someone.)
     {end} (NPC) Game over. [begin]
     " => static string script;
 }

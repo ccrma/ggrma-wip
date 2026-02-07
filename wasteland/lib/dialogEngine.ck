@@ -92,31 +92,28 @@ public class Prompt {
                 if (prompts.isInMap(tag)) <<< "warning, duplicate tag: ", tag >>>;
                 continue;
             }
-            // check for speaker designation
-            else if (char == '(') {
-                 ++idx;
-                // make sure there's a closing paranthesis
-                s.find(')', idx) => int close_spk_idx;
-                if (close_spk_idx == -1) {
-                    <<< "missing closing tag ) to match with tag at index ", idx >>>; 
-                    return null;
-                }
-                s.substring(idx, close_spk_idx - idx) => string spk;
-                if (spk == "Player") {
-                    Prompt.Speaker_Player => speaker;
-                } else {
-                    Prompt.Speaker_NPC => speaker;
-                    // Check for NPC:Name syntax (e.g., "NPC:Cleaner")
-                    spk.find(':', 0) => int colonIdx;
-                    if (colonIdx >= 0) {
-                        spk.substring(colonIdx + 1) => speakerName;
+            // check for speaker designation: (Player) or (NPC) or (NPC:Name)
+            else if (char == '(' && s.find(')', idx + 1) >= 0) {
+                s.find(')', idx + 1) => int close_spk_idx;
+                s.substring(idx + 1, close_spk_idx - idx - 1) => string spk;
+                if (spk == "Player" || spk.find("NPC", 0) == 0) {
+                    close_spk_idx + 1 => idx;
+                    if (spk == "Player") {
+                        Prompt.Speaker_Player => speaker;
+                    } else {
+                        Prompt.Speaker_NPC => speaker;
+                        spk.find(':', 0) => int colonIdx;
+                        if (colonIdx >= 0) {
+                            spk.substring(colonIdx + 1) => speakerName;
+                        }
                     }
+                    if (log) <<< "parsed speaker", spk >>>;
+                    continue;
                 }
-                if (log) <<< "parsed speaker", spk >>>;
-                close_spk_idx + 1 => idx;
+                // Not a valid speaker — fall through to text consumption below
             }
             // ignore comments
-            else if (char == '#' || (char == '/' && s.charAt(idx + 1) == '/')) {
+            if (char == '#' || (char == '/' && s.charAt(idx + 1) == '/')) {
                 s.find('\n', idx+1) => int end_comment_idx;
                 if (end_comment_idx == -1) s.length() => idx;
                 end_comment_idx + 1 => idx;

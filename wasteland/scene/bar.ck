@@ -10,7 +10,7 @@ public class BarScene extends Scene {
 
     fun void init(Player @ player, Prompt prompts[]) {
         dm.dialog().leftMargin(3.5);
-        dm.dialog().rightMargin(3);
+        dm.dialog().rightMargin(3.8);
         dm.setPlayer(player);
 
         // Create scene NPC (identity set by dialogue script)
