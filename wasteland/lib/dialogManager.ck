@@ -129,6 +129,14 @@ public class DialogManager {
         npcSays(text);
     }
 
+    // Waits for typewriter to finish, then activates radio. Call via spork.
+    fun void activateRadioAfterTyping() {
+        while (dialogBox.isTyping()) {
+            GG.nextFrame() => now;
+        }
+        _radio.activate();
+    }
+
     // Activates radio and shows response template for current prompt.
     fun void showChoices() {
         if (_radio == null || _currentPrompt == null) return;
@@ -139,12 +147,18 @@ public class DialogManager {
             labels << _currentPrompt.responses[i].text;
         }
         _radio.setOptions(labels);
-        _radio.activate();
 
         if (_currentPrompt.responseTemplate.length() > 0) {
             _currentPrompt.responseTemplate.rfind("...") => int ellipsisIdx;
             playerSays(_currentPrompt.responseTemplate.substring(0, ellipsisIdx) + "...");
         }
+
+        // Activate radio only after typewriter finishes
+        spork ~ activateRadioAfterTyping();
+    }
+
+    fun int awaitingChoiceReveal() {
+        return _awaitingChoiceReveal;
     }
 
     fun void showCurrentPrompt() {
@@ -194,13 +208,14 @@ public class DialogManager {
 
         // Insert selection after "..."
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
-        _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string afterEllipsis;
         _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
             responseText.rtrim() +
-            afterEllipsis => string fullText;
+            _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string fullText;
+        fullText.rtrim() => fullText;
 
-        // Add period if choice is the last word in the sentence
-        if (afterEllipsis.rtrim().length() == 0) {
+        // Add period if choice ends the sentence (no trailing punctuation)
+        fullText.charAt(fullText.length() - 1) => int lastChar;
+        if (lastChar != '.' && lastChar != '!' && lastChar != '?') {
             fullText + "." => fullText;
         }
 
