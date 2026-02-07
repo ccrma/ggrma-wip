@@ -1,7 +1,10 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
 @import "../lib/camera.ck"
+@import "../lib/sonifyText.ck"
 
 public class DialogBox {
+    TextSonifier textSon(TextSonifier.Mode_None) => dac;
+
     string _speakerName;
     string _text;
     float _scale;
@@ -11,14 +14,20 @@ public class DialogBox {
     1.5 => float _leftMargin;
     1.5 => float _rightMargin;
 
-    float _charCount;
+    int _charCount;
     int _targetCharCount;
-    0.5 => float _charsPerFrame;
+
+    .034 => float _char_cd_secs;
+    .0 => float _char_curr_cd_timer;
 
     fun void update(ChuGUI gui) {
-        if (_charCount < _targetCharCount) {
-            _charCount + _charsPerFrame => _charCount;
-            if (_charCount > _targetCharCount) _targetCharCount => _charCount;
+        GG.dt() => float dt;
+        dt -=> _char_curr_cd_timer;
+        if (_charCount < _targetCharCount && _char_curr_cd_timer < 0) {
+            _char_cd_secs => _char_curr_cd_timer; // reset cd timer
+            Math.min(_charCount + 1, _targetCharCount) => _charCount; // bump char count
+            // speak!
+            textSon.speak();
         }
         render(gui);
     }
@@ -88,17 +97,28 @@ public class DialogBox {
         gui.units(ChuGUI.NDC);
     }
 
+
+    // returns length of string minus spaces
+    // because GText.characters() ignores spaces
+    fun int lengthIgnoringSpaces(string s) {
+        int num_spaces;
+        for (int i; i < s.length(); ++i) {
+            if (s.charAt(i) == ' ') ++num_spaces;
+        }
+        return s.length() - num_spaces;
+    }
+
     fun void text(string text) {
-        text => _text;
-        0 => _charCount;
-        _text.length() => _targetCharCount;
+        this.text(text, 0);
     }
 
     // Set text but start typewriter from a specific character position
     fun void text(string text, int startFrom) {
         text => _text;
         startFrom => _charCount;
-        _text.length() => _targetCharCount;
+        lengthIgnoringSpaces(text) => _targetCharCount;
+
+        textSon.reset(); // reset sonifier
     }
 
     fun string text() {
@@ -115,6 +135,13 @@ public class DialogBox {
 
     fun void speakerName(string name) {
         name => _speakerName;
+        // update text sonifier mode
+        // TODO update to new robot names here
+        if      (name == "Media") textSon.mode(TextSonifier.Mode_MediaBot);
+        else if (name == "Sommelier") textSon.mode(TextSonifier.Mode_SommelierBot);
+        else if (name == "Tsundere") textSon.mode(TextSonifier.Mode_TsundereBot);
+        else if (name == "Cleaner") textSon.mode(TextSonifier.Mode_VaccuumBot);
+        else                        textSon.mode(TextSonifier.Mode_None);
     }
 
     fun string speakerName() {

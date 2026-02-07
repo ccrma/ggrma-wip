@@ -43,6 +43,10 @@ public class QuestionMark extends GGen {
     static Texture@ tex;
 
     Spring spring(0, 4200, 20);
+    Spring rot_spring(0, 3500, 12);
+
+    SndBuf tick(me.dir() + "../assets/audio/tick.wav") => dac; tick.samples() => tick.pos;
+    SndBuf tock(me.dir() + "../assets/audio/tock.wav") => dac; tock.samples() => tock.pos;
 
     if (fill_shader == null) {
         ShaderDesc shader_desc;
@@ -60,6 +64,7 @@ public class QuestionMark extends GGen {
     }
 
     Material material;
+    true => material.transparent;
     fill_shader => material.shader; // connect shader to material
 
     material.uniformFloat3(0, Color.hex(0x901212));
@@ -70,19 +75,37 @@ public class QuestionMark extends GGen {
     PlaneGeometry geo;
     GMesh mesh(geo, material) --> this;
 
-    fun void fill(float percentage) { material.uniformFloat(3, percentage); }
+    float _last_percentage;
+    fun void fill(float percentage) { 
+        material.uniformFloat(3, percentage); 
+        percentage => _last_percentage;
+    }
+    fun float fill() { return _last_percentage; }
     fun void color(vec3 color) { material.uniformFloat3(0, color); }
     fun void alert() { spring.pull(.5); }
 
+    int warn_count;
+    fun void warn() { 
+        rot_spring.pull(.12); 
+        if (warn_count++ % 2) {
+            0 => tick.pos;
+        } else {
+            0 => tock.pos;
+        }
+        
+    }
+
     fun void update(float dt) {
         spring.update(dt);
+        rot_spring.update(dt);
 
         1 + spring.x => mesh.sca;
+        rot_spring.x => mesh.rotZ;
     }
 }
 
 // unit test
-if (0) {
+if (1) {
     QuestionMark mark --> GG.scene();
 
     UI_Float3 color(Color.hex(0x901212));
@@ -102,7 +125,11 @@ if (0) {
         UI.slider("force", force, 0, 1);
 
         // if (UI.button("bounce")) mark.spring.pull(force.val());
-        if (UI.button("bounce")) mark.alert();
+        if (UI.button("bounce")) {
+            mark.warn();
+            // mark.alert();
+            // mark.rot_spring.pull(force.val());
+        }
 
 
         y.val() => mark.fill;

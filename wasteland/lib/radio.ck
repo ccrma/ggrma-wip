@@ -1,8 +1,14 @@
 @import "../../ChuGUI/src/ChuGUI.ck"
 @import "radioFilter.ck"
+@import "fillShader.ck"
 
 public class RadioMechanic {
     ChuGUI gui;
+
+    QuestionMark mark;
+    15::second => dur REPSONSE_TIME_LIMIT;
+    1 => float response_warn_cd;
+    0 => float response_warn_curr;
 
     float val;
 
@@ -25,6 +31,7 @@ public class RadioMechanic {
 
     // Whether the radio is active (for dialogue choices)
     0 => int _active;
+    int _powered_on;
     time _activate_time;
 
     // Position offset for rendering
@@ -33,12 +40,11 @@ public class RadioMechanic {
         // positions of zoomed-in radio
     @(0, 2 * GG.camera().viewSize()) => vec2 start_pos;
     start_pos => vec2 target_pos;
+    start_pos => vec2 mark_start_pos;
+    start_pos => vec2 mark_target_pos;
 
     // tween animation time (for entry/exit of zoomed radio)
-    1.0::second => dur ANIM_TIME;
-
-    // render options
-    int render_slider;
+    .6::second => dur ANIM_TIME;
 
     // audio
     SndBuf audio[0];
@@ -111,6 +117,12 @@ public class RadioMechanic {
     0 => radio_button_click.rate;
     SndBuf radio_off_button(me.dir() + "../assets/audio/radio-off-button.wav") => dac; 
     0 => radio_off_button.rate; 0 => radio_off_button.loop;
+
+    SndBuf radio_falling_1(me.dir() + "../assets/audio/crates_falling_1.wav") => dac;
+    0 => radio_falling_1.rate;
+    SndBuf radio_falling_2(me.dir() + "../assets/audio/crates_falling_2.wav") => dac;
+    0 => radio_falling_2.rate;
+
 
     fun RadioMechanic() {
         0 => numOptions;
@@ -211,31 +223,57 @@ public class RadioMechanic {
     fun float easeInBack(float x) {
         1.70158 => float c1;
         c1 + 1 => float c3;
-        return c3 * x * x * x - c1 * x * x;
+        return Math.clampf(c3 * x * x * x - c1 * x * x, 0, 1);
+    }
+
+    // fun void easeOutBack(x: number): number {
+    //     const c1 = 1.70158;
+    //     const c3 = c1 + 1;
+    //     return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    // }
+
+    fun float easeOutQuad(float x) {
+        Math.clampf(x, 0, 1) => x;
+        return 1 - (1 - x) * (1 - x);
     }
 
     fun float easeOutBounce(float x) {
-        7.5625 => float n1;
-        2.75 => float d1;
+        // 7.5625 => float n1;
+        // 2.75 => float d1;
+        // if (x > 1) return 1;
+        // if (x < 1 / d1) {
+        //     return n1 * x * x;
+        // } 
+        // else if (x < 2 / d1) {
+        //     return n1 * (1.5 / d1 -=> x) * x + 0.75;
+        // } 
+        // else if (x < 2.5 / d1) {
+        //     return n1 * (2.25 / d1 -=> x) * x + 0.9375;
+        // } 
+        // else {
+        //     return n1 * (2.625 / d1 -=> x) * x + 0.984375;
+        // }
+
         if (x > 1) return 1;
-        if (x < 1 / d1) {
-            return n1 * x * x;
-        } else if (x < 2 / d1) {
-            return n1 * (1.5 / d1 -=> x) * x + 0.75;
-        } else if (x < 2.5 / d1) {
-            return n1 * (2.25 / d1 -=> x) * x + 0.9375;
-        } else {
-            return n1 * (2.625 / d1 -=> x) * x + 0.984375;
+        if (x < .75) {
+            return 1 + (16.0/9) * (x - .75) * (x + .75);
         }
+        else {
+            .875 -=> x;
+            return 1 + 3.5 * (x - .125) * (x + .125);
+        }
+        
     }
 
     fun void activate() {
+        if (_active) return;
         spork ~ activateShred();
     }
 
     fun void activateShred() {
         1 => _active;
         now => _activate_time;
+        mark --> GG.scene();
 
         // set start and end pos
         @(  
@@ -244,18 +282,29 @@ public class RadioMechanic {
         ) => start_pos;
         @(0, 0) => target_pos;
 
+        @(  
+            2.,
+            .75 * GG.camera().viewSize()
+        ) => mark_start_pos;
+        @(2., 1.5) => mark_target_pos;
+
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
             0.5 => audio[i].gain;
         }
-        0.2 => radio_left.gain;
-        0.2 => radio_right.gain;
 
-        1 => radio_static.gain;
-        1 => radio_hum.gain;
 
         { // sfx
-            ANIM_TIME => now;
+            .75 *  ANIM_TIME => now;
+
+            SndBuf@ falling;
+            if (maybe) radio_falling_1 @=> falling;
+            else radio_falling_2 @=> falling;
+            0 => falling.pos;
+            1 => falling.rate;
+
+            .8 * ANIM_TIME => now;
+
             0 => radio_on.pos;
             1 => radio_on.rate;
             1 => radio_on.gain;
@@ -263,7 +312,9 @@ public class RadioMechanic {
             waveform --> GG.scene();
             1 => radio_static.rate;
             1 => radio_hum.rate;
-            true => render_slider;
+            0.2 => radio_left.gain;
+            0.2 => radio_right.gain;
+            true => _powered_on;
         }
     }
 
@@ -290,7 +341,7 @@ public class RadioMechanic {
         1 => radio_off_button.rate;
 
         .2::second => now;
-        false => render_slider;
+        false => _powered_on;
 
         // Mute all audio when deactivated
         for (int i; i < audio.size(); i++) {
@@ -312,6 +363,8 @@ public class RadioMechanic {
     }
 
     fun void update() {
+        GG.dt() => float dt; 
+
         slider("radio", _scale, _position, 3.0, false);
         UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, _brightness));
         UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.3, 0.175));
@@ -326,6 +379,16 @@ public class RadioMechanic {
             // set the mesh position
             waveform.positions( positions );
             updateAudio();
+
+            // update response time limit
+            (now - _activate_time) / REPSONSE_TIME_LIMIT => mark.fill;
+            if (mark.fill() > .5) {
+                dt -=> response_warn_curr;
+                if (response_warn_curr < 0) {
+                    response_warn_cd => response_warn_curr;
+                    mark.warn();
+                }
+            }
         }
         render();
     }
@@ -377,7 +440,8 @@ public class RadioMechanic {
         }
 
         // radio static
-        1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
+        if (_powered_on)
+            1.0 * Math.pow(Math.max(0.2, 1 - total_sample_gain), 1) => radio_static.gain => radio_hum.gain;
     }
 
     // do audio stuff
@@ -497,13 +561,24 @@ public class RadioMechanic {
 
     fun void render() {
         // tween between actual and target pos
+        (now - _activate_time) / ANIM_TIME => float x;
         float t;
-        if (_active) easeOutBounce((now - _activate_time) / ANIM_TIME) => t;
-        else easeInBack((now - _activate_time) / ANIM_TIME) => t;
+        float mark_t;
+        if (_active) {
+            easeOutBounce(x) => t;
+            easeOutQuad(x) => mark_t;
+        }
+        else {
+            easeInBack(x) => t;
+            1 - Math.clampf(x * x, 0, 1) => mark_t;
+        }
 
         start_pos + t * (target_pos - start_pos) => vec2 pos;
 
-        if (render_slider) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
+        mark_start_pos + mark_t * (mark_target_pos - mark_start_pos) => mark.pos;
+        <<< mark.pos(), mark_t, t >>>;
+
+        if (_powered_on) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
