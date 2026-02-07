@@ -6,15 +6,15 @@ public class BarScene extends Scene {
     GMesh @ light_mesh;
     SndBuf light_buzz(me.dir() + "../assets/audio/light_buzz.wav") => dac;
     1 => light_buzz.loop;
-    0.8 => float buzzBaseGain;
+    0.4 => float buzzBaseGain;
 
     SndBuf robot_steps(me.dir() + "../assets/audio/robot-steps.wav") => dac;
     1 => robot_steps.loop;
-    0.05 => robot_steps.gain;
+    0.025 => robot_steps.gain;
 
     SndBuf robot_noises(me.dir() + "../assets/audio/robot-noises.wav") => dac;
     1 => robot_noises.loop;
-    0.05 => robot_noises.gain;
+    0.03 => robot_noises.gain;
 
 
     fun BarScene() {

@@ -6,6 +6,7 @@ public class RadioMechanic {
     ChuGUI gui;
 
     QuestionMark mark;
+    mark.sca(1.5);
     15::second => dur REPSONSE_TIME_LIMIT;
     1 => float response_warn_cd;
     0 => float response_warn_curr;
@@ -20,6 +21,8 @@ public class RadioMechanic {
     int optionNumListens[0];
 
     ["4", "8", "12", "16"] @=> string radioNumbers[];
+
+    Spring rot_spring(0, 3500, 12);
 
     float dotX[0];
 
@@ -58,12 +61,12 @@ public class RadioMechanic {
     1::second => dur LOOP_DUR;
 
     256 => int WINDOW_SIZE;
-    3 => float WAVEFORM_Y;
-    2.2 => float DISPLAY_WIDTH;
+    2.65 => float WAVEFORM_Y;
+    1.8 => float DISPLAY_WIDTH;
     GLines waveform; waveform.width(.025);
     waveform.posY( WAVEFORM_Y );
-    waveform.posX(-3.6);
-    waveform.color(Color.GREEN);
+    waveform.posX(-3.5);
+    waveform.color(Color.WHITE);
 
     dac => Gain input;
     input => Flip accum => blackhole;
@@ -283,10 +286,10 @@ public class RadioMechanic {
         @(0, 0) => target_pos;
 
         @(  
-            2.,
+            1.5,
             .75 * GG.camera().viewSize()
         ) => mark_start_pos;
-        @(2., 1.5) => mark_target_pos;
+        @(1.5, 1.5) => mark_target_pos;
 
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
@@ -302,6 +305,7 @@ public class RadioMechanic {
             else radio_falling_2 @=> falling;
             0 => falling.pos;
             1 => falling.rate;
+            rot_spring.pull(.12);
 
             .8 * ANIM_TIME => now;
 
@@ -366,8 +370,9 @@ public class RadioMechanic {
 
     fun void update() {
         GG.dt() => float dt; 
+        rot_spring.update(dt);
 
-        slider("radio", _scale, _position, 3.0, false);
+        slider("radio", _scale, _position, 3.0, false, false);
         UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, _brightness));
         UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.3, 0.175));
         UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
@@ -500,11 +505,13 @@ public class RadioMechanic {
         0.0 => _brightness;
     }
 
-    fun void slider(string id, vec2 scale, vec2 pos, float z_index, int show_text) {
+    fun void slider(string id, vec2 scale, vec2 pos, float z_index, int show_text, int spring) {
         @(0.5 * scale.x, 0.01 * scale.y) => vec2 localSliderSize;
 
         // Scale factor from base sliderSize to this slider's size
         scale.x / _scale.x => float scaleRatio;
+
+        spring ? rot_spring.x : 0. => float rotZ;
 
         // dots with option labels
         for (int i; i < dotX.size(); i++) {
@@ -518,20 +525,22 @@ public class RadioMechanic {
             }
             UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
             UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
+            UIStyle.pushVar(UIStyle.VAR_RECT_ROTATE, rotZ);
             gui.rect(@(label_x, -0.01 + pos.y));
-            UIStyle.popVar(2);
+            UIStyle.popVar(3);
             UIStyle.popColor();
 
             if (show_text && optionNumListens[i] > 0) { // text labels
                 UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
                 UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.02 * scale.x);
                 UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
+                UIStyle.pushVar(UIStyle.VAR_LABEL_ROTATE, rotZ);
 
                 Math.max(1, 400 / Math.pow(2, optionNumListens[i])) => float antialias;
 
                 UIStyle.pushVar(UIStyle.VAR_LABEL_ANTIALIAS, antialias);
                 gui.label(optionLabels[i], @(label_x, pos.y - .05 * scale.y));
-                UIStyle.popVar(3);
+                UIStyle.popVar(4);
                 UIStyle.popColor();
             }
         }
@@ -540,13 +549,14 @@ public class RadioMechanic {
             UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
             UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.04 * scale.x);
             UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
+            UIStyle.pushVar(UIStyle.VAR_LABEL_ROTATE, rotZ);
 
             for (int i; i < radioNumbers.size(); i++) {
                 -localSliderSize.x / 2. + (i * 1.0) / (radioNumbers.size() - 1) * localSliderSize.x => float xPos;
                 gui.label(radioNumbers[i], @(xPos + pos.x, 0.03 * scale.y + pos.y));
             }
 
-            UIStyle.popVar(2);
+            UIStyle.popVar(3);
             UIStyle.popColor();
         }
 
@@ -559,8 +569,9 @@ public class RadioMechanic {
         UIStyle.pushVar(UIStyle.VAR_SLIDER_TRACK_SIZE, @(0.5 * scale.x , 0.01 * scale.y));
         UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005 * scale.x, 0.08 * scale.y));
         UIStyle.pushVar(UIStyle.VAR_SLIDER_Z_INDEX, z_index);
+        UIStyle.pushVar(UIStyle.VAR_SLIDER_ROTATE, rotZ);
         gui.slider(id, @(pos.x, pos.y), 0, 1, val) => val;
-        UIStyle.popVar(3);
+        UIStyle.popVar(4);
         UIStyle.popColor();
     }
 
@@ -583,13 +594,13 @@ public class RadioMechanic {
 
         mark_start_pos + mark_t * (mark_target_pos - mark_start_pos) => mark.pos;
 
-        if (_powered_on) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true);
+        if (_powered_on) slider("zoomed_radio", @(_scale.x * 3, _scale.y * 1.5), pos, 4.1, true, true);
 
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
+        UIStyle.pushVar(UIStyle.VAR_ICON_ROTATE, rot_spring.x);
         gui.icon(me.dir() + "../assets/radio_box.png", pos); 
-        UIStyle.popVar(2);
-
+        UIStyle.popVar(3);
 
         if (_active) {
             UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, 0.6));
