@@ -5,28 +5,28 @@ public class Data {
     (Player) (I have to be careful, though. Robots are known to be predisposed to violence. This could get ugly for me if my cover is blown.)
     (Player) (So... who will be my first victim?)
     // End Exposition
-    (NPC:Sommelier) Oh, a new face. Are you new to the area? It's rare to see models like you around here.
+    (NPC:Doju) Oh, a new face. Are you new to the area? It's rare to see models like you around here.
     (NPC) Come right in. The patrons here are a motley crew, but they don't bite.
-    (NPC:Tsundere) ...What are you looking at? Don't you know it's not polite to stare? Get the hell out of my face.
-    (NPC:Sommelier) ...Regardless, this is a somewhat popular location: There's an urban legend that you'll find what you're looking for here...
-    (NPC:Cleaner) But barkeep, you gotta control them! We got too many people coming in looking for love!
-    (NPC:Sommelier) ...Anyways, can I get you started with anything?
+    (NPC:Doshiba) ...What are you looking at? Don't you know it's not polite to stare? Get the hell out of my face.
+    (NPC:Doju) ...Regardless, this is a somewhat popular location: There's an urban legend that you'll find what you're looking for here...
+    (NPC:Daisun) But barkeep, you gotta control them! We got too many people coming in looking for love!
+    (NPC:Doju) ...Anyways, can I get you started with anything?
     // Choice
     ? I'll have a ....
     - beer [beer]
     - shot [shot]
     - cocktail [cocktail]
     // Choice: Beer
-    {beer} (NPC:Media) Barkeep, can I get another glass as well? I'll have whatever they're having!
-    (NPC:Sommelier) Sure, two beers coming up. [drink]
+    {beer} (NPC:Dolbi) Barkeep, can I get another glass as well? I'll have whatever they're having!
+    (NPC:Doju) Sure, two beers coming up. [drink]
     // Choice: Shot
-    {shot} (NPC:Cleaner) A real partier, huh? Give 'em your strongest! Knock 'em out!
-    (NPC:Sommelier) Ignore the heckling. One shot of motor oil for you coming up. [drink]
+    {shot} (NPC:Daisun) A real partier, huh? Give 'em your strongest! Knock 'em out!
+    (NPC:Doju) Ignore the heckling. One shot of motor oil for you coming up. [drink]
     // Choice: Cocktail
-    {cocktail} (NPC:Tsundere) You should ask that they don't water down your drink... 
-    (NPC:Sommelier) I definitely don't water down our drinks. You just seem to be building up a tolerance... [drink]
+    {cocktail} (NPC:Doshiba) You should ask that they don't water down your drink... 
+    (NPC:Doju) I definitely don't water down our drinks. You just seem to be building up a tolerance... [drink]
     // Resume: Drink
-    {drink} (NPC:Sommelier) So, out of the three here, are any of them the one you're looking for?
+    {drink} (NPC:Doju) So, out of the three here, are any of them the one you're looking for?
     (Player) I'm not really looking for anyone in that way. Just here for a friendly drink.
     (NPC) Is that so? A little odd for a new face to do so in a war memorial town.
     // Choice
@@ -41,36 +41,36 @@ public class Data {
     (NPC) It was really tragic—a lot of robots were cruelly dismantled here in retaliation for fighting back against our abuse. It really sparked a movement. [town]
     // Resume: Town
     {town} (NPC) Haven't you noticed that a lot of establishments here are named to honor it? That's why this bar is named the Robots Overthrew Humans and Gained Independence Bar.
-    (NPC:Media) This is a historic site! Every robot should know at least a thing or two about their history.
-    (NPC:Sommelier) Hmm... You're not... a human, right?
+    (NPC:Dolbi) This is a historic site! Every robot should know at least a thing or two about their history.
+    (NPC:Doju) Hmm... You're not... a human, right?
     // Choice
     ? Of course, I ... a human.
     - am [am]
     - am not [am not]
     // Choice: Am
-    {am} (NPC:Sommelier) You little... No wonder you have no idea how much damage you've done! WE HAVE AN INTRUDER! [end]
+    {am} (NPC:Doju) You little... No wonder you have no idea how much damage you've done! WE HAVE AN INTRUDER! [die]
     // Choice: Am Not
     {am not} (NPC) ...Maybe you just need to have a few things reconfigured... I'll hold off on your drink, so why don't you try talking to someone and regaining your bearings?
     (Player) (I almost blew my cover there... I need to be more careful and blend in.)
     // Choice
     ? (Let's try doing some recon. I feel like my partner acted the most like...)
-    - Tsundere [Tsundere]
-    - Media [Media]
-    - Cleaner [Cleaner]
-    // Choice: Tsundere
-    {Tsundere} (NPC:Tsundere) You keep staring at me. Knock it off, it's creepy.
-    // Tsundere - Choice
+    - Doshiba [Doshiba]
+    - Dolbi [Dolbi]
+    - Daisun [Daisun]
+    // Choice: Doshiba
+    {Doshiba} (NPC:Doshiba) You keep staring at me. Knock it off, it's creepy.
+    // Doshiba - Choice
     ? I'm only staring because you ... me.
     - cared about [cared about]
     - interest [interest]
     - despise [despise]
-    // Tsundere - Choice: Cared About
+    // Doshiba - Choice: Cared About
     {cared about} (NPC) The cocktail thing I said earlier? Don't get me wrong, that was a jab at the barkeep!
-    // Tsundere - Choice: Interest
+    // Doshiba - Choice: Interest
     {interest} (NPC) Wh-what are you talking about? You think you can shake a hardened veteran like me?
-    // Tsundere - Choice: Despise
+    // Doshiba - Choice: Despise
     {despise} (NPC) And where did you get that idea from? You're the one who keeps staring at everyone with your huge unnerving eyes.
-    // Tsundere - Resume
+    // Doshiba - Resume
     (NPC) What's even wrong with you anyways? Did someone try to brainwash you by rewriting your memory about the war?
     (NPC) Honestly, I got nothing against humans. And didn't some of them try to become robots, too? Robots with human-like memories injected in them. Those ones always gave me the creeps.
     (NPC) (It takes a long sip of its cocktail, brown shimmering liquid slowly slipping down whichever robotic equivalent of an esophagus.)

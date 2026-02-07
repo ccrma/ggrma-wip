@@ -10,22 +10,22 @@ Improvement (if time)
 
 public class TextSonifier extends Chugraph {
     ADSR adsr(5::ms, 45::ms, 0, 0::ms) => outlet;
-    adsr.gain(.5);
+    adsr.gain(.1);
     UGen@ curr;
 
     SinOsc sin;
     SinOsc sin2; .5 => sin2.gain;
 
     PulseOsc pulse;
-    SawOsc saw; .5 => saw.gain;
-    Blit blit;
+    SawOsc saw; 1.0 => saw.gain;
+    Blit blit; 1.25 => blit.gain;
 
     // TODO remove if sticking with granular synth
-    CNoise noise => BPF bpf(440, .5); 6 => bpf.gain;
+    CNoise noise => BPF bpf(440, .5); 4 => bpf.gain;
     // noise.mode("pink");
 
     TriOsc lfo_tri => blackhole;
-    LiSa lisa; 2.5 => lisa.gain;
+    LiSa lisa; 1 => lisa.gain;
     lisa.chan(0) => PoleZero blocker; .99 => blocker.blockZero;
     lisa.play( false );
     lisa.loop( false );
@@ -192,70 +192,70 @@ public class TextSonifier extends Chugraph {
 
 }
 
-GText text --> GG.scene();
-text.text("
-hello this is an example dialog string
-hello this is an example dialog string
-hello this is an example dialog string
-hello this is an example dialog string
-");
-// text.text("123 456 789");
-.1 => text.size;
-text.characters(0);
-int char_count;
+// GText text --> GG.scene();
+// text.text("
+// hello this is an example dialog string
+// hello this is an example dialog string
+// hello this is an example dialog string
+// hello this is an example dialog string
+// ");
+// // text.text("123 456 789");
+// .1 => text.size;
+// text.characters(0);
+// int char_count;
 
-TextSonifier son(TextSonifier.Mode_SommelierBot) => dac;
+// TextSonifier son(TextSonifier.Mode_SommelierBot) => dac;
 
-fun int numSpaces(string s) {
-    int count;
-    for (int i; i < s.length(); ++i) {
-        if (s.charAt(i) == ' ') ++count;
-    }
-    return count;
-}
+// fun int numSpaces(string s) {
+//     int count;
+//     for (int i; i < s.length(); ++i) {
+//         if (s.charAt(i) == ' ') ++count;
+//     }
+//     return count;
+// }
 
-// returns length of string minus spaces
-// because GTExt.characters() ignores spaces
-fun int charLength(string s) {
-    return s.length() - numSpaces(s);
-}
+// // returns length of string minus spaces
+// // because GTExt.characters() ignores spaces
+// fun int charLength(string s) {
+//     return s.length() - numSpaces(s);
+// }
 
-UI_Int mode(son._mode);
-UI_Float attack_ms(son.adsr.attackTime()/ms);
-UI_Float decay_ms(son.adsr.decayTime()/ms);
-UI_Float bpf_q(son.bpf.Q());
-
-
-fun void g() {
-    while (1) {
-        GG.nextFrame() => now;
-        if (UI.slider("attack (ms)", attack_ms, 0, 100)) son.adsr.attackTime(attack_ms.val()::ms);
-        if (UI.slider("decay (ms)", decay_ms, 0, 100)) son.adsr.decayTime(decay_ms.val()::ms);
-
-        if (UI.listBox("mode", mode, TextSonifier.mode_names)) son.mode(mode.val());
-
-        if (UI.slider("Q", bpf_q, 0, 20)) bpf_q.val() => son.bpf.Q;
-
-        UI.slider("grain len", son.grain_len_ms, 1, 1000);
-        UI.slider("grain rate", son.grain_rate, .1, 10);
-
-        if (UI.button("reset")) {
-            son.reset();
-            0 => char_count;
-        }
-    }
-} spork ~ g();
+// UI_Int mode(son._mode);
+// UI_Float attack_ms(son.adsr.attackTime()/ms);
+// UI_Float decay_ms(son.adsr.decayTime()/ms);
+// UI_Float bpf_q(son.bpf.Q());
 
 
-charLength(text.text()) => int len;
+// fun void g() {
+//     while (1) {
+//         GG.nextFrame() => now;
+//         if (UI.slider("attack (ms)", attack_ms, 0, 100)) son.adsr.attackTime(attack_ms.val()::ms);
+//         if (UI.slider("decay (ms)", decay_ms, 0, 100)) son.adsr.decayTime(decay_ms.val()::ms);
+
+//         if (UI.listBox("mode", mode, TextSonifier.mode_names)) son.mode(mode.val());
+
+//         if (UI.slider("Q", bpf_q, 0, 20)) bpf_q.val() => son.bpf.Q;
+
+//         UI.slider("grain len", son.grain_len_ms, 1, 1000);
+//         UI.slider("grain rate", son.grain_rate, .1, 10);
+
+//         if (UI.button("reset")) {
+//             son.reset();
+//             0 => char_count;
+//         }
+//     }
+// } spork ~ g();
 
 
-while (1) {
-    text.characters(char_count + 1);
-    if (char_count < len) { 
-        son.speak();
-    }
-    ++char_count;
-    // <<< char_count >>>;
-    60::ms => now;
-}
+// charLength(text.text()) => int len;
+
+
+// while (1) {
+//     text.characters(char_count + 1);
+//     if (char_count < len) { 
+//         son.speak();
+//     }
+//     ++char_count;
+//     // <<< char_count >>>;
+//     60::ms => now;
+// }

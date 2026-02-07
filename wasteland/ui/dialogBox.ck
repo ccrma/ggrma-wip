@@ -90,7 +90,7 @@ public class DialogBox {
         UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.19 * s);
         UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, textMaxWidth);
         UIStyle.pushVar(UIStyle.VAR_LABEL_CHARACTERS, _charCount $ int);
-        gui.label(_text.trim(), @(textLeftX - 0.9, textY));
+        gui.label(_text.trim(), @(textLeftX - 1.15, textY));
         UIStyle.popVar(5);
         UIStyle.popColor();
 
@@ -137,10 +137,10 @@ public class DialogBox {
         name => _speakerName;
         // update text sonifier mode
         // TODO update to new robot names here
-        if      (name == "Media") textSon.mode(TextSonifier.Mode_MediaBot);
-        else if (name == "Sommelier") textSon.mode(TextSonifier.Mode_SommelierBot);
-        else if (name == "Tsundere") textSon.mode(TextSonifier.Mode_TsundereBot);
-        else if (name == "Cleaner") textSon.mode(TextSonifier.Mode_VaccuumBot);
+        if      (name == "Dolbi") textSon.mode(TextSonifier.Mode_MediaBot);
+        else if (name == "Doju") textSon.mode(TextSonifier.Mode_SommelierBot);
+        else if (name == "Doshiba") textSon.mode(TextSonifier.Mode_TsundereBot);
+        else if (name == "Daisun") textSon.mode(TextSonifier.Mode_VaccuumBot);
         else                        textSon.mode(TextSonifier.Mode_None);
     }
 

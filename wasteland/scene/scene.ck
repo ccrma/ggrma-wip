@@ -6,6 +6,10 @@ public class Scene {
 
     DialogManager dm;
 
+    fun void init(Player @ player, Prompt prompts[]) {
+        // To be overridden by subclasses
+    }
+
     fun void update(ChuGUI gui) {
         render(gui);
     }

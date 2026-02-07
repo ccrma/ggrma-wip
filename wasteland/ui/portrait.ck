@@ -21,6 +21,13 @@ public class Portrait {
 
     0.8 => float defaultHeightRatio;
 
+    SndBuf fadeInSnd(me.dir() + "../assets/audio/fade_in.wav") => dac;
+    0 => fadeInSnd.rate;
+    0.2 => fadeInSnd.gain;
+    SndBuf fadeOutSnd(me.dir() + "../assets/audio/fade_out.wav") => dac;
+    0 => fadeOutSnd.rate;
+    0.2 => fadeOutSnd.gain;
+
     fun Portrait() {
         @(0, 0) => _pos;
         @(1, 1) => _size;
@@ -112,7 +119,21 @@ public class Portrait {
         ratio => defaultHeightRatio;
     }
 
+    fun void playFadeIn() {
+        1 => fadeInSnd.rate;
+        0 => fadeInSnd.pos;
+        fadeInSnd.length() => now;
+    }
+
+    fun void playFadeOut() {
+        1 => fadeOutSnd.rate;
+        0 => fadeOutSnd.pos;
+        fadeOutSnd.length() => now;
+    }
+
     fun void show() {
+        spork ~ playFadeIn();
+
         true => _visible;
         45 => int frames;
         2.0 => float startOffset;
@@ -128,6 +149,8 @@ public class Portrait {
     }
 
     fun void hide() {
+        spork ~ playFadeOut();
+
         30 => int frames;
         2.0 => float endOffset;
         for (int i; i <= frames; i++) {

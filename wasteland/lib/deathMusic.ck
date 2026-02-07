@@ -85,6 +85,13 @@ public class DeathMusic {
         }
     } spork ~ pitchSlew();
 
+    fun void stop() {
+        adsr =< dac;
+        noise =< dac;
+        0 => noise.rate;
+        0 => m.gain;
+    }
+
     fun void play(float base_midi) {
         adsr => dac;
         noise => dac;

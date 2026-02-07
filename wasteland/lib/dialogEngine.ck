@@ -217,7 +217,8 @@ public class Prompt {
         for (auto p : prompts) {
             if (p.next_tag.length()) {
                 if (!prompts.isInMap(p.next_tag)) {
-                    <<< "error: redirect tag [", p.next_tag, "] does not exist for prompt", p.toString() >>>;
+                    if (p.next_tag != "die")
+                        <<< "error: redirect tag [", p.next_tag, "] does not exist for prompt", p.toString() >>>;
                     continue;
                 }
                 prompts[p.next_tag] @=> p.next;

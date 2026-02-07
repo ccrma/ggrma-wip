@@ -12,6 +12,7 @@
 
 GG.camera().aspect(16./9);
 GG.camera().orthographic();
+GG.camera().posZ(8.0);
 
 //----------------------------------------------------------------------------
 // Scene Setup
