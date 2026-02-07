@@ -178,11 +178,14 @@ public class DialogManager {
         _radio.getSelectedIndex() => int selectedIdx;
         _currentPrompt.responses[selectedIdx].text => string responseText;
 
+
         // Insert selection after "..."
         _currentPrompt.responseTemplate.find("...") => int ellipsisIdx;
+        <<< _currentPrompt.responseTemplate, ellipsisIdx, responseText >>>;
         _currentPrompt.responseTemplate.substring(0, ellipsisIdx + 3) + " " +
             responseText.rtrim() +
-            _currentPrompt.responseTemplate.substring(ellipsisIdx + 3) => string fullText;
+            _currentPrompt.responseTemplate.substring(ellipsisIdx + 2) => string fullText;
+        
 
         dialogBox.text(fullText, ellipsisIdx + 3);
     }
