@@ -1,4 +1,4 @@
-@import "../../ChuGUI/src/ChuGUI.ck"
+@import "../ChuGUI/src/ChuGUI.ck"
 @import "../lib/camera.ck"
 @import "../lib/sonifyText.ck"
 

@@ -1,4 +1,4 @@
-@import "../../ChuGUI/src/ChuGUI.ck"
+@import "../ChuGUI/src/ChuGUI.ck"
 @import "player.ck"
 @import "npc.ck"
 @import "dialogEngine.ck"

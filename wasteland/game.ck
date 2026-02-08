@@ -1,4 +1,4 @@
-@import "../ChuGUI/src/ChuGUI.ck"
+@import "ChuGUI/src/ChuGUI.ck"
 @import "lib/player.ck"
 @import "lib/radio.ck"
 @import "lib/data.ck"
