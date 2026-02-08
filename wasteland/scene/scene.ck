@@ -10,6 +10,10 @@ public class Scene {
         // To be overridden by subclasses
     }
 
+    fun void deinit() {
+        // to be overridden
+    }
+
     fun void update(ChuGUI gui) {
         render(gui);
     }

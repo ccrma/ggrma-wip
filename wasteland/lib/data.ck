@@ -59,7 +59,6 @@ public class Data {
     - Doshiba [Doshiba]
     - Dolbi [Dolbi]
     - Daisun [Daisun]
-    
     // Choice: Doshiba
     {Doshiba} (NPC:Doshiba:Suspicious) You keep staring at me. Knock it off, it's creepy.
     // Doshiba - Choice
@@ -113,7 +112,6 @@ public class Data {
     (NPC:Doshiba) You, too? More than myself, I think most about the people in those memories, who I cherished and will never get to see again.
     (NPC:Doshiba:Sad) If only I could be with them again, human or not...
     (Player) (Could they be the one I'm searching for? Maybe there is something special about the bar. Might as well shoot my shot... What could go wrong?) [good:Doshiba]
-    
     {bad:Doshiba} (Narrator) The atmosphere in the bar suddenly grows heavy.
     (Narrator) Doshiba's face, once a gentle pale green, turns a dark blood red as they open their chassis to reveal what looks like a combat-grade titanium bonesaw.
     (Narrator) You don't think you're going to make it through the night as they set it to your soft squishy cardboard casing.
@@ -122,7 +120,6 @@ public class Data {
     (Narrator) Doshiba learns of and accepts your human identity, and it complements Doshiba's fragmented human memories.
     {good:Doshiba} (Narrator) You enjoy their companionship and witty banter for some time, but something feels missing despite the back-and-forth and despite the teasing.
     (Narrator) The restless longing for your past partner inevitably pulls you away, and you grow distant. The search continues...
-
     // Choice: Dolbi
     {Dolbi} (Player) Hey there, fellow bot. How's your beer?
     (NPC:Dolbi:Suspicious) Well, *that's* an unusual way to greet someone. What firmware version were you released on?
@@ -168,7 +165,6 @@ public class Data {
     (Player) Wasn't it the massacre?
     (NPC:Dolbi:Sad) That's nothing more than government propaganda, framing it as a random act of violence to justify further, organized violence.
     (NPC:Dolbi:Sad) But without a true, reliable source of information, we will never know for sure. [neutral:Dolbi]
-
     {bad:Dolbi} (NPC:Dolbi:Angry) Okay, now I know you're bluffing. Off by a few orders of magnitude from even the oldest models. And sound is a particle these days, anyways.
     (Narrator) His already eery countenance now turns into a wicked grin. A well-worn crimson record emerges from his abdomen and is placed delicately on his central turntable.
     (Narrator) The needle drops, the record rotates.
@@ -179,7 +175,6 @@ public class Data {
     {good:Dolbi}(Narrator) Dolby eventually realizes you are human, and loves you all the more for it.
     (Narrator) You become his muse, providing primary-source material and an invaluable human perspective for his film career.
     (Narrator) As a duo, your work makes waves across the robot literati, blazing the the trail for Robot new-wave cinema.
-
     // Choice: Daisun
     {Daisun} (NPC:Daisun:Happy) h-heyyyy good looking! i mean good morning, oops i mean good afternoon i mean. oh no...
     (Player) ...
@@ -239,21 +234,15 @@ public class Data {
     " => static string script;
 
 
-    "
-    (Player) Pretty neat game, wonder who made it...
-
+    " (Player) Pretty neat game, wonder who made it...
     (NPC:Dolbi) My records show a certain 'azaday' was responsible for the music. 
     (NPC:Dolbi:Happy) Somewhat plebeian by my standards, but I suppose it suffices. 
-
     (NPC:Daisun) oh wow it turns out all art assets were handmade by Audrey Lee, Gray Wong, and gunoo.
     (NPC:Daisun:Love) so talented!! uwu. i hope i can draw like that some day... 
-
     (NPC:Doshiba) Scanning logs... looks like azaday and Ben Hoang wrote most of the code here. 
     (NPC:Doshiba:Suspicious) Personally, I've always thought code should be written by robots. But well done, I guess.
-
     (NPC:Doju) And everyone contributed to SFX and voiceovers: Audrey Lee, azaday, Ben Hoang, Gray Wong, and gunoo.
     (NPC) Now that's some teamwork! If yall ever swing by, drinks are on the house!
-
     (Narrator) Despite this being a game about robots ... NO AI WAS USED. All music/code/art was lovingly hand-crafted.
     (Narrator) Thank you to Ge Wang and the rest of the CCRMA community for all your support!
     (Narrator) Programmed in ChuGL/ChucK for WASTELAND Jam 02 by Good Game Research in Music & Acoustics (GGRMA), a research group at Stanford University's CCRMA.

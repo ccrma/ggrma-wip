@@ -197,7 +197,7 @@ public class DialogManager {
     fun void showCurrentPrompt() {
         if (_currentPrompt == null) {
             clearSpeaker();
-            setDialog("", "End of dialogue.");
+            
             if (_radio != null) _radio.deactivate();
             return;
         }

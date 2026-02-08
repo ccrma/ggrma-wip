@@ -39,7 +39,7 @@ public class Game {
     SndBuf title_music(me.dir() + "./assets/audio/wasteland.wav") => ADSR title_music_adsr => dac;
     1 => title_music.loop;
     title_music_adsr.attackTime(10::second);
-    PoleZero pole; .99 => pole.blockZero;
+    title_music_adsr => PoleZero pole; .99 => pole.blockZero;
     (34 * (second/samp))$int => title_music.pos;
 
     Spring enter_rot_spring(0, 100, 8);
@@ -68,7 +68,7 @@ public class Game {
         .75 => titleRadio.dotX[1];
 
         dac =< titleRadio.accum;
-        title_music_adsr => pole => titleRadio.accum;
+        pole =< titleRadio.accum; pole => titleRadio.accum;
         titleRadio.waveform.pos(@(.05, -.315));
         titleRadio.waveform.width(.01);
         1.1 => titleRadio.DISPLAY_WIDTH;
@@ -82,7 +82,7 @@ public class Game {
 
         // Init music and audio
         titleRadio.sfx_gain =< dac;
-        titleRadio.sfx_gain => title_music_adsr;
+        titleRadio.sfx_gain =< title_music_adsr; titleRadio.sfx_gain => title_music_adsr;
         spork ~ startMusic();
     }
 
@@ -110,7 +110,6 @@ public class Game {
             UIStyle.pushVar(UIStyle.VAR_LABEL_FONT, me.dir() + "assets/fonts/GiantRobotArmy.ttf");
 
             if (titleScreen) {
-
                 if (GWindow.keyDown(GWindow.KEY_RIGHT) || GWindow.keyDown(GWindow.KEY_LEFT)) {
                     arrow_rot_spring.pull(.1);
                     arrow_sca_spring.pull(.1);
@@ -165,6 +164,9 @@ public class Game {
                 scene.update(gui);
                 radio.update();
 
+                if (scene.dialogManager()._currentPrompt == null) {
+                    gotoTitleScreen();
+                }
                 // Disable all input during NPC transitions and death
                 if (!scene.dialogManager().inTransition() && !dead) {
                     // ENTER advances dialogue and confirms radio selections
@@ -292,5 +294,11 @@ public class Game {
         // Show death menu radio
         deathRadio.activate();
         true => deathMenuActive;
+    }
+
+    fun void gotoTitleScreen() {
+        true => titleScreen;
+        init();
+        (scene $ BarScene).deinit();
     }
 }

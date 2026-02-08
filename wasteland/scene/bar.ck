@@ -1,9 +1,21 @@
 @import "scene.ck"
 
 public class BarScene extends Scene {
-    NPC @ stranger;
+    NPC stranger("", "");
 
-    GMesh @ light_mesh;
+    static GMesh@ light_mesh;
+    if (light_mesh == null) {
+        TextureLoadDesc desc;
+        true => desc.flip_y;
+        Texture.load( me.dir() + "../assets/bar/bar_light.png", desc ) @=> Texture light_tex;
+        PlaneGeometry geo;
+        FlatMaterial mat;
+        mat.colorMap(light_tex);
+        mat.transparent(true);
+        new GMesh( geo, mat ) @=> light_mesh;
+    }
+
+
     SndBuf light_buzz(me.dir() + "../assets/audio/light_buzz.wav") => dac;
     1 => light_buzz.loop;
     0 => light_buzz.rate;
@@ -28,7 +40,6 @@ public class BarScene extends Scene {
         dm.dialog().rightMargin(3.8);
         dm.setPlayer(player);
 
-        new NPC("", "") @=> stranger;
         dm.setNpc(stranger);
 
         dm.registerNpc("Daisun", me.dir() + "../assets/cleaner/cleaning-bot.png");
@@ -64,18 +75,15 @@ public class BarScene extends Scene {
         0.5 => robot_noises.rate;
         spork ~ fadeInAudio();
 
-        TextureLoadDesc desc;
-        true => desc.flip_y;
-        Texture.load( me.dir() + "../assets/bar/bar_light.png", desc ) @=> Texture light_tex;
-        PlaneGeometry geo;
-        FlatMaterial mat;
-        mat.colorMap(light_tex);
-        mat.transparent(true);
-        new GMesh( geo, mat ) @=> light_mesh;
         light_mesh.sca(ChuGUI.NDCToWorldSize(@(2, 2)));
         light_mesh --> GG.scene();
 
         spork ~ lightFlicker();
+    }
+
+    fun void deinit() {
+        stopAudio();
+        light_mesh --< GG.scene();
     }
 
     fun void update(ChuGUI gui) {
@@ -88,7 +96,7 @@ public class BarScene extends Scene {
         (light_mesh.mat() $ FlatMaterial).alpha(alpha);
         alpha / 0.8 * buzzBaseGain => light_buzz.gain;
     }
-
+    
     fun void stopAudio() {
         true => _stopAudio;
         spork ~ fadeOutAudio();
@@ -126,12 +134,15 @@ public class BarScene extends Scene {
         }
     }
 
+    int _lightFlickerGen;
     fun void lightFlicker() {
         0.8 => float baseAlpha;
         0.1 => float flickerIntensity;
 
+        ++_lightFlickerGen => int flickerGen;
+
         while (true) {
-            if (_stopAudio) return;
+            if (flickerGen != _lightFlickerGen) return;
             // shutoff (~2% chance)
             if (Math.random2f(0, 1) < 0.02) {
                 setLight(Math.random2f(0, 0.15));
