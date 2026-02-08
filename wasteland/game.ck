@@ -10,6 +10,7 @@ public class Game {
     ChuGUI gui --> GG.scene();
 
     Prompt.parse(Data.script, false) @=> Prompt prompts[];
+    Prompt.parse(Data.credits, false) @=> Prompt credit_prompts[];
 
     // Player persists across all scenes
     Player player("You", me.dir() + "assets/human/human.png");
@@ -89,11 +90,11 @@ public class Game {
         title_music_adsr.keyOn();
     }
 
-    fun void startGame() {
+    fun void startGame(Prompt prompt[]) {
         false => titleScreen;
         titleRadio.deactivate();
         1.0 => _fadeAlpha;
-        scene.init(player, prompts);
+        scene.init(player, prompt);
         scene.dialogManager().setRadio(radio);
     }
 
@@ -148,12 +149,13 @@ public class Game {
 
                 if (GWindow.keyDown(GWindow.KEY_ENTER) && titleRadio.hasSelection()) {
                     titleRadio.getSelectedIndex() => int sel;
-                    title_music_adsr.keyOff();
 
                     if (sel == 0) {
                         // "Start" selected
-                        startGame();
-                        // turn off music
+                        title_music_adsr.keyOff();
+                        startGame(prompts);
+                    } else {
+                        startGame(credit_prompts);
                     }
                     // sel == 1 is "Credits" — handle later
                 }
