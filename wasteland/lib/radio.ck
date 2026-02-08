@@ -11,7 +11,7 @@ public class RadioMechanic {
     QuestionMark mark;
     mark.sca(1.5);
     mark.posZ(3.5);
-    15::second => dur REPSONSE_TIME_LIMIT;
+    22::second => dur REPSONSE_TIME_LIMIT;
     1 => float response_warn_cd;
     0 => float response_warn_curr;
 
