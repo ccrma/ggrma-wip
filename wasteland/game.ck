@@ -78,6 +78,7 @@ public class Game {
         deathRadio.scale(@(0.525, 1.5));
         deathRadio.setAudioBasePath(me.dir() + "assets/audio/");
         deathRadio.init();
+        deathRadio.setOptions(["Restart", "Continue", "Credits", "Exit"]);
 
         // Init music and audio
         titleRadio.sfx_gain =< dac;
@@ -269,7 +270,7 @@ public class Game {
                                 // Credits
                             } else if (sel == 3) {
                                 // Exit
-                                me.exit();
+                                GWindow.close();
                             }
                         }
                     }
@@ -289,7 +290,6 @@ public class Game {
         1::second => now;
 
         // Show death menu radio
-        deathRadio.setOptions(["Restart", "Continue", "Credits", "Exit"]);
         deathRadio.activate();
         true => deathMenuActive;
     }

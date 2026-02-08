@@ -154,6 +154,7 @@ public class RadioMechanic {
     }
 
     fun void loadAudioForLabels(string labels[]) {
+        <<< this.toString() >>>;
         // Clear existing audio
         for (int i; i < pan.size(); i++) {
             pan[i].left =< radio_left;
@@ -657,10 +658,10 @@ public class TitleRadioMechanic extends RadioMechanic {
         @(0, 0) => target_pos;
 
         for (int i; i < audio.size(); i++) {
-            0.5 => audio[i].gain;
+            1.0 => audio[i].gain;
         }
-        0.2 => radio_left.gain;
-        0.2 => radio_right.gain;
+        0.5 => radio_left.gain;
+        0.5 => radio_right.gain;
         1 => radio_static.rate;
         1 => radio_hum.rate;
 
@@ -677,6 +678,7 @@ public class TitleRadioMechanic extends RadioMechanic {
         }
         0 => radio_left.gain;
         0 => radio_right.gain;
+        0 => radio_on.gain;
         0 => radio_static.gain;
         0 => radio_hum.gain;
 
@@ -720,12 +722,16 @@ public class DeathRadioMechanic extends RadioMechanic {
 
         // Unmute audio
         for (int i; i < audio.size(); i++) {
-            0.5 => audio[i].gain;
+            1.0 => audio[i].gain;
+            1.0 => audio[i].rate;
         }
+        0 => radio_on.pos;
+        1 => radio_on.rate;
+        1 => radio_on.gain;
         1 => radio_static.rate;
         1 => radio_hum.rate;
-        0.2 => radio_left.gain;
-        0.2 => radio_right.gain;
+        1 => radio_left.gain;
+        1 => radio_right.gain;
     }
 
     fun void deactivate() {
@@ -743,19 +749,11 @@ public class DeathRadioMechanic extends RadioMechanic {
         // Mute and stop all audio immediately
         for (int i; i < audio.size(); i++) {
             0 => audio[i].gain;
-            0 => audio[i].rate;
-        }
-        for (int i; i < pan.size(); i++) {
-            pan[i].left =< radio_left;
-            pan[i].right =< radio_right;
         }
         0 => radio_left.gain;
         0 => radio_right.gain;
         0 => radio_on.gain;
-        0 => radio_on.rate;
-        0 => radio_static.rate;
         0 => radio_static.gain;
-        0 => radio_hum.rate;
         0 => radio_hum.gain;
     }
 
