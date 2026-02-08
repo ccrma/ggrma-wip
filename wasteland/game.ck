@@ -104,8 +104,8 @@ public class Game {
 
     fun void startGame(Prompt prompt[]) {
         false => titleScreen;
-        titleRadio.deactivate();
-        1.0 => _fadeAlpha;
+        false => end;
+1.0 => _fadeAlpha;
         scene.init(player, prompt);
         scene.dialogManager().setRadio(radio);
     }
@@ -320,8 +320,6 @@ enough for suspicion. And, as it turns out for you, death.
                             } else if (sel == 2) { // title
                                 deathRadio.deactivate();
                                 death_music.stop();
-                                false => dead;
-                                false => deathMenuActive;
                                 1.0 => _fadeAlpha;
                                 spork ~ gotoTitleScreen();
                             } 
@@ -387,9 +385,14 @@ enough for suspicion. And, as it turns out for you, death.
     }
 
     fun void gotoTitleScreen() {
+        if (titleScreen) return;
         spork ~ fadeInOutShred(FADE_TIME_SECS);
         .5*FADE_TIME_SECS::second => now;
         true => titleScreen;
+
+        false => dead;
+        false => deathMenuActive;
+
         init();
         (scene $ BarScene).deinit();
         scene.dialogManager().resetState();

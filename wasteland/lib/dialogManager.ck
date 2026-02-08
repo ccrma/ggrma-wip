@@ -146,7 +146,8 @@ public class DialogManager {
         null @=> _lastChoicePrompt;
 
         // nocheckin azaday
-        // prompts[18] @=> _currentPrompt;
+        // prompts[30] @=> _currentPrompt;
+        prompts[150] @=> _currentPrompt;
 
         showCurrentPrompt();
     }

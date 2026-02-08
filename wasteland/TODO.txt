@@ -4,11 +4,15 @@ BUGS
 - death screen music [x]
 - waveform smaller [x]
 - huh? and what? wav files not found [x]
+- bad ending should go to last checkpoint
 
 
 Features
 - player blink [x]
 - player shock
 - click to turn on radio sfx + animation (waveform too)
+- change doju's bad ending (am human option)
+- bad ending causes game to not start again
 
+- make the voiceover sndbufs louder
 - normalize all the gains [ ]
