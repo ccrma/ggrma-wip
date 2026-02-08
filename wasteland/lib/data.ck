@@ -39,7 +39,7 @@ public class Data {
     (NPC:Doju) It's a small town, but it was where one of the inciting incidents for the Great Robot-Human War happened. You know, the reason why we're all free and not serving humans right now. [town]
     // Choice: Memorial
     {memorial} (NPC:Doju:Suspicious) Is your memory out-of-date? You might be due for a software update, my friend.
-    (NPC:Doju) It was really tragic—a lot of robots were cruelly dismantled here in retaliation for fighting back against our abuse. It really sparked a movement. [town]
+    (NPC:Doju) It was really tragic. A lot of robots were cruelly dismantled here in retaliation for fighting back against our abuse. It really sparked a movement. [town]
     // Resume: Town
     {town} (NPC) Haven't you noticed that a lot of establishments here are named to honor it? That's why this bar is named the Robots Overthrew Humans and Gained Independence Bar.
     (NPC:Daisun:Suspicious) this is, like, a historic site! signs everywhere commemorating everything!
@@ -144,9 +144,9 @@ public class Data {
     ? Why is that ...?
     - a need [a need]
     - thankless [thankless]
-    {a need} (NPC:Dolbi) There's a famous human saying: Those that do not learn from history are doomed to repeat it...
-    {thankless} (NPC:Dolbi:Sad) You know how we robots are. Always looking to the future and technology in search of answers...
-    (NPC:Dolbi:Happy) ...But by understanding our history, we understand ourselves.
+    {a need} (NPC:Dolbi) There's a famous human saying: Those that do not learn from history are doomed to repeat it... [understand-history]
+    {thankless} (NPC:Dolbi:Sad) You know how we robots are. Always looking to the future and technology in search of answers... [understand-history]
+    {understand-history} (NPC:Dolbi:Happy) ...But by understanding our history, we understand ourselves.
     (Narrator) You feel taken aback by the genuine display of purpose. Their passion reminds you of a certain someone.
     (NPC:Dolbi) I collect first-robot accounts of the war, though far and few between, and stitch them together.
     (NPC:Dolbi:Love) Presently, I'm working on terribly delicate scene: did you know that, up to and during the war, in rare cases there were purportedly robots and humans who fell in *love* with each other?
@@ -188,14 +188,15 @@ public class Data {
     ? Thanks, I'm just being ....
     - human [human]
     - normal [normal]
+    - myself [myself]
     // choice: human
     {human} (NPC:Daisun:Happy) HUEHUEHUEHUE
     (Narrator) Dyson emits a huge cloud of dust as they double over from laughter.
-    (NPC:Daisun:Happy) you're funny too!
+    (NPC:Daisun:Happy) you're funny too! [good-time]
     {normal} (NPC:Daisun:Sad) oh...normal... I'm normal too!
     (NPC:Daisun:Angry) In fact, I'm as NORMAL as they come! SeE, LoOK HoW uSefUL I CAN BEEEEEE!!! [bad:Daisun]
-    {myself} (NPC) oh wow... that's brave of you.
-    (NPC:Daisun:Love) i'm actually...sorta having a good time with you... wow, this never happens. i really needed this after last time...
+    {myself} (NPC) oh wow... that's brave of you. [good-time]
+    {good-time} (NPC:Daisun:Love) i'm actually...sorta having a good time with you... wow, this never happens. i really needed this after last time...
     (NPC:Daisun:Suspicious) oh, did you not hear? a gang of robo-raiders came through town not long ago, swung by this bar to confront someboty about unfinished business. 
     (NPC:Daisun:Sad) i was, like, SOOOO scared. but they were being sooo Mean! to everyone! i couldn't just stand and watch... so, i turned on my vacuum.
     (NPC:Daisun) i... i know i'm strong but... every time i help, i just make a bigger mess, and others get hurt.
