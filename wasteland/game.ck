@@ -177,7 +177,6 @@ public class Game {
                 radio.update();
 
                 if (scene.dialogManager()._currentPrompt == null && !end) {
-                    <<< "END REACHED" >>>;
                     true => end;
                     0 => _fadeInAlpha;
                     spork ~ gotoTitleScreen();
@@ -210,7 +209,6 @@ public class Game {
                         spork ~ deathScreenShred();
                     }
                     if (scene.dialogManager().endTriggered() && !end) {
-                        <<< "END TRIGGERED" >>>;
                         true => end;
                         true => dead;
                         now => dead_time;
@@ -250,7 +248,7 @@ public class Game {
 
             // death
             {
-                if (radio.outOfTime() && !dead || GWindow.keyDown(GWindow.KEY_D)) {
+                if (radio.outOfTime() && !dead /*|| GWindow.keyDown(GWindow.KEY_D)*/) {
                     true => dead;
                     now => dead_time;
                     radio.mark.alert();

@@ -27,7 +27,6 @@ public class NPC {
     }
 
     fun void show() {
-        <<< "trying to show" >>>;
         spork ~ portrait.show();
         // if (!shown) {
         //     true => shown;

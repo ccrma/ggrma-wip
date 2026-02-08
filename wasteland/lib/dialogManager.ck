@@ -165,14 +165,10 @@ public class DialogManager {
         npcName(_lastNpcName) => string lastName;
 
         if (lastName.trim() == name.trim() && lastName != "") {
-            <<< "assetpath" >>>;
             _npc.setAssetPath(assetPath);
         } else {
-            <<< "transition" >>>;
             _npc.transition(assetPath);
         }
-
-        <<< lastName, name >>>;
 
         npcSays(text);
         false => _inTransition;

@@ -90,11 +90,7 @@ public class RadioMechanic {
     4 => float waveform_sca;
     fun void map2waveform( float in[], vec2 out[] )
     {
-        if( in.size() != out.size() )
-        {
-            <<< "size mismatch in map2waveform()", "" >>>;
-            return;
-        }
+        if( in.size() != out.size() ) return;
         
         // mapping to xyz coordinate
         int i;
