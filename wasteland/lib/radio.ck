@@ -660,8 +660,8 @@ public class TitleRadioMechanic extends RadioMechanic {
         for (int i; i < audio.size(); i++) {
             1.0 => audio[i].gain;
         }
-        1 => radio_left.gain;
-        1 => radio_right.gain;
+        0.5 => radio_left.gain;
+        0.5 => radio_right.gain;
         1 => radio_static.rate;
         1 => radio_hum.rate;
 
@@ -749,10 +749,6 @@ public class DeathRadioMechanic extends RadioMechanic {
         // Mute and stop all audio immediately
         for (int i; i < audio.size(); i++) {
             0 => audio[i].gain;
-        }
-        for (int i; i < pan.size(); i++) {
-            pan[i].left =< radio_left;
-            pan[i].right =< radio_right;
         }
         0 => radio_left.gain;
         0 => radio_right.gain;
