@@ -26,7 +26,11 @@ public class Game {
 
     // fade-in state
     float _fadeAlpha;
+    1.1 => float _fadeInAlpha;
     2.0 => float FADE_IN_SECS;
+
+    // end state
+    int end;
 
     // death state stuff
     int dead;
@@ -73,6 +77,9 @@ public class Game {
         titleRadio.waveform.width(.01);
         1.1 => titleRadio.DISPLAY_WIDTH;
         1 => titleRadio.waveform_sca;
+
+        1.1 => float _fadeInAlpha;
+        false => end;
 
         // Initialize death radio
         deathRadio.scale(@(0.525, 1.5));
@@ -164,8 +171,11 @@ public class Game {
                 scene.update(gui);
                 radio.update();
 
-                if (scene.dialogManager()._currentPrompt == null) {
-                    gotoTitleScreen();
+                if (scene.dialogManager()._currentPrompt == null && !end) {
+                    <<< "END REACHED" >>>;
+                    true => end;
+                    0 => _fadeInAlpha;
+                    spork ~ gotoTitleScreen();
                 }
                 // Disable all input during NPC transitions and death
                 if (!scene.dialogManager().inTransition() && !dead) {
@@ -194,12 +204,18 @@ public class Game {
                         radio.mark.alert();
                         spork ~ deathScreenShred();
                     }
+                    if (scene.dialogManager().endTriggered() && !end) {
+                        <<< "END TRIGGERED" >>>;
+                        true => end;
+                        0 => _fadeInAlpha;
+                        spork ~ gotoTitleScreen();
+                    }
                 }
             }
-
+            
             UIStyle.popVar();
 
-            // fade-in overlay
+            // fade-out overlay
             if (_fadeAlpha > 0) {
                 GG.dt() / FADE_IN_SECS -=> _fadeAlpha;
                 if (_fadeAlpha < 0) 0 => _fadeAlpha;
@@ -211,6 +227,20 @@ public class Game {
                 UIStyle.popVar(3);
                 UIStyle.popColor();
             }
+
+            // // fade-in overlay
+            // if (_fadeInAlpha < 1.0) {
+            //     <<< "FADE IN", _fadeInAlpha >>>;
+            //     GG.dt() / FADE_IN_SECS +=> _fadeInAlpha;
+            //     if (_fadeInAlpha > 1) 1 => _fadeInAlpha;
+            //     UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, _fadeInAlpha));
+            //     UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
+            //     UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+            //     UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 4.5);
+            //     gui.rect(@(0, 0));
+            //     UIStyle.popVar(3);
+            //     UIStyle.popColor();
+            // }
 
             // death
             {
@@ -281,6 +311,45 @@ public class Game {
         }
     }
 
+    int _fadeInOutShredGen;
+    fun void fadeInOutShred(float fade_secs) {
+        ++_fadeInOutShredGen => int gen;
+        now => time start;
+        while (1) {
+            GG.nextFrame() => now;
+            if (_fadeInOutShredGen != gen) {
+                <<< "break 1" >>>;
+                break;
+            }
+            (now - start) / second => float elapsed_time;
+
+            elapsed_time / fade_secs => float t;
+
+            float alpha;
+            if (t < 0.5) {
+                t * 2 => alpha;
+            }
+            else if (t < 1.0) {
+                1 - (t - .5) * 2 => alpha;
+            }
+            else {
+                <<< "break 2" >>>;
+                break;
+            } 
+
+
+            <<< alpha, t, _fadeInOutShredGen >>>;
+
+            UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, alpha));
+            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
+            UIStyle.pushVar(UIStyle.VAR_RECT_TRANSPARENT, true);
+            UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, 4.5);
+            gui.rect(@(0, 0));
+            UIStyle.popVar(3);
+            UIStyle.popColor();
+        }
+    }
+
     fun void deathScreenShred() {
         FADE_TIME_SECS::second => now;
         radio.deactivate();
@@ -297,8 +366,11 @@ public class Game {
     }
 
     fun void gotoTitleScreen() {
+        spork ~ fadeInOutShred(FADE_TIME_SECS);
+        .5*FADE_TIME_SECS::second => now;
         true => titleScreen;
         init();
         (scene $ BarScene).deinit();
+        FADE_TIME_SECS::second => now;
     }
 }

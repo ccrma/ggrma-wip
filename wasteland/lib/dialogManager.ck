@@ -24,6 +24,7 @@ public class DialogManager {
     Prompt @ _lastChoicePrompt; // saved for continue
 
     int _deathTriggered;
+    int _endTriggered;
     int _selectionShown;
     int _confirmedSelectionIdx;
     int _awaitingChoiceReveal;
@@ -197,7 +198,7 @@ public class DialogManager {
     fun void showCurrentPrompt() {
         if (_currentPrompt == null) {
             clearSpeaker();
-            
+
             if (_radio != null) _radio.deactivate();
             return;
         }
@@ -291,6 +292,10 @@ public class DialogManager {
                 true => _deathTriggered;
                 return;
             }
+            if (_currentPrompt.next_tag == "end") {
+                true => _endTriggered;
+                return;
+            }
             _currentPrompt.next @=> _currentPrompt;
         }
 
@@ -339,6 +344,9 @@ public class DialogManager {
 
     fun int deathTriggered() {
         return _deathTriggered;
+    }
+    fun int endTriggered() {
+        return _endTriggered;
     }
 
     fun void resetState() {

@@ -43,7 +43,7 @@ public class BarScene extends Scene {
         dm.setNpc(stranger);
 
         dm.registerNpc("Daisun", me.dir() + "../assets/cleaner/cleaning-bot.png");
-        dm.registerNpc("Daisun:Suspicioius", me.dir() + "../assets/cleaner/cleaner-suspicious.png");
+        dm.registerNpc("Daisun:Suspicious", me.dir() + "../assets/cleaner/cleaner-suspicious.png");
         dm.registerNpc("Daisun:Sad", me.dir() + "../assets/cleaner/cleaner-sad.png");
         dm.registerNpc("Daisun:Love", me.dir() + "../assets/cleaner/cleaner-love.png");
         dm.registerNpc("Daisun:Angry", me.dir() + "../assets/cleaner/cleaner-angry.png");
@@ -83,7 +83,7 @@ public class BarScene extends Scene {
 
     fun void deinit() {
         stopAudio();
-        light_mesh --< GG.scene();
+        if (light_mesh.parent() != null) light_mesh --< GG.scene();
     }
 
     fun void update(ChuGUI gui) {

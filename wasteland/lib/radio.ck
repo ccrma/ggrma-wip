@@ -154,7 +154,6 @@ public class RadioMechanic {
     }
 
     fun void loadAudioForLabels(string labels[]) {
-        <<< this.toString() >>>;
         // Clear existing audio
         for (int i; i < pan.size(); i++) {
             pan[i].left =< radio_left;
