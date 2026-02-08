@@ -66,8 +66,8 @@ public class RadioMechanic {
     1::second => dur LOOP_DUR;
 
     256 => int WINDOW_SIZE;
-    2.65 => float WAVEFORM_Y;
-    1.8 => float DISPLAY_WIDTH;
+    2.63 => float WAVEFORM_Y;
+    2.1 => float DISPLAY_WIDTH;
     GLines waveform; waveform.width(.025);
     waveform.posY( WAVEFORM_Y );
     waveform.posX(-3.5);
