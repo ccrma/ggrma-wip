@@ -6,6 +6,8 @@ public class NPC {
     Portrait portrait;
     string _name;
 
+    false => int shown;
+
     fun NPC(string name, string assetPath) {
         name => _name;
 
@@ -25,10 +27,12 @@ public class NPC {
     }
 
     fun void show() {
+        true => shown;
         spork ~ portrait.show();
     }
 
     fun void hide() {
+        false => shown;
         spork ~ portrait.hide();
     }
 
@@ -48,7 +52,6 @@ public class NPC {
         portrait.assetPath(assetPath);
     }
 
-    // Blocking transition: hide current, swap asset, show new.
     // Call via spork.
     fun void transition(string assetPath) {
         if (portrait.visible()) {
