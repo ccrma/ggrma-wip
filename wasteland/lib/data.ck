@@ -7,7 +7,7 @@ public class Data {
     (Player) (So... who will be my first victim?)
     // End Exposition
     (NPC:Doju) Oh, a new face. Are you new to the area? It's rare to see models like you around here.
-    (NPC:Doju:Angry) Come right in. The patrons here are a motley crew, but they don't bite.
+    (NPC:Doju) Come right in. The patrons here are a motley crew, but they don't bite.
     (NPC:Doshiba) ...What are you looking at? Don't you know it's not polite to stare? Get the hell out of my face.
     (NPC:Doju) ...Regardless, this is a somewhat popular location: There's an urban legend that you'll find what you're looking for here...
     (NPC:Dolbi) But barkeep, you've *got* to control them! We have too many people coming in looking for love!
