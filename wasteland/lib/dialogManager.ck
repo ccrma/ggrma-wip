@@ -11,6 +11,7 @@ public class DialogManager {
 
     string _npcAssets[0]; // NPC name -> asset path mapping
     string _currentNpcName;
+    string _lastNpcName;
 
     DialogBox dialogBox;
 
@@ -151,7 +152,18 @@ public class DialogManager {
 
     // Blocking: transitions NPC portrait then shows text. Call via spork.
     fun void switchNpcAndSpeak(string assetPath, string text) {
-        _npc.transition(assetPath);
+        _npc.name() => string name;
+        name.find(':') => int colonIdx;
+        if (colonIdx >= 0) {
+            name.substring(0, colonIdx) => name;
+        }
+
+        if (_lastNpcName.trim() == name.trim() && _lastNpcName != "") {
+            _npc.setAssetPath(assetPath);
+        } else {
+            _npc.transition(assetPath);
+        }
+
         npcSays(text);
         false => _inTransition;
     }
@@ -196,6 +208,7 @@ public class DialogManager {
             if (_currentPrompt.speakerName.length() > 0 && _currentPrompt.speakerName != _currentNpcName) {
                 _currentPrompt.speakerName => _currentNpcName;
                 if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
+                    _npc.name() => _lastNpcName;
                     _npc.setName(_currentNpcName);
                     true => _inTransition;
                     spork ~ switchNpcAndSpeak(_npcAssets[_currentNpcName], _currentPrompt.text);
