@@ -79,6 +79,9 @@ public class Game {
         1.1 => titleRadio.DISPLAY_WIDTH;
         1 => titleRadio.waveform_sca;
 
+        titleRadio.radio_on =< titleRadio.sfx_gain;
+        titleRadio.radio_on => dac;
+
         1.1 => float _fadeInAlpha;
         false => end;
 
@@ -339,7 +342,6 @@ enough for suspicion. And, as it turns out for you, death.
         while (1) {
             GG.nextFrame() => now;
             if (_fadeInOutShredGen != gen) {
-                <<< "break 1" >>>;
                 break;
             }
             (now - start) / second => float elapsed_time;
@@ -354,12 +356,8 @@ enough for suspicion. And, as it turns out for you, death.
                 1 - (t - .5) * 2 => alpha;
             }
             else {
-                <<< "break 2" >>>;
                 break;
             } 
-
-
-            <<< alpha, t, _fadeInOutShredGen >>>;
 
             UIStyle.pushColor(UIStyle.COL_RECT, @(0, 0, 0, alpha));
             UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(2, 2));
@@ -394,6 +392,8 @@ enough for suspicion. And, as it turns out for you, death.
         true => titleScreen;
         init();
         (scene $ BarScene).deinit();
+        scene.dialogManager().resetState();
+        scene.dialogManager().hideNpc();
         FADE_TIME_SECS::second => now;
     }
 }

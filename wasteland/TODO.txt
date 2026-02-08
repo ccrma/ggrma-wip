@@ -1,0 +1,14 @@
+BUGS
+- transition animation across emotions [X]
+- persisting NPC after death [X]
+- death screen music [x]
+- waveform smaller [x]
+- huh? and what? wav files not found [x]
+
+
+Features
+- player blink [x]
+- player shock
+- click to turn on radio sfx + animation (waveform too)
+
+- normalize all the gains [ ]

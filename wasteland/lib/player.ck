@@ -6,6 +6,12 @@ public class Player {
     Portrait portrait;
     string _name;
 
+    me.dir() + "../assets/human/human-blink.png" => string blink_path;
+    me.dir() + "../assets/human/human.png" => string normal_path;
+    int eyes_closed;
+
+    me.dir() + "../assets/human/human-shocked.png" => string shock_path;
+
     fun Player(string name, string assetPath) {
         name => _name;
 
@@ -18,8 +24,22 @@ public class Player {
         portrait.visible(true);
     }
 
+    5 => float blink_cd_curr;
     fun void update(ChuGUI gui) {
+        GG.dt() => float dt;
         portrait.update(gui);
+
+        dt -=> blink_cd_curr;
+        if (blink_cd_curr < 0) {
+            !eyes_closed => eyes_closed;
+            if (eyes_closed) {
+                blink_path => portrait._assetPath;
+                Math.random2f(.03,.06) => blink_cd_curr;
+            } else {
+                normal_path => portrait._assetPath; 
+                Math.random2f(3,7) => blink_cd_curr;
+            }
+        }
     }
 
     fun string name() {
