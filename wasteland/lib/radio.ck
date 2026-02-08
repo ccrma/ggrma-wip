@@ -167,7 +167,11 @@ public class RadioMechanic {
 
         for (int i; i < labels.size(); i++) {
             labels[i].trim().lower() + ".wav" => string filename;
-            _audioBasePath + filename => string filepath;
+            "/voice0/" => string dir;
+            if (maybe) {
+                "/voice1/" => dir;
+            }
+            _audioBasePath + dir + filename => string filepath;
             audioFiles << filepath;
             audio[i] => pan[i];
             pan[i].left => radio_left;
@@ -294,9 +298,8 @@ public class RadioMechanic {
 
         // Unmute all audio when activated
         for (int i; i < audio.size(); i++) {
-            0.5 => audio[i].gain;
+            1.0 => audio[i].gain;
         }
-
 
         { // sfx
             .75 *  ANIM_TIME => now;
@@ -317,8 +320,8 @@ public class RadioMechanic {
             waveform --> GG.scene();
             1 => radio_static.rate;
             1 => radio_hum.rate;
-            0.2 => radio_left.gain;
-            0.2 => radio_right.gain;
+            1 => radio_left.gain;
+            1 => radio_right.gain;
             true => _powered_on;
         }
     }
