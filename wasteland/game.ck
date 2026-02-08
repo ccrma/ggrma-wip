@@ -267,7 +267,7 @@ public class Game {
                                 // Credits
                             } else if (sel == 3) {
                                 // Exit
-                                me.exit();
+                                GWindow.close();
                             }
                         }
                     }
