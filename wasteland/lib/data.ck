@@ -100,7 +100,7 @@ public class Data {
     {patching} (NPC:Doshiba:Happy) Oh, you helped repair robots? We both did honest work, then. [doshiba2]
     {doshiba2} (NPC:Doshiba) So what about you? What kind of combat did you see?
     (Player) I looked after robots with transplanted memories.
-    (Narrator) T's facial display turns a bright pink, an uncannily human hue.
+    (Narrator) Doshiba's facial display turns a bright pink, an uncannily human hue.
     (NPC:Doshiba:Love) Wh-why those robots? Did you like something about them?
     // Choice 3
     ? Yes. I liked that they were ....
