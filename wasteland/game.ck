@@ -34,6 +34,13 @@ public class Game {
     3 => float FADE_TIME_SECS;
     DeathMusic death_music;
 
+    // title screen stuff
+    SndBuf title_music(me.dir() + "./assets/audio/wasteland.wav") => ADSR title_music_adsr => dac;
+    1 => title_music.loop;
+    title_music_adsr.attackTime(10::second);
+    PoleZero pole; .99 => pole.blockZero;
+    (34 * (second/samp))$int => title_music.pos;
+
     fun void init() {
         // Initialize game radio
         radio.scale(@(0.525, 1.5));
@@ -42,16 +49,38 @@ public class Game {
         radio.init();
 
         // Initialize title radio
-        titleRadio.scale(@(0.525, 1.5));
+        // titleRadio.scale(@(0.525, 1.5));
+        titleRadio.scale(@(0.45, 1.5));
+        // titleRadio.setPosition(@(0, 0.4));
+        1.5 => titleRadio._textScale;
         titleRadio.setAudioBasePath(me.dir() + "assets/audio/");
         titleRadio.init();
         titleRadio.setOptions(["Start", "Credits"]);
         titleRadio.activate();
+        .25 => titleRadio.dotX[0];
+        .75 => titleRadio.dotX[1];
+
+        dac =< titleRadio.accum;
+        title_music_adsr => pole => titleRadio.accum;
+        titleRadio.waveform.pos(@(.05, -.315));
+        titleRadio.waveform.width(.01);
+        1.1 => titleRadio.DISPLAY_WIDTH;
+        1 => titleRadio.waveform_sca;
 
         // Initialize death radio
         deathRadio.scale(@(0.525, 1.5));
         deathRadio.setAudioBasePath(me.dir() + "assets/audio/");
         deathRadio.init();
+
+        // Init music and audio
+        titleRadio.sfx_gain =< dac;
+        titleRadio.sfx_gain => title_music_adsr;
+        spork ~ startMusic();
+    }
+
+    fun void startMusic() {
+        second => now;
+        title_music_adsr.keyOn();
     }
 
     fun void startGame() {
