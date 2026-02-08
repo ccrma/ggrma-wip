@@ -26,7 +26,7 @@ GG.scene().backgroundColor(@(0.1, 0.1, 0.15));
 
 // GWindow.sizeLimits(1920, 1080, 0, 0, @(16, 9));
 // GWindow.center();
-GWindow.title("Wasteland");
+GWindow.title("Date the Dobots");
 
 //----------------------------------------------------------------------------
 // Start the game
