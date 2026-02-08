@@ -62,7 +62,7 @@ public class DialogBox {
         
         UIStyle.pushVar(UIStyle.VAR_ICON_CONTROL_POINTS, @(0.5, 0));
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1730./1730 * 12, 490./1730 * 8));
-        gui.icon(me.dir() + "../assets/dialogue_box.png", @(0.15, -1));
+        gui.icon(me.dir() + "../assets/ui/dialogue_box.png", @(0.15, -1));
         UIStyle.popVar(2);
 
         gui.posUnits(ChuGUI.WORLD);
@@ -134,13 +134,18 @@ public class DialogBox {
     }
 
     fun void speakerName(string name) {
-        name => _speakerName;
+        name.find(':') => int colonIdx;
+        if (colonIdx >= 0) {
+            name.substring(0, colonIdx) => _speakerName;
+        } else {
+            name => _speakerName;
+        }
         // update text sonifier mode
         // TODO update to new robot names here
-        if      (name == "Dolbi") textSon.mode(TextSonifier.Mode_MediaBot);
-        else if (name == "Doju") textSon.mode(TextSonifier.Mode_SommelierBot);
-        else if (name == "Doshiba") textSon.mode(TextSonifier.Mode_TsundereBot);
-        else if (name == "Daisun") textSon.mode(TextSonifier.Mode_VaccuumBot);
+        if      (_speakerName == "Dolbi") textSon.mode(TextSonifier.Mode_MediaBot);
+        else if (_speakerName == "Doju") textSon.mode(TextSonifier.Mode_SommelierBot);
+        else if (_speakerName == "Doshiba") textSon.mode(TextSonifier.Mode_TsundereBot);
+        else if (_speakerName == "Daisun") textSon.mode(TextSonifier.Mode_VaccuumBot);
         else                        textSon.mode(TextSonifier.Mode_None);
     }
 

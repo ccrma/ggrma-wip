@@ -123,6 +123,7 @@ public class DialogManager {
     }
 
     fun void narratorSays(string text) {
+        dialogBox.speakerName("");
         if (_npc != null) _npc.dim();
         if (_player != null) _player.dim();
         if (_radio != null) spork ~ _radio.dim();
@@ -206,6 +207,8 @@ public class DialogManager {
             }
         } else if (_currentPrompt.speaker == Prompt.Speaker_Player) {
             playerSays(_currentPrompt.text);
+        } else if (_currentPrompt.speaker == Prompt.Speaker_Narrator) {
+            narratorSays(_currentPrompt.text);
         }
 
         // If there are responses, wait for user to advance before showing choices

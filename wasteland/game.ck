@@ -12,7 +12,7 @@ public class Game {
     Prompt.parse(Data.script, false) @=> Prompt prompts[];
 
     // Player persists across all scenes
-    Player player("You", me.dir() + "assets/human.png");
+    Player player("You", me.dir() + "assets/human/human.png");
 
     true => int titleScreen;
 
@@ -75,13 +75,13 @@ public class Game {
                 UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
 
                 UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, -1);
-                gui.icon(me.dir() + "assets/title_screen.png", @(0, 0));
+                gui.icon(me.dir() + "assets/title/title_screen.png", @(0, 0));
                 UIStyle.popVar();
 
                 UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 0);
-                gui.icon(me.dir() + "assets/title_silhouettes.png", @(0, 0));
-                gui.icon(me.dir() + "assets/title_arrows.png", @(0, 0));
-                gui.icon(me.dir() + "assets/title_enter.png", @(0, 0));
+                gui.icon(me.dir() + "assets/title/title_silhouettes.png", @(0, 0));
+                gui.icon(me.dir() + "assets/title/title_arrows.png", @(0, 0));
+                gui.icon(me.dir() + "assets/title/title_enter.png", @(0, 0));
                 UIStyle.popVar();
 
                 UIStyle.popVar();
