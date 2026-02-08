@@ -103,8 +103,8 @@ public class Game {
     }
 
     fun void startGame(Prompt prompt[]) {
+        titleRadio.deactivate();
         false => titleScreen;
-        false => end;
 1.0 => _fadeAlpha;
         scene.init(player, prompt);
         scene.dialogManager().setRadio(radio);
@@ -212,6 +212,8 @@ public class Game {
                     if (scene.dialogManager().endTriggered() && !end) {
                         <<< "END TRIGGERED" >>>;
                         true => end;
+                        true => dead;
+                        now => dead_time;
                         0 => _fadeInAlpha;
                         spork ~ gotoTitleScreen();
                     }
@@ -276,8 +278,9 @@ public class Game {
                     // UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, .5);
                     gui.label(
 "
-   In a robot's world, not responding promptly is reason 
-enough for suspicion. And, as it turns out for you, death.
+YOU DIED BRO...
+In a robot's world, suspicion is deadly.
+Speed and deception may be needed to survive.
 ", 
                     @(0, 0));
                     UIStyle.popVar(4);
@@ -392,6 +395,7 @@ enough for suspicion. And, as it turns out for you, death.
 
         false => dead;
         false => deathMenuActive;
+        false => end;
 
         init();
         (scene $ BarScene).deinit();

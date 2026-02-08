@@ -147,7 +147,7 @@ public class DialogManager {
 
         // nocheckin azaday
         // prompts[30] @=> _currentPrompt;
-        prompts[150] @=> _currentPrompt;
+        // prompts[150] @=> _currentPrompt;
 
         showCurrentPrompt();
     }
@@ -365,6 +365,7 @@ public class DialogManager {
         false => _inTransition;
         false => _pendingRadioActivation;
         false => _deathTriggered;
+        false => _endTriggered;
         "" => _currentNpcName;
         "" => _lastNpcName;
     }
