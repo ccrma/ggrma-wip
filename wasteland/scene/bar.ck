@@ -20,7 +20,7 @@ public class BarScene extends Scene {
     false => int _stopAudio;
 
     fun BarScene() {
-        me.dir() + "../assets/background.png" => assetPath;
+        me.dir() + "../assets/bar/background.png" => assetPath;
     }
 
     fun void init(Player @ player, Prompt prompts[]) {
@@ -31,10 +31,30 @@ public class BarScene extends Scene {
         new NPC("", "") @=> stranger;
         dm.setNpc(stranger);
 
-        dm.registerNpc("Daisun", me.dir() + "../assets/cleaning-bot.png");
-        dm.registerNpc("Dolbi", me.dir() + "../assets/media-bot.png");
-        dm.registerNpc("Doju", me.dir() + "../assets/sommelier-bot.png");
-        dm.registerNpc("Doshiba", me.dir() + "../assets/tsundere-bot.png");
+        dm.registerNpc("Daisun", me.dir() + "../assets/cleaner/cleaning-bot.png");
+        dm.registerNpc("Daisun:Suspicioius", me.dir() + "../assets/cleaner/cleaner-suspicious.png");
+        dm.registerNpc("Daisun:Sad", me.dir() + "../assets/cleaner/cleaner-sad.png");
+        dm.registerNpc("Daisun:Love", me.dir() + "../assets/cleaner/cleaner-love.png");
+        dm.registerNpc("Daisun:Angry", me.dir() + "../assets/cleaner/cleaner-angry.png");
+        dm.registerNpc("Daisun:Happy", me.dir() + "../assets/cleaner/cleaner-happy.png");
+
+        dm.registerNpc("Dolbi", me.dir() + "../assets/media/media-bot.png");
+        dm.registerNpc("Dolbi:Love", me.dir() + "../assets/media/media-love.png");
+        dm.registerNpc("Dolbi:Suspicious", me.dir() + "../assets/media/media-suspicious.png");
+        dm.registerNpc("Dolbi:Sad", me.dir() + "../assets/media/media-sad.png");
+        dm.registerNpc("Dolbi:Happy", me.dir() + "../assets/media/media-happy.png");
+        dm.registerNpc("Dolbi:Angry", me.dir() + "../assets/media/media-angry.png");
+
+        dm.registerNpc("Doju", me.dir() + "../assets/sommelier/sommelier-bot.png");
+        dm.registerNpc("Doju:Angry", me.dir() + "../assets/sommelier/sommelier-bot-angry.png");
+        dm.registerNpc("Doju:Suspicious", me.dir() + "../assets/sommelier/sommelier-bot-suspicious.png");
+
+        dm.registerNpc("Doshiba", me.dir() + "../assets/tsundere/tsundere-bot.png");
+        dm.registerNpc("Doshiba:Love", me.dir() + "../assets/tsundere/tsundere-love.png");
+        dm.registerNpc("Doshiba:Suspicious", me.dir() + "../assets/tsundere/tsundere-suspicious.png");
+        dm.registerNpc("Doshiba:Happy", me.dir() + "../assets/tsundere/tsundere-happy.png");
+        dm.registerNpc("Doshiba:Sad", me.dir() + "../assets/tsundere/tsundere-sad.png");
+        dm.registerNpc("Doshiba:Angry", me.dir() + "../assets/tsundere/tsundere-angry.png");
 
         dm.startDialogue(prompts);
 
@@ -46,7 +66,7 @@ public class BarScene extends Scene {
 
         TextureLoadDesc desc;
         true => desc.flip_y;
-        Texture.load( me.dir() + "../assets/bar_light.png", desc ) @=> Texture light_tex;
+        Texture.load( me.dir() + "../assets/bar/bar_light.png", desc ) @=> Texture light_tex;
         PlaneGeometry geo;
         FlatMaterial mat;
         mat.colorMap(light_tex);

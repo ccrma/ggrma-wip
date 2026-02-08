@@ -597,7 +597,7 @@ public class RadioMechanic {
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.0);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
         UIStyle.pushVar(UIStyle.VAR_ICON_ROTATE, rot_spring.x);
-        gui.icon(me.dir() + "../assets/radio_box.png", pos);
+        gui.icon(me.dir() + "../assets/ui/radio_box.png", pos);
         UIStyle.popVar(3);
 
         if (_active) {
@@ -691,10 +691,10 @@ public class TitleRadioMechanic extends RadioMechanic {
     }
 
     fun void render() {
-        if (_powered_on) slider("zoomed_radio", @(_scale.x * 2.5, _scale.y * 1.5), @(0, 0.25), 4.1, true, false);
+        if (_powered_on) slider("zoomed_radio", @(_scale.x * 2, _scale.y * 2), @(0, 0.25), 4.1, true, false);
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, -0.5);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
-        gui.icon(me.dir() + "../assets/title_radio_box.png", _position);
+        gui.icon(me.dir() + "../assets/title/title_radio_box.png", _position);
         UIStyle.popVar(2);
     }
 }
@@ -784,7 +784,7 @@ public class DeathRadioMechanic extends RadioMechanic {
         UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 4.6);
         UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(1314./1314, 553./1314));
         UIStyle.pushVar(UIStyle.VAR_ICON_ROTATE, rot_spring.x);
-        gui.icon(me.dir() + "../assets/radio_box.png", pos);
+        gui.icon(me.dir() + "../assets/ui/radio_box.png", pos);
         UIStyle.popVar(3);
     }
 }

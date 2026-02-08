@@ -31,6 +31,7 @@ public class Prompt {
 
     0 => static int Speaker_Player;
     1 => static int Speaker_NPC;
+    2 => static int Speaker_Narrator;
 
     int type;
     int style;
@@ -96,15 +97,18 @@ public class Prompt {
             else if (char == '(' && s.find(')', idx + 1) >= 0) {
                 s.find(')', idx + 1) => int close_spk_idx;
                 s.substring(idx + 1, close_spk_idx - idx - 1) => string spk;
-                if (spk == "Player" || spk.find("NPC", 0) == 0) {
+                if (spk.find("Player", 0) == 0 || spk.find("NPC", 0) == 0 || spk.find("Narrator", 0) == 0) {
                     close_spk_idx + 1 => idx;
                     if (spk == "Player") {
                         Prompt.Speaker_Player => speaker;
+                    } else if (spk == "Narrator") {
+                        Prompt.Speaker_Narrator => speaker;
+                        "" => speakerName;
                     } else {
                         Prompt.Speaker_NPC => speaker;
-                        spk.find(':', 0) => int colonIdx;
-                        if (colonIdx >= 0) {
-                            spk.substring(colonIdx + 1) => speakerName;
+                        spk.find(':', 0) => int firstColonIdx;
+                        if (firstColonIdx >= 0) {
+                            spk.substring(firstColonIdx + 1) => speakerName;
                         }
                     }
                     if (log) <<< "parsed speaker", spk >>>;

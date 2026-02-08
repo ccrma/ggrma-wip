@@ -61,7 +61,7 @@ public class QuestionMark extends GGen {
         TextureLoadDesc load_desc;
         true => load_desc.flip_y;  // flip the texture vertically
         true => load_desc.gen_mips; // generate mip maps automatically
-        Texture.load(me.dir() + "../assets/question_mark.png", load_desc) @=> tex;
+        Texture.load(me.dir() + "../assets/ui/question_mark.png", load_desc) @=> tex;
     }
 
     Material material;
