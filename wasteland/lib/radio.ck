@@ -5,6 +5,9 @@
 public class RadioMechanic {
     ChuGUI gui;
 
+    .4 * Color.GREEN => static vec3 SELECTED_COLOR;
+    .2 * Color.RED => static vec3 DEFAULT_COLOR;
+
     QuestionMark mark;
     mark.sca(1.5);
     mark.posZ(3.5);
@@ -15,6 +18,7 @@ public class RadioMechanic {
     float val;
 
     @(1., 1.) => vec2 _scale;
+    1 => float _textScale;
     vec2 sliderSize;
 
     int numOptions;
@@ -62,20 +66,15 @@ public class RadioMechanic {
     1::second => dur LOOP_DUR;
 
     256 => int WINDOW_SIZE;
-    2.65 => float WAVEFORM_Y;
-    1.8 => float DISPLAY_WIDTH;
+    2.63 => float WAVEFORM_Y;
+    2.1 => float DISPLAY_WIDTH;
     GLines waveform; waveform.width(.025);
     waveform.posY( WAVEFORM_Y );
     waveform.posX(-3.5);
     waveform.color(Color.WHITE);
 
-    dac => Gain input;
-    input => Flip accum => blackhole;
-    input => PoleZero dcbloke => FFT fft => blackhole;
-    .95 => dcbloke.blockZero;
+    dac => Flip accum => blackhole;
     WINDOW_SIZE => accum.size;
-    Windowing.hann(WINDOW_SIZE) => fft.window;
-    WINDOW_SIZE*2 => fft.size;
     Windowing.hann(WINDOW_SIZE) @=> float window[];
 
     float samples[0];
@@ -88,6 +87,7 @@ public class RadioMechanic {
 
     // map audio buffer to 3D positions
     UI_Float waveform_zeno(.3);
+    8 => float waveform_sca;
     fun void map2waveform( float in[], vec2 out[] )
     {
         if( in.size() != out.size() )
@@ -104,27 +104,29 @@ public class RadioMechanic {
             // space evenly in X
             -width/2 + width/WINDOW_SIZE*i => out[i].x;
             // map y, using window function to taper the ends
-            waveform_zeno.val() * (s*8 * window[i] - out[i].y) +=> out[i].y;
+            waveform_zeno.val() * (s* waveform_sca * window[i] - out[i].y) +=> out[i].y;
             // increment
             i++;
         }
     }
 
     // sfx
-    SndBuf radio_on(me.dir() + "../assets/audio/radio-on-button.wav") => dac;
+    Gain sfx_gain => dac;
+
+    SndBuf radio_on(me.dir() + "../assets/audio/radio-on-button.wav") => sfx_gain;
     0 => radio_on.rate;
-    SndBuf radio_static(me.dir() + "../assets/audio/radio-static.wav") => dac;
+    SndBuf radio_static(me.dir() + "../assets/audio/radio-static.wav") => sfx_gain;
     0 => radio_static.rate; 1 => radio_static.loop;
-    SndBuf radio_hum(me.dir() + "../assets/audio/radio-hum.wav") => dac;
+    SndBuf radio_hum(me.dir() + "../assets/audio/radio-hum.wav") => sfx_gain;
     0 => radio_hum.rate; 1 => radio_hum.loop;
-    SndBuf radio_button_click(me.dir() + "../assets/audio/radio-button-click.wav") => dac; 
+    SndBuf radio_button_click(me.dir() + "../assets/audio/radio-button-click.wav") => sfx_gain; 
     0 => radio_button_click.rate;
-    SndBuf radio_off_button(me.dir() + "../assets/audio/radio-off-button.wav") => dac; 
+    SndBuf radio_off_button(me.dir() + "../assets/audio/radio-off-button.wav") => sfx_gain; 
     0 => radio_off_button.rate; 0 => radio_off_button.loop;
 
-    SndBuf radio_falling_1(me.dir() + "../assets/audio/crates_falling_1.wav") => dac;
+    SndBuf radio_falling_1(me.dir() + "../assets/audio/crates_falling_1.wav") => sfx_gain;
     0 => radio_falling_1.rate;
-    SndBuf radio_falling_2(me.dir() + "../assets/audio/crates_falling_2.wav") => dac;
+    SndBuf radio_falling_2(me.dir() + "../assets/audio/crates_falling_2.wav") => sfx_gain;
     0 => radio_falling_2.rate;
 
 
@@ -469,12 +471,7 @@ public class RadioMechanic {
             accum.upchuck();
             // get the last window size samples (waveform)
             accum.output( samples );
-            // upchuck to take FFT, get magnitude reposne
-            fft.upchuck();
-            // get spectrum (as complex values)
-            fft.spectrum( response );
-            // jump by samples
-            WINDOW_SIZE::samp/2 => now;
+            WINDOW_SIZE::samp => now;
         }
     } spork ~ doAudio();
 
@@ -524,9 +521,9 @@ public class RadioMechanic {
             dot_x * scaleRatio + pos.x => float label_x;
             // Highlight selected dot
             if (i == _selectedIndex) {
-                UIStyle.pushColor(UIStyle.COL_RECT, Color.GREEN);
+                UIStyle.pushColor(UIStyle.COL_RECT, SELECTED_COLOR);
             } else {
-                UIStyle.pushColor(UIStyle.COL_RECT, Color.RED);
+                UIStyle.pushColor(UIStyle.COL_RECT, DEFAULT_COLOR);
             }
             UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
             UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
@@ -537,11 +534,11 @@ public class RadioMechanic {
 
             if (show_text && optionNumListens[i] > 0) { // text labels
                 UIStyle.pushColor(UIStyle.COL_LABEL, @(0.5, 0.5, 0.5));
-                UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.02 * scale.x);
+                UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, 0.02 * scale.x * _textScale);
                 UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, z_index);
                 UIStyle.pushVar(UIStyle.VAR_LABEL_ROTATE, rotZ);
 
-                Math.max(1, 400 / Math.pow(2, optionNumListens[i])) => float antialias;
+                Math.max(1, 100 / Math.pow(2, optionNumListens[i])) => float antialias;
 
                 UIStyle.pushVar(UIStyle.VAR_LABEL_ANTIALIAS, antialias);
                 gui.label(optionLabels[i], @(label_x, pos.y - .05 * scale.y));
@@ -567,9 +564,9 @@ public class RadioMechanic {
 
         // slider
         if (_selectedIndex >= 0) {
-            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.GREEN);
+            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, SELECTED_COLOR);
         } else {
-            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, Color.RED);
+            UIStyle.pushColor(UIStyle.COL_SLIDER_HANDLE, DEFAULT_COLOR);
         }
         UIStyle.pushVar(UIStyle.VAR_SLIDER_TRACK_SIZE, @(0.5 * scale.x , 0.01 * scale.y));
         UIStyle.pushVar(UIStyle.VAR_SLIDER_HANDLE_SIZE, @(0.005 * scale.x, 0.08 * scale.y));
@@ -666,6 +663,8 @@ public class TitleRadioMechanic extends RadioMechanic {
         0.2 => radio_right.gain;
         1 => radio_static.rate;
         1 => radio_hum.rate;
+
+        waveform --> GG.scene();
     }
 
     fun void deactivate() {
@@ -680,12 +679,16 @@ public class TitleRadioMechanic extends RadioMechanic {
         0 => radio_right.gain;
         0 => radio_static.gain;
         0 => radio_hum.gain;
+
+        waveform --< GG.scene();
     }
 
     fun void update() {
         if (_active && numOptions > 0) {
             updateSelection();
             updateAudio();
+            map2waveform( samples, positions );
+            waveform.positions( positions );
         }
         render();
     }

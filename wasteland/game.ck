@@ -34,6 +34,19 @@ public class Game {
     3 => float FADE_TIME_SECS;
     DeathMusic death_music;
 
+    // title screen stuff
+    SndBuf title_music(me.dir() + "./assets/audio/wasteland.wav") => ADSR title_music_adsr => dac;
+    1 => title_music.loop;
+    title_music_adsr.attackTime(10::second);
+    PoleZero pole; .99 => pole.blockZero;
+    (34 * (second/samp))$int => title_music.pos;
+
+    Spring enter_rot_spring(0, 100, 8);
+    Spring enter_sca_spring(0, 420, 8);
+    Spring arrow_rot_spring(0, 100, 8);
+    Spring arrow_sca_spring(0, 420, 8);
+
+
     fun void init() {
         // Initialize game radio
         radio.scale(@(0.525, 1.5));
@@ -42,16 +55,38 @@ public class Game {
         radio.init();
 
         // Initialize title radio
-        titleRadio.scale(@(0.525, 1.5));
+        // titleRadio.scale(@(0.525, 1.5));
+        titleRadio.scale(@(0.45, 1.5));
+        // titleRadio.setPosition(@(0, 0.4));
+        1.5 => titleRadio._textScale;
         titleRadio.setAudioBasePath(me.dir() + "assets/audio/");
         titleRadio.init();
         titleRadio.setOptions(["Start", "Credits"]);
         titleRadio.activate();
+        .25 => titleRadio.dotX[0];
+        .75 => titleRadio.dotX[1];
+
+        dac =< titleRadio.accum;
+        title_music_adsr => pole => titleRadio.accum;
+        titleRadio.waveform.pos(@(.05, -.315));
+        titleRadio.waveform.width(.01);
+        1.1 => titleRadio.DISPLAY_WIDTH;
+        1 => titleRadio.waveform_sca;
 
         // Initialize death radio
         deathRadio.scale(@(0.525, 1.5));
         deathRadio.setAudioBasePath(me.dir() + "assets/audio/");
         deathRadio.init();
+
+        // Init music and audio
+        titleRadio.sfx_gain =< dac;
+        titleRadio.sfx_gain => title_music_adsr;
+        spork ~ startMusic();
+    }
+
+    fun void startMusic() {
+        second => now;
+        title_music_adsr.keyOn();
     }
 
     fun void startGame() {
@@ -68,31 +103,57 @@ public class Game {
         // Main game loop
         while (true) {
             GG.nextFrame() => now;
+            GG.dt() => float dt;
 
             UIStyle.pushVar(UIStyle.VAR_LABEL_FONT, me.dir() + "assets/fonts/GiantRobotArmy.ttf");
 
             if (titleScreen) {
-                UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
 
+                if (GWindow.keyDown(GWindow.KEY_RIGHT) || GWindow.keyDown(GWindow.KEY_LEFT)) {
+                    arrow_rot_spring.pull(.1);
+                    arrow_sca_spring.pull(.1);
+                }
+
+                if (GWindow.keyDown(GWindow.KEY_ENTER)) {
+                    enter_rot_spring.pull(.1);
+                    enter_sca_spring.pull(.1);
+                }
+
+                arrow_rot_spring.update(dt);
+                arrow_sca_spring.update(dt);
+                enter_rot_spring.update(dt);
+                enter_sca_spring.update(dt);
+
+                UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
                 UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, -1);
                 gui.icon(me.dir() + "assets/title/title_screen.png", @(0, 0));
-                UIStyle.popVar();
+                UIStyle.popVar(2);
 
+                UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, @(2, 2));
                 UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 0);
                 gui.icon(me.dir() + "assets/title/title_silhouettes.png", @(0, 0));
-                gui.icon(me.dir() + "assets/title/title_arrows.png", @(0, 0));
-                gui.icon(me.dir() + "assets/title/title_enter.png", @(0, 0));
-                UIStyle.popVar();
+                UIStyle.popVar(2);
 
-                UIStyle.popVar();
+                UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 0);
+                UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, (2 + .5 * arrow_sca_spring.x) * @(1, 1));
+                gui.icon(me.dir() + "assets/title/title_arrows.png", @(0, 0));
+                UIStyle.popVar(2);
+
+                UIStyle.pushVar(UIStyle.VAR_ICON_Z_INDEX, 0);
+                UIStyle.pushVar(UIStyle.VAR_ICON_SIZE, (2 + .5 * enter_sca_spring.x) * @(1, 1));
+                gui.icon(me.dir() + "assets/title/title_enter.png", @(0, 0));
+                UIStyle.popVar(2);
 
                 titleRadio.update();
 
                 if (GWindow.keyDown(GWindow.KEY_ENTER) && titleRadio.hasSelection()) {
                     titleRadio.getSelectedIndex() => int sel;
+                    title_music_adsr.keyOff();
+
                     if (sel == 0) {
                         // "Start" selected
                         startGame();
+                        // turn off music
                     }
                     // sel == 1 is "Credits" — handle later
                 }
