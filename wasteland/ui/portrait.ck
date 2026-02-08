@@ -120,8 +120,6 @@ public class Portrait {
     }
 
     fun void playFadeIn() {
-        1 => fadeInSnd.rate;
-        0 => fadeInSnd.pos;
         fadeInSnd.length() => now;
     }
 
@@ -132,7 +130,11 @@ public class Portrait {
     }
 
     fun void show() {
-        spork ~ playFadeIn();
+        // spork ~ playFadeIn();
+        if (_visible) return;
+
+        1 => fadeInSnd.rate;
+        0 => fadeInSnd.pos;
 
         true => _visible;
         45 => int frames;
@@ -148,8 +150,14 @@ public class Portrait {
         0.0 => _slideOffset;
     }
 
+    int hide_in_process;
     fun void hide() {
-        spork ~ playFadeOut();
+        if (hide_in_process || !_visible) return;
+        true => hide_in_process;
+
+        // spork ~ playFadeOut();
+        1 => fadeOutSnd.rate;
+        0 => fadeOutSnd.pos;
 
         30 => int frames;
         2.0 => float endOffset;
@@ -163,6 +171,8 @@ public class Portrait {
         0.0 => _alpha;
         endOffset => _slideOffset;
         false => _visible;
+
+        false => hide_in_process;
     }
 
     fun float scale() {

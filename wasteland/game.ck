@@ -66,10 +66,11 @@ public class Game {
         1.5 => titleRadio._textScale;
         titleRadio.setAudioBasePath(me.dir() + "assets/audio/");
         titleRadio.init();
-        titleRadio.setOptions(["Start", "Credits"]);
+        titleRadio.setOptions(["Credits", "Start", "Exit"]);
         titleRadio.activate();
-        .25 => titleRadio.dotX[0];
-        .75 => titleRadio.dotX[1];
+        1/6. => titleRadio.dotX[0];
+        3/6. => titleRadio.dotX[1];
+        5/6. => titleRadio.dotX[2];
 
         dac =< titleRadio.accum;
         pole =< titleRadio.accum; pole => titleRadio.accum;
@@ -85,7 +86,7 @@ public class Game {
         deathRadio.scale(@(0.525, 1.5));
         deathRadio.setAudioBasePath(me.dir() + "assets/audio/");
         deathRadio.init();
-        deathRadio.setOptions(["Restart", "Continue", "Credits", "Exit"]);
+        deathRadio.setOptions(["Restart", "Continue", "Title"]);
 
         // Init music and audio
         titleRadio.sfx_gain =< dac;
@@ -156,15 +157,16 @@ public class Game {
 
                 if (GWindow.keyDown(GWindow.KEY_ENTER) && titleRadio.hasSelection()) {
                     titleRadio.getSelectedIndex() => int sel;
-
-                    if (sel == 0) {
-                        // "Start" selected
+                    if (sel == 0) { // credits
+                        startGame(credit_prompts);
+                    } 
+                    else if (sel == 1) { // start
                         title_music_adsr.keyOff();
                         startGame(prompts);
-                    } else {
-                        startGame(credit_prompts);
+                    }  
+                    else if (sel == 2) { // exit
+                        GWindow.close();
                     }
-                    // sel == 1 is "Credits" — handle later
                 }
             } else {
                 player.update(gui);
@@ -213,7 +215,6 @@ public class Game {
                 }
             }
             
-            UIStyle.popVar();
 
             // fade-out overlay
             if (_fadeAlpha > 0) {
@@ -267,14 +268,29 @@ public class Game {
                     UIStyle.pushColor(UIStyle.COL_LABEL, t * @(1.0, 0.0, 0.0));
                     UIStyle.pushVar(UIStyle.VAR_LABEL_CONTROL_POINTS, @(0.5, 0.5));
                     UIStyle.pushVar(UIStyle.VAR_LABEL_Z_INDEX, 4.51);
-                    UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, t*0.24);
-                    gui.label("YOU DIED BRO", @(0, 0));
-                    UIStyle.popVar(3);
+                    UIStyle.pushVar(UIStyle.VAR_LABEL_SIZE, t*0.05);
+                    UIStyle.pushVar(UIStyle.VAR_LABEL_ALIGN, UIStyle.CENTER);
+                    // UIStyle.pushVar(UIStyle.VAR_LABEL_MAX_WIDTH, .5);
+                    gui.label(
+"
+   In a robot's world, not responding promptly is reason 
+enough for suspicion. And, as it turns out for you, death.
+", 
+                    @(0, 0));
+                    UIStyle.popVar(4);
                     UIStyle.popColor();
 
                     // Death menu radio
                     if (deathMenuActive) {
                         deathRadio.update();
+
+                        { // remove npc protrait
+                        // <<< "trying to remove npc" >>>;
+                        // scene.dialogManager().hideNpc();
+                            // scene.dialogManager()._npc @=> NPC@ npc;
+                            // if (npc != null && npc.shown) npc.hide();
+                            // if (npc != null) npc.hide();
+                        }
 
                         if (GWindow.keyDown(GWindow.KEY_ENTER) && deathRadio.hasSelection()) {
                             deathRadio.getSelectedIndex() => int sel;
@@ -298,16 +314,21 @@ public class Game {
                                 1.0 => _fadeAlpha;
                                 (scene $ BarScene).startAudio();
                                 scene.dialogManager().continueFromLastChoice();
-                            } else if (sel == 2) {
-                                // Credits
-                            } else if (sel == 3) {
-                                // Exit
-                                GWindow.close();
-                            }
+                            } else if (sel == 2) { // title
+                                deathRadio.deactivate();
+                                death_music.stop();
+                                false => dead;
+                                false => deathMenuActive;
+                                1.0 => _fadeAlpha;
+                                spork ~ gotoTitleScreen();
+                            } 
                         }
                     }
                 }
             }
+
+            UIStyle.popVar(); // popfont
+
         }
     }
 
@@ -356,13 +377,15 @@ public class Game {
         titleRadio.deactivate();
         (scene $ BarScene).stopAudio();
 
-        FADE_TIME_SECS::second => now;
-        spork ~ death_music.play(65);
-        1::second => now;
+        // FADE_TIME_SECS::second => now;
+        scene.dialogManager().hideNpc();
 
         // Show death menu radio
         deathRadio.activate();
         true => deathMenuActive;
+
+        death_music.play(65);
+        1::second => now;
     }
 
     fun void gotoTitleScreen() {

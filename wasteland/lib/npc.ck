@@ -27,13 +27,22 @@ public class NPC {
     }
 
     fun void show() {
-        true => shown;
+        <<< "trying to show" >>>;
         spork ~ portrait.show();
+        // if (!shown) {
+        //     true => shown;
+        //     spork ~ portrait.show();
+        // }
     }
 
     fun void hide() {
-        false => shown;
         spork ~ portrait.hide();
+        // <<< "already hidden" >>>;
+        // if (shown) {
+        //     <<< "hiding" >>>;
+        //     false => shown;
+        //     spork ~ portrait.hide();
+        // }
     }
 
     fun void highlight() {

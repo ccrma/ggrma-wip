@@ -146,24 +146,32 @@ public class DialogManager {
         null @=> _lastChoicePrompt;
 
         // nocheckin azaday
-        // prompts[10] @=> _currentPrompt;
+        // prompts[18] @=> _currentPrompt;
 
         showCurrentPrompt();
     }
 
+
+    fun string npcName(string name) {
+        name.find(':') => int colonIdx;
+        if (colonIdx >= 0) return name.substring(0, colonIdx);
+        else return name;
+    }
+
     // Blocking: transitions NPC portrait then shows text. Call via spork.
     fun void switchNpcAndSpeak(string assetPath, string text) {
-        _npc.name() => string name;
-        name.find(':') => int colonIdx;
-        if (colonIdx >= 0) {
-            name.substring(0, colonIdx) => name;
-        }
+        npcName(_npc.name()) => string name;
+        npcName(_lastNpcName) => string lastName;
 
-        if (_lastNpcName.trim() == name.trim() && _lastNpcName != "") {
+        if (lastName.trim() == name.trim() && lastName != "") {
+            <<< "assetpath" >>>;
             _npc.setAssetPath(assetPath);
         } else {
+            <<< "transition" >>>;
             _npc.transition(assetPath);
         }
+
+        <<< lastName, name >>>;
 
         npcSays(text);
         false => _inTransition;
@@ -209,7 +217,7 @@ public class DialogManager {
             if (_currentPrompt.speakerName.length() > 0 && _currentPrompt.speakerName != _currentNpcName) {
                 _currentPrompt.speakerName => _currentNpcName;
                 if (_npc != null && _npcAssets.isInMap(_currentNpcName)) {
-                    _npc.name() => _lastNpcName;
+                    if (_npc.portrait.visible()) _npc.name() => _lastNpcName;
                     _npc.setName(_currentNpcName);
                     true => _inTransition;
                     spork ~ switchNpcAndSpeak(_npcAssets[_currentNpcName], _currentPrompt.text);
@@ -357,6 +365,7 @@ public class DialogManager {
         false => _pendingRadioActivation;
         false => _deathTriggered;
         "" => _currentNpcName;
+        "" => _lastNpcName;
     }
 
     fun void restartDialogue() {

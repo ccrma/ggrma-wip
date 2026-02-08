@@ -87,7 +87,7 @@ public class RadioMechanic {
 
     // map audio buffer to 3D positions
     UI_Float waveform_zeno(.3);
-    8 => float waveform_sca;
+    4 => float waveform_sca;
     fun void map2waveform( float in[], vec2 out[] )
     {
         if( in.size() != out.size() )
@@ -104,7 +104,7 @@ public class RadioMechanic {
             // space evenly in X
             -width/2 + width/WINDOW_SIZE*i => out[i].x;
             // map y, using window function to taper the ends
-            waveform_zeno.val() * (s* waveform_sca * window[i] - out[i].y) +=> out[i].y;
+            waveform_zeno.val() * (s * waveform_sca * window[i] - out[i].y) +=> out[i].y;
             // increment
             i++;
         }
@@ -657,7 +657,7 @@ public class TitleRadioMechanic extends RadioMechanic {
         @(0, 0) => target_pos;
 
         for (int i; i < audio.size(); i++) {
-            1.0 => audio[i].gain;
+            0.0 => audio[i].gain;
         }
         0.5 => radio_left.gain;
         0.5 => radio_right.gain;
@@ -675,8 +675,8 @@ public class TitleRadioMechanic extends RadioMechanic {
         for (int i; i < audio.size(); i++) {
             0 => audio[i].gain;
         }
-        0 => radio_left.gain;
-        0 => radio_right.gain;
+        .0 => radio_left.gain;
+        .0 => radio_right.gain;
         0 => radio_on.gain;
         0 => radio_static.gain;
         0 => radio_hum.gain;

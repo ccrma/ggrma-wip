@@ -235,16 +235,16 @@ public class Data {
 
 
     " (Player) Pretty neat game, wonder who made it...
-    // (NPC:Dolbi) My records show a certain 'azaday' was responsible for the music. 
-    // (NPC:Dolbi:Happy) Somewhat plebeian by my standards, but I suppose it suffices. 
-    // (NPC:Daisun) oh wow it turns out all art assets were handmade by Audrey Lee, Gray Wong, and gunoo.
-    // (NPC:Daisun:Love) so talented!! uwu. i hope i can draw like that some day... 
-    // (NPC:Doshiba) Scanning logs... looks like azaday and Ben Hoang wrote most of the code here. 
-    // (NPC:Doshiba:Suspicious) Personally, I've always thought code should be written by robots. But well done, I guess.
-    // (NPC:Doju) And everyone contributed to SFX and voiceovers: Audrey Lee, azaday, Ben Hoang, Gray Wong, and gunoo.
-    // (NPC) Now that's some teamwork! If yall ever swing by, drinks are on the house!
-    // (Narrator) Despite this being a game about robots ... NO AI WAS USED. All music/code/art was lovingly hand-crafted.
-    // (Narrator) Thank you to Ge Wang and the rest of the CCRMA community for all your support!
-    // (Narrator) Programmed in ChuGL/ChucK for WASTELAND Jam 02 by Good Game Research in Music & Acoustics (GGRMA), a research group at Stanford University's CCRMA.
+    (NPC:Dolbi) My records show a certain 'azaday' was responsible for the music. 
+    (NPC:Dolbi:Happy) Somewhat plebeian by my standards, but I suppose it suffices. 
+    (NPC:Daisun) oh wow it turns out all art assets were handmade by Audrey Lee, Gray Wong, and gunoo.
+    (NPC:Daisun:Love) so talented!! uwu. i hope i can draw like that some day... 
+    (NPC:Doshiba) Scanning logs... looks like azaday and Ben Hoang wrote most of the code here. 
+    (NPC:Doshiba:Suspicious) Personally, I've always thought code should be written by robots. But well done, I guess.
+    (NPC:Doju) And everyone contributed to SFX and voiceovers: Audrey Lee, azaday, Ben Hoang, Gray Wong, and gunoo.
+    (NPC) Now that's some teamwork! If yall ever swing by, drinks are on the house!
+    (Narrator) Despite this being a game about robots ... NO AI WAS USED. All music/code/art was lovingly hand-crafted.
+    (Narrator) Thank you to Ge Wang and the rest of the CCRMA community for all your support!
+    (Narrator) Programmed in ChuGL/ChucK for WASTELAND Jam 02 by Good Game Research in Music & Acoustics (GGRMA), a research group at Stanford University's CCRMA.
     " => static string credits;
 }
