@@ -17,8 +17,8 @@ public class TextSonifier extends Chugraph {
     SinOsc sin2; .5 => sin2.gain;
 
     PulseOsc pulse;
-    SawOsc saw; 1.0 => saw.gain;
-    Blit blit; 1.25 => blit.gain;
+    SawOsc saw; .85 => saw.gain;
+    Blit blit; 2.25 => blit.gain;
 
     // TODO remove if sticking with granular synth
     CNoise noise => BPF bpf(440, .5); 4 => bpf.gain;
@@ -181,7 +181,7 @@ public class TextSonifier extends Chugraph {
         }
 
         // Std.mtof(text.text().charAt(char_count) - 32) => osc.freq;
-        if (_mode == Mode_MediaBot) Math.random2(1,12) => blit.harmonics;
+        if (_mode == Mode_MediaBot) Math.random2(3,12) => blit.harmonics;
         adsr.keyOn();
     }
 
