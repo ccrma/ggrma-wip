@@ -432,6 +432,8 @@ public class RadioMechanic {
 
     0.2 => float SAMPLE_RADIUS; // max dist threshold (on a normalized scale 0-1) for hearing a sample
     fun void updateAudio() {
+        if (!_powered_on) return;
+
         float total_sample_gain;
         for (int i; i < audio.size() && i < numOptions; i++) {
             dotX[i] => float dotPos;
@@ -485,6 +487,7 @@ public class RadioMechanic {
     }
 
     fun int hasSelection() {
+        if (!_powered_on) return false;
         return _selectedIndex >= 0;
     }
     
@@ -525,7 +528,7 @@ public class RadioMechanic {
             } else {
                 UIStyle.pushColor(UIStyle.COL_RECT, DEFAULT_COLOR);
             }
-            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.01 * scale.x, 0.01 * scale.y));
+            UIStyle.pushVar(UIStyle.VAR_RECT_SIZE, @(0.02 * scale.x, 0.015 * scale.y));
             UIStyle.pushVar(UIStyle.VAR_RECT_Z_INDEX, z_index - 0.05);
             UIStyle.pushVar(UIStyle.VAR_RECT_ROTATE, rotZ);
             gui.rect(@(label_x, -0.01 + pos.y));
@@ -650,8 +653,7 @@ public class TitleRadioMechanic extends RadioMechanic {
 
     fun void activate() {
         if (_active) return;
-        1 => _active;
-        true => _powered_on;
+        true => _active;
         now => _activate_time;
         @(0, 0) => start_pos;
         @(0, 0) => target_pos;
@@ -664,7 +666,16 @@ public class TitleRadioMechanic extends RadioMechanic {
         1 => radio_static.rate;
         1 => radio_hum.rate;
 
+        spork ~ activateShred();
+    }
+
+    fun void activateShred() {
+        second => now;
         waveform --> GG.scene();
+        0 => radio_on.pos;
+        1 => radio_on.rate;
+        2 => radio_on.gain;
+        true => _powered_on;
     }
 
     fun void deactivate() {
@@ -690,8 +701,8 @@ public class TitleRadioMechanic extends RadioMechanic {
             updateAudio();
             map2waveform( samples, positions );
             waveform.positions( positions );
+            render();
         }
-        render();
     }
 
     fun void render() {

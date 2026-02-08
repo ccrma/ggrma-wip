@@ -127,10 +127,10 @@ public class Data {
     (NPC:Dolbi:Suspicious) Slow-witted too, I see. Although that's probably more than obvious from your lack of knowledge about the area.
     (NPC:Dolbi:Suspicious) Must be pre-12512525.0152311.5253553 patch.
     (NPC:Dolbi:Sad) Hm, that means you don't even have the upgraded neural DSP processors either. What's even the window size of your FFT unit? 
-    ? ...
-    - Huh? [huh]
-    - What? [what]
-    - 512 samples. [bad:Dolbi]
+    ? ...?
+    - Huh [huh]
+    - What [what]
+    - 512 samples [bad:Dolbi]
     {huh} (NPC:Dolbi) Okay, trick question. I just had to check.
     {what} (NPC:Dolbi) Okay, trick question. I just had to check.
     (NPC:Dolbi) But wait, the way you grunted just now... Your speech synthesis model is absolutely immaculate.
