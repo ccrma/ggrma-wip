@@ -17,4 +17,16 @@ public class Util {
     fun static vec2 mousePos(float distanceFromCamera) {
         return GG.camera().screenCoordToWorldPos(GWindow.mousePos(), distanceFromCamera) $ vec2;
     }
+
+    fun static int mouseHovered(GGen g) {
+        mousePos() => vec2 mousePos;
+        g.posWorld().x - Math.fabs(g.scaWorld().x / 2) => float gLeft;
+        g.posWorld().x + Math.fabs(g.scaWorld().x / 2) => float gRight;
+        g.posWorld().y - Math.fabs(g.scaWorld().y / 2) => float gBottom;
+        g.posWorld().y + Math.fabs(g.scaWorld().y / 2) => float gTop;
+        if (mousePos.x >= gLeft && mousePos.x <= gRight && mousePos.y >= gBottom && mousePos.y <= gTop) {
+            return true;
+        }
+        return false;
+    }
 }

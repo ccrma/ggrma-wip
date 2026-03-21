@@ -13,6 +13,9 @@ public class Throw extends Minigame {
     vec3 baseObjSca;
 
     GMesh @ trash;
+    float trashLeft;
+    float trashRight;
+    float trashY;
 
     fun Throw(int level) {
         me.dir() + "../assets/throw/object_level" + level + ".png" => string objectPath;
@@ -27,11 +30,11 @@ public class Throw extends Minigame {
 
         FlatMaterial objMat;
         objMat.colorMap(objTex);
-        GMesh objMesh(new PlaneGeometry, objMat) @=> obj;
+        new GMesh(new PlaneGeometry, objMat) @=> obj;
 
         FlatMaterial trashMat;
         trashMat.colorMap(trashTex);
-        GMesh trashMesh(new PlaneGeometry, trashMat) @=> trash;
+        new GMesh(new PlaneGeometry, trashMat) @=> trash;
 
         obj.pos(@(0, -0.5, 1.1));
 
@@ -39,6 +42,9 @@ public class Throw extends Minigame {
         obj.sca(baseObjSca);
 
         trash.sca(trash.sca() * 0.1 * this.aspect);
+        trash.posWorld().x - Math.fabs(trash.scaWorld().x / 2) => trashLeft;
+        trash.posWorld().x + Math.fabs(trash.scaWorld().x / 2) => trashRight;
+        trash.posWorld().y + Math.fabs(trash.scaWorld().y / 2) => trashY;
 
         obj --> this;
         trash --> this;
@@ -70,6 +76,14 @@ public class Throw extends Minigame {
 
             obj.sca(baseObjSca * scale);
             obj.pos(@(posX, posY));
+
+            obj.posWorld() => vec3 posWorld;
+            if (posWorld.x >= trashLeft && posWorld.x <= trashRight && Math.fabs(posWorld.y - trashY) < 0.075) {
+                true => _win;
+                true => _finished;
+                false => throwing;
+                break;
+            }
 
             if (obj.pos().x > 0.5 || obj.pos().x < -0.5 || obj.pos().y > 0.5 || obj.pos().y < -0.5) {
                 true => _finished;
