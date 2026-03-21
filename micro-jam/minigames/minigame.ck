@@ -1,10 +1,22 @@
-class Minigame extends GGen {
-  // gruck all your game ggens to `this`
+public class Minigame extends GGen {
+    // gruck all your game ggens to `this`
+    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) => vec3 aspect;
+    this.scaWorld(aspect);
 
-  fun int finished() { // returns true when player can swipe to next screen
-    return false;
-  }
+    int _finished;
+    int _win;
 
-  fun void update(float dt) { // called once per frame. put all your game logic here
-  }
+    GPlane bg --> this;
+    bg.sca(1);
+
+    fun int finished() { // returns true when player can swipe to next screen
+        return _finished;
+    }
+
+    fun int win() { // returns true if the minigame is finished and won
+        return _finished && _win;
+    }
+
+    fun void update(float dt) { // called once per frame. put all your game logic here
+    }
 }
