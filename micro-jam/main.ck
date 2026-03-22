@@ -1,3 +1,4 @@
+@import "phone/start.ck"
 @import "phone/phone.ck"
 
 GG.camera().orthographic();
@@ -14,7 +15,16 @@ GG.outputPass().tonemap(OutputPass.ToneMap_None);
 // disable gamma
 // GG.outputPass().gamma(false);
 
-Phone phone --> GG.scene();
+Start start --> GG.scene();
+
+fun void startListener() {
+    while(true) {
+        start.startEvent => now;
+        // start.hide();
+        Phone phone --> GG.scene();
+        spork ~ phone.slideUp();
+    }
+} spork ~ startListener();
 
 while(true) {
     GG.nextFrame() => now;

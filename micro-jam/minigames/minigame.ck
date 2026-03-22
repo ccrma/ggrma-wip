@@ -2,7 +2,7 @@
 
 public class Minigame extends GGen {
     // gruck all your game ggens to `this`
-    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) => vec3 aspect;
+    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.85 => vec3 aspect;
     // this.scaWorld(aspect);
 
     // static G2D@ g; // used by face.ck, pimples.ck
