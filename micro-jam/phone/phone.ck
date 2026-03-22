@@ -177,11 +177,17 @@ public class Phone extends GGen {
                     overlay.batteryDrain(3);
                     1 +=> batteryDrain3Count;
                 }
+
+                if (overlay.batteryPercentage <= 0) { // game over
+                    overlay --< this;
+                    minigame --< this;
+                    if (nextMinigame.parent() != null) nextMinigame --< this;
+                }
             }
 
             true => minigame.stopped;
 
-            nextGame() @=> nextMinigame; // select random minigame for next one -- for now it's just the throw game lol
+            nextGame() @=> nextMinigame; // select random minigame for next one
             nextMinigame --> this; // render the next minigame
             nextMinigame.posY(-GG.camera().viewSize()); // position next minigame at bottom
 

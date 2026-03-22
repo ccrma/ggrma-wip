@@ -90,7 +90,11 @@ public class FaceGame extends Minigame
         else if (level == 5) {
             .77 => sca_mod;
         }
-    } 
+    }
+
+    fun int music() {
+        return Music.FACE1 + (level - 1) % 3; // return the music enum
+    }
 
     fun void update(float dt) { // called once per frame. put all your game logic here
         g.mousePos() => vec2 mouse_pos;

@@ -206,6 +206,10 @@ public class Pimples extends Minigame {
         (num_pimples == 0) => _finished;
     }
 
+    fun int music() {
+        return Music.POPPING1 + (level - 1) % 3; // return the music enum
+    }
+
     fun void update(float dt) {
         g.mousePos() => vec2 mouse_pos;
         now / second => float t;

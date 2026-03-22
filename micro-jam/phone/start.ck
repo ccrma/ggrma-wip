@@ -5,6 +5,30 @@ public class Start extends GGen {
 
     true => int active;
 
+    TextureLoadDesc load_desc;
+    true => load_desc.flip_y;  // flip the texture vertically
+    true => load_desc.gen_mips; // generate mip maps automatically
+
+    TextureSampler sampler;
+    TextureSampler.WRAP_CLAMP => sampler.wrapU;
+    TextureSampler.WRAP_CLAMP => sampler.wrapV;
+    TextureSampler.WRAP_CLAMP => sampler.wrapW;
+    TextureSampler.FILTER_NEAREST => sampler.filterMag;
+    TextureSampler.FILTER_NEAREST => sampler.filterMin;
+    TextureSampler.FILTER_NEAREST => sampler.filterMip;
+
+    PlaneGeometry plane_geo;
+
+    // frame
+    Texture.load(me.dir() + "../assets/ui/start/phone.png", load_desc) @=> Texture @ phoneTex;
+    FlatMaterial phoneMat;
+    phoneMat.transparent(true);
+    phoneMat.colorMap(phoneTex);
+    GMesh phone(plane_geo, phoneMat);
+    phone.posZ(2.0);
+    phone.sca(1);
+    phone --> this;
+
     GText text --> this;
     text.text("DOOMSCROLLING");
     text.color(Color.BLACK);

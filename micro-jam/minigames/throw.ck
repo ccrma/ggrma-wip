@@ -135,7 +135,7 @@ public class Throw extends Minigame {
     }
 
     fun int music() {
-        return Music.BREAKCORE1 + level - 1; // return the music enum
+        return Music.TOSS1 + (level - 1) % 3; // return the music enum
     }
 
     fun void update(float dt) { // called once per frame. put all your game logic here

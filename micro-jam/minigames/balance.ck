@@ -203,6 +203,10 @@ public class Balance extends Minigame {
     GMesh bg(new PlaneGeometry, bgMat) --> this;
     bg.sca(@(1080 * scale / 180.0, 1920 * scale / 180.0, 1.0));
 
+    fun int music() {
+        return Music.CHOICE1 + (level - 1) % 3; // return the music enum
+    }
+
     fun Balance(int level)
     {
         Math.clampi(level, 1, 3) => this.level;

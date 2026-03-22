@@ -291,6 +291,10 @@ public class Mukbang extends Minigame
         mukbangGame();
     }
 
+    fun int music() {
+        return Music.MUKBANG1 + (level - 1) % 3; // return the music enum
+    }
+
     fun void mukbangGame() {
         // Start the UI
         go_bar_pivot --> this;

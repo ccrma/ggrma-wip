@@ -15,22 +15,22 @@ GG.outputPass().tonemap(OutputPass.ToneMap_None);
 // disable gamma
 // GG.outputPass().gamma(false);
 
-
+Phone phone;
 Start start;
 
 fun void startListener() {
     while(true) {
         start.startEvent => now;
-        Phone phone --> GG.scene();
+        phone --> GG.scene();
         spork ~ phone.slideUp();
     }
 }
 
-if (0) {
+if (1) {
     start --> GG.scene();
     spork ~ startListener();
 } else {
-    Phone phone --> GG.scene();
+    phone --> GG.scene();
     spork ~ phone.slideUp();
 }
 
