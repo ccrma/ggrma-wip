@@ -5,8 +5,11 @@ public class Minigame extends GGen {
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) => vec3 aspect;
     // this.scaWorld(aspect);
 
-    G2D g; // used by face.ck, pimples.ck
-    g --> this;
+    // static G2D@ g; // used by face.ck, pimples.ck
+    // if (g == null) {
+    //     new G2D @=> g;
+    //     g --> this;
+    // }
 
     int _finished;
     int _win;

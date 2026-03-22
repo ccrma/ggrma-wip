@@ -5,15 +5,54 @@
 public class Phone extends GGen {
     Minigame @ minigame;
     Minigame @ nextMinigame;
+    int minigame_type;
+    int next_minigame_type;
+
+    0 => static int Game_Throw;
+    1 => static int Game_Face;
+    2 => static int Game_Count;
+
+    int game_levels[Game_Count];
+    // start all games at level 1
+    for (int i; i < Game_Count; ++i) 1 => game_levels[i];
+    5 => game_levels[Game_Face];
+
+    // FaceGame face_game;
 
     Overlay overlay --> this;
-
-    1 => int throwLevel;
     int scrolling;
+
+    fun Minigame@ nextGame() {
+        int valid_games[0];
+        for (int i; i < Game_Count; ++i) {
+            if (game_levels[i] <= 5) valid_games << i;
+        }
+
+        // only allow games that are not level 5
+        if (valid_games.size() == 0) return null;
+        valid_games[Math.random2(0, valid_games.size() - 1)] 
+            => next_minigame_type;
+
+
+        game_levels[next_minigame_type] => int level;
+
+        Minigame@ game;
+        <<< "initialized game", next_minigame_type, "level", level >>>;
+        if (next_minigame_type == Game_Throw) {
+            return new Throw(level);
+        }
+        else if (next_minigame_type == Game_Face) {
+            return new FaceGame(level);
+        }
+
+        <<< "ERROR Phone.nextGame() returning null" >>>;
+        return null;
+    }
 
     fun Phone() {
         // TODO impl random game selection
-        new Throw(throwLevel) @=> minigame;
+        nextGame() @=> minigame;
+        next_minigame_type => minigame_type;
         minigame --> this;
     }
 
@@ -41,6 +80,7 @@ public class Phone extends GGen {
         nextMinigame.posY(0);
 
         nextMinigame @=> minigame;
+        next_minigame_type => minigame_type;
         false => scrolling;
     }
 
@@ -49,12 +89,10 @@ public class Phone extends GGen {
 
         if (GWindow.scrollY() > 1 && minigame.finished()) {
             if (minigame.win()) { // increment minigame level if won
-                if (minigame.typeOfInstance() == Throw) {
-                    1 +=> throwLevel;
-                }
+                ++game_levels[minigame_type];
             }
 
-            new Throw(throwLevel) @=> nextMinigame; // select random minigame for next one -- for now it's just the throw game lol
+            nextGame() @=> nextMinigame; // select random minigame for next one -- for now it's just the throw game lol
             nextMinigame --> this; // render the next minigame
             nextMinigame.posY(-GG.camera().viewSize()); // position next minigame at bottom
 
