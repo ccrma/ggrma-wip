@@ -1,6 +1,7 @@
 @import "../minigames/throw.ck"
 @import "../minigames/face.ck"
 @import "../minigames/pimple.ck"
+@import "../minigames/rxn.ck"
 @import "overlay.ck"
 
 public class Phone extends GGen {
@@ -12,7 +13,8 @@ public class Phone extends GGen {
     0 => static int Game_Throw;
     1 => static int Game_Face;
     2 => static int Game_Pimples;
-    3 => static int Game_Count;
+    3 => static int Game_Rxn;
+    4 => static int Game_Count;
 
     int game_levels[Game_Count];
     // start all games at level 1
@@ -22,10 +24,14 @@ public class Phone extends GGen {
 
     // FaceGame face_game;
 
+    // preload assets
+    Rxn.init();
+
     Overlay overlay --> this;
     int scrolling;
 
-    fun Minigame@ nextGame() {
+    fun Minigame@ nextGame() { 
+        <<< "calling nextgame" >>>; 
         int valid_games[0];
         for (int i; i < Game_Count; ++i) {
             if (game_levels[i] <= 5) valid_games << i;
@@ -37,7 +43,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        Game_Pimples => next_minigame_type;
+        Game_Rxn => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
@@ -51,6 +57,10 @@ public class Phone extends GGen {
         }
         else if (next_minigame_type == Game_Pimples) {
             return new Pimples(level);
+        }
+        else if (next_minigame_type == Game_Rxn) {
+            // RXN game levels go from 0-4
+            return new Rxn(level - 1);
         }
 
         <<< "ERROR Phone.nextGame() returning null" >>>;
@@ -107,6 +117,7 @@ public class Phone extends GGen {
             nextMinigame.posY(-screenHeight + screenHeight * 0.2 + offset);
         }
 
+        minigame.ungruck();
         minigame --< this;
         nextMinigame.posY(0);
 
@@ -122,6 +133,8 @@ public class Phone extends GGen {
             if (minigame.win()) { // increment minigame level if won
                 ++game_levels[minigame_type];
             }
+
+            true => minigame.stopped;
 
             nextGame() @=> nextMinigame; // select random minigame for next one -- for now it's just the throw game lol
             nextMinigame --> this; // render the next minigame
