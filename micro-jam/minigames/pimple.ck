@@ -44,7 +44,7 @@ public class Pimples extends Minigame {
 
     static Texture@ monster_tex;
     static Texture@ eyeblink_tex;
-    1.4 => static float MONSTER_SPAWN_RADIUS;
+    1.2 => static float MONSTER_SPAWN_RADIUS;
 
     // size
     .5 => static float r;
@@ -150,7 +150,7 @@ public class Pimples extends Minigame {
         }
         else if (level == Level_Clown) {
             // TODO position hard-code
-            Math.random2(6, 8) => int count;
+            Math.random2(12, 16) => int count;
 
             count => num_pimples;
             positions.size(count);
@@ -159,10 +159,7 @@ public class Pimples extends Minigame {
 
             for (int i; i < count; i++) {
                 true => active[i];
-                if (i < count / 2) M.randomPointInArea(@(0,g.screen_h * .25), 2, 1.5) => positions[i];
-                else {
-                    M.randomPointInArea(@(1.5,0), .5, 4) => positions[i];
-                }
+                M.randomPointInArea(@(0,0), .4 * aspect.x, .35 * aspect.y) => positions[i];
                 @(
                     Math.randomf(),
                     Math.randomf(),
@@ -172,7 +169,7 @@ public class Pimples extends Minigame {
             }
         }
         else if (level == Level_Monster) {
-            Math.random2(6, 8) => int count;
+            Math.random2(8, 20) => int count;
             count => num_pimples;
             positions.size(count);
             active.size(count);
@@ -180,7 +177,7 @@ public class Pimples extends Minigame {
 
             for (int i; i < count; i++) {
                 true => active[i];
-                M.randomPointInCircle(@(0, 0), .5, MONSTER_SPAWN_RADIUS) => positions[i];
+                M.randomPointInCircle(@(-.1, .5), .25, MONSTER_SPAWN_RADIUS) => positions[i];
                 @(
                     Math.randomf(),
                     Math.randomf(),
@@ -257,8 +254,9 @@ public class Pimples extends Minigame {
                 }
             }
             else if (level == Level_Clown) {
+                .6 * (.2 + rand[i].y) * Math.sin(t * (.2 + rand[i].w)) +=> p.y;
                 .95 * r => mod_r;
-                g.square(p + .5 * g.UP, 2 * mod_r);
+                // g.square(p + .5 * g.UP, 2 * mod_r);
             }
             else if (level == Level_Monster) {
                 .9 * r => mod_r;
@@ -332,17 +330,13 @@ public class Pimples extends Minigame {
                     g.sprite(pillbug_smushed, p, r, angle);
             }
             else if (level == Level_Clown) {
-                g.pushLayer(0);
-                g.sprite(clown_tex, @(0,0), @(aspect.x, -aspect.y), 0);
-                g.popLayer();
 
                 if (active) 
                     g.sprite(balloon_tex, @(4, 1), @(0, 0), p, BALLOON_VISUAL_SCA * r * @(BALLOON_ASPECT, -1), 0, Color.WHITE);
             }
             else if (level == Level_Monster) {
-                g.pushLayer(0);
-                g.sprite(monster_tex, @(0,0), @(aspect.x, -aspect.y), 0);
-                g.popLayer();
+
+                // g.circleFilled(@(-.1, .5), 1.2, Color.RED);
 
                 if (active) {
                     g.sprite(eyeblink_tex, 3, 0, p, 2 * r * @(1, -1), 0, Color.WHITE);
@@ -366,8 +360,18 @@ public class Pimples extends Minigame {
         // background
         if (level == Level_Bubble || level == Level_Wrap)
             _background(Color.BLACK);
-        else if (level == Level_Bubble)
+        else if (level == Level_Bug)
             _background(Color.BEIGE);
+        else if (level == Level_Clown) {
+            g.pushLayer(0);
+            g.sprite(clown_tex, @(0,0), @(aspect.x, -aspect.y), 0);
+            g.popLayer();
+        }
+        else if (level == Level_Monster) {
+            g.pushLayer(0);
+            g.sprite(monster_tex, @(0,0), @(aspect.x, -aspect.y), 0);
+            g.popLayer();
+        }
     }
 }
 
