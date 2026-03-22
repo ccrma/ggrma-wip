@@ -70,9 +70,6 @@ public class Rxn extends Minigame
     // ------------------------------------------------------------
     // Consists of blank face texture and three sets of facial features (neutral, good, bad)
 
-    // Texture loading
-    static TextureLoadDesc load_desc;
-
     // Arrays to hold the preloaded facial feature textures
     static Texture@ neutral_textures[0];
     static Texture@ good_textures[0];
@@ -133,13 +130,14 @@ public class Rxn extends Minigame
     view_bg.posZ(0);
     view_bg.sca(@(.8, .15));
 
+    static TextureLoadDesc load_desc;
+    true => load_desc.flip_y;
+    false => load_desc.gen_mips;
+
     static int _init;
     fun static void init() {
         if (_init) return;
         true => _init;
-
-        true => load_desc.flip_y;
-        true => load_desc.gen_mips;
 
         FileIO fio;
         me.dir() + "../assets/rxn" => string assets_dir;
