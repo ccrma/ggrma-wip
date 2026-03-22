@@ -105,7 +105,11 @@ public class FaceGame extends Minigame
         go_face --> this;
 
         for (auto tex : face.features) go_face_features << sprite(tex, true);
-    } 
+    }
+
+    fun int music() {
+        return Music.FACE1 + (level - 1) % 3; // return the music enum
+    }
 
     fun void update(float dt) { // called once per frame. put all your game logic here
         g.mousePos() => vec2 mouse_pos;
