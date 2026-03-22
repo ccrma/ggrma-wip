@@ -12,6 +12,7 @@ public class Overlay extends GGen {
     int liked;
 
     100 => int batteryPercentage;
+    PlaneGeometry plane_geo;
 
     fun Overlay() {
         // border
@@ -46,8 +47,8 @@ public class Overlay extends GGen {
         heartMat.sampler(sampler);
         heartMat.transparent(true);
         heartMat.colorMap(heartTex);
-        new GMesh(new PlaneGeometry, heartMat) @=> heart;
-        heart.sca(heart.sca() * 0.025 * this.aspect);
+        new GMesh(plane_geo, heartMat) @=> heart;
+        heart.sca(heart.sca() * 0.025 * (6.6/10) * this.aspect);
         heart.pos(@(0.4, -0.2, 2.0));
         heart --> this;
 
@@ -57,8 +58,8 @@ public class Overlay extends GGen {
         commentMat.sampler(sampler);
         commentMat.transparent(true);
         commentMat.colorMap(commentTex);
-        GMesh comment(new PlaneGeometry, commentMat);
-        comment.sca(comment.sca() * 0.025 * this.aspect);
+        GMesh comment(plane_geo, commentMat);
+        comment.sca(comment.sca() * 0.025 * (6.6/10) * this.aspect);
         comment.pos(@(0.4, -0.275, 2.0));
         comment --> this;
 
@@ -68,25 +69,18 @@ public class Overlay extends GGen {
         shareMat.sampler(sampler);
         shareMat.transparent(true);
         shareMat.colorMap(shareTex);
-        GMesh share(new PlaneGeometry, shareMat);
-        share.sca(share.sca() * 0.025 * this.aspect);
+        GMesh share(plane_geo, shareMat);
+        share.sca(share.sca() * 0.025 * (6.6/10) * this.aspect);
         share.pos(@(0.4, -0.35, 2.0));
         share --> this;
-
-        // toolbar
-        FlatMaterial toolbarMat;
-        toolbarMat.color(Color.BLACK);
-        GMesh toolbar(new PlaneGeometry, toolbarMat) --> this;
-        toolbar.pos(@(0, 0.48, 2.0));
-        toolbar.sca(@(1.0, 0.04));
 
         // battery
         Texture.load(me.dir() + "../assets/ui/battery.png", load_desc) @=> Texture @ batteryTex;
         FlatMaterial batteryMat;
         batteryMat.colorMap(batteryTex);
         batteryMat.color(Color.WHITE);
-        GMesh battery(new PlaneGeometry, batteryMat);
-        battery.sca(battery.sca() * 0.015 * this.aspect);
+        GMesh battery(plane_geo, batteryMat);
+        battery.sca(battery.sca() * 0.015 * (6.6/10) * this.aspect);
         battery.scaX(-battery.scaX());
         battery.pos(@(0.425, 0.48, 2.0));
         battery --> this;
@@ -94,7 +88,7 @@ public class Overlay extends GGen {
         // battery percentage
         GText batteryText --> this;
         batteryText.text(batteryPercentage + "%");
-        batteryText.sca(battery.sca() / 2);
+        batteryText.sca(battery.sca() / 2 * (6.6/10));
         batteryText.controlPoints(@(1.0, 0.5));
         batteryText.pos(@(0.365, 0.48, 2.0));
         batteryText.color(Color.WHITE);

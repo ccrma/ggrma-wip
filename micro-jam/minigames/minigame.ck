@@ -1,10 +1,20 @@
+@import "../lib/g2d/g2d.ck"
+
 public class Minigame extends GGen {
     // gruck all your game ggens to `this`
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) => vec3 aspect;
     // this.scaWorld(aspect);
 
+    G2D g; // used by face.ck, pimples.ck
+    g --> this;
+
     int _finished;
     int _win;
+
+    static PlaneGeometry@ plane_geo;
+    if (plane_geo == null) new PlaneGeometry @=> plane_geo;
+
+    fun void init(int level) {} // called to start minigame at level
 
     fun int finished() { // returns true when player can swipe to next screen
         return _finished;

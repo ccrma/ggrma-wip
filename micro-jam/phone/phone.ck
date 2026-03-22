@@ -1,4 +1,5 @@
 @import "../minigames/throw.ck"
+@import "../minigames/face.ck"
 @import "overlay.ck"
 
 public class Phone extends GGen {

@@ -19,7 +19,10 @@ public class Throw extends Minigame {
     float trashRight;
     float trashY;
 
+    static Texture@ bgTex;
+
     fun Throw(int level) {
+        // TODO have all textures be loaded on start
         me.dir() + "../assets/throw/bg.png" => string bgPath;
         me.dir() + "../assets/throw/object" + level + ".png" => string objectPath;
         me.dir() + "../assets/throw/bucket" + level + ".png" => string trashPath;
@@ -36,7 +39,7 @@ public class Throw extends Minigame {
         TextureSampler.FILTER_NEAREST => sampler.filterMin;
         TextureSampler.FILTER_NEAREST => sampler.filterMip;
 
-        Texture.load(bgPath, load_desc) @=> Texture bgTex;
+        if (bgTex == null) Texture.load(bgPath, load_desc) @=> bgTex;
         FlatMaterial bgMat;
         bgMat.sampler(sampler);
         bgMat.colorMap(bgTex);
