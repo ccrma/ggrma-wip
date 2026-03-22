@@ -12,7 +12,9 @@ Lvls
 @import "../lib/g2d/g2d.ck"
 @import "../lib/M.ck"
 
-class Pimples {
+public class Pimples extends Minigame {
+    G2D g --> this;
+
     // static stuff ====================================================
     1 => static int Level_Bubble;
     2 => static int Level_Wrap;
@@ -21,40 +23,57 @@ class Pimples {
     5 => static int Level_Monster;
 
     // TODO optimize only load textures once, statically
-
     static TextureLoadDesc load_desc;
     false => load_desc.flip_y;
 
-    // bubble
-    Texture.load("./assets/pimple/bubble.png", load_desc) @=> static Texture bubble_tex;
+    static Texture@ bubble_tex;
     2 => static float BUBBLE_SPRITE_SCA_MODIFIER;
 
-    // wrap
-    Texture.load("./assets/pimple/bubblewrap-popped.png", load_desc) @=> static Texture bubblewrap_popped;
-    Texture.load("./assets/pimple/bubblewrap-unpopped.png", load_desc) @=> static Texture bubblewrap_unpopped;
+    static Texture@ bubblewrap_popped;
+    static Texture@ bubblewrap_unpopped;
     5 => static int WRAP_N_COLS;
     4 => static int WRAP_N_ROWS;
 
+    static Texture@ pillbug;
+    static Texture@ pillbug_smushed;
     // bug
-    Texture.load("./assets/pimple/pillbug.png", load_desc) @=> static Texture pillbug;
-    Texture.load("./assets/pimple/pillbug-smushed.png", load_desc) @=> static Texture pillbug_smushed;
     10 => static int PILLBUG_N_FRAMES;
     .5 => static float PILLBUG_SCA_MOD;
 
-    // clown
-    Texture.load("./assets/pimple/clown.png", load_desc) @=> static Texture clown_tex;
-    Texture.load("./assets/pimple/balloon.png", load_desc) @=> static Texture balloon_tex;
-    balloon_tex.width() / 4.0 / balloon_tex.height() => static float BALLOON_ASPECT;
-    4.2 => float BALLOON_VISUAL_SCA;
-    
-    // monster
-    Texture.load("./assets/pimple/monster.png", load_desc) @=> static Texture monster_tex;
-    Texture.load("./assets/pimple/eyeblink-no-pupil.png", load_desc) @=> static Texture eyeblink_tex;
-    1.4 => float MONSTER_SPAWN_RADIUS;
+    static Texture@ clown_tex;
+    static Texture@ balloon_tex;
+    static float BALLOON_ASPECT;
+    4.2 => static float BALLOON_VISUAL_SCA;
+
+    static Texture@ monster_tex;
+    static Texture@ eyeblink_tex;
+    1.4 => static float MONSTER_SPAWN_RADIUS;
 
     // size
     .5 => static float r;
     r * r => static float r2;
+
+    // load textures
+    static int loaded;
+    if (!loaded) {
+        true => loaded;
+        <<< "loading pop game textures" >>>;
+        Texture.load("./assets/pimple/bubble.png", load_desc) @=> bubble_tex;
+
+        Texture.load("./assets/pimple/bubblewrap-popped.png", load_desc) @=> bubblewrap_popped;
+        Texture.load("./assets/pimple/bubblewrap-unpopped.png", load_desc) @=> bubblewrap_unpopped;
+
+        Texture.load("./assets/pimple/pillbug.png", load_desc) @=> pillbug;
+        Texture.load("./assets/pimple/pillbug-smushed.png", load_desc) @=> pillbug_smushed;
+
+        Texture.load("./assets/pimple/clown.png", load_desc) @=> clown_tex;
+        Texture.load("./assets/pimple/balloon.png", load_desc) @=> balloon_tex;
+        balloon_tex.width() / 4.0 / balloon_tex.height() => BALLOON_ASPECT;
+
+        // monster
+        Texture.load("./assets/pimple/monster.png", load_desc) @=> monster_tex;
+        Texture.load("./assets/pimple/eyeblink-no-pupil.png", load_desc) @=> eyeblink_tex;
+    }
 
     // local stuff ====================================================
     vec2 positions[0]; // .z is > 0 if popped
@@ -63,18 +82,23 @@ class Pimples {
     int num_pimples;
     int level;
 
-    fun void sprite(Texture tex, vec2 pos, float sca) {
-        tex.width() $ float / tex.height() => float aspect;
-        g.sprite(tex, pos, sca * @(aspect, 1), 0);
-    }
+    true => _win; // not loseable
 
-    fun void init(int count, int level) {
+    // fun void sprite(Texture tex, vec2 pos, float sca) {
+    //     tex.width() $ float / tex.height() => float aspect;
+    //     g.sprite(tex, pos, sca * @(aspect, 1), 0);
+    // }
+
+    fun Pimples(int level) {
+        false => _finished;
         level => this.level;
+
         positions.clear();
         active.clear();
         rand.clear();
 
         if (level == Level_Bubble) {
+            Math.random2(8, 12) => int count;
             count => num_pimples;
             positions.size(count);
             active.size(count);
@@ -82,7 +106,7 @@ class Pimples {
 
             for (int i; i < count; i++) {
                 true => active[i];
-                M.randomPointInArea(@(0,0), 2, 4) => positions[i];
+                M.randomPointInArea(@(0,0), 1.8, 3.5) => positions[i];
                 @(
                     Math.randomf(),
                     Math.randomf(),
@@ -92,7 +116,6 @@ class Pimples {
             }
         }
         else if (level == Level_Wrap) {
-
             // 1 0
             // 2 .5
             // 3 1
@@ -114,6 +137,8 @@ class Pimples {
             }
         }
         else if (level == Level_Bug) {
+            Math.random2(8, 12) => int count;
+
             // all spawn at center
             positions.size(count);
             active.size(count);
@@ -123,14 +148,16 @@ class Pimples {
                 true => active[i];
 
                 // set random bug targets
-                M.randomPointInArea(@(0,0), .5 * 5, .5 * g.screen_h) $ vec4 => rand[i];
-                <<< rand[i], g.screen_w >>>;
+                M.randomPointInArea(@(0,0), .5 * 5, .3 * g.screen_h) $ vec4 => rand[i];
                 // set random frame offset
                 Math.random2(0, PILLBUG_N_FRAMES - 1) => rand[i].z;
                 Math.random2f(.8, 1.2) => rand[i].w; // speed
             }
         }
         else if (level == Level_Clown) {
+            // TODO position hard-code
+            Math.random2(6, 8) => int count;
+
             count => num_pimples;
             positions.size(count);
             active.size(count);
@@ -151,6 +178,7 @@ class Pimples {
             }
         }
         else if (level == Level_Monster) {
+            Math.random2(6, 8) => int count;
             count => num_pimples;
             positions.size(count);
             active.size(count);
@@ -169,9 +197,16 @@ class Pimples {
         }
     }
 
+    fun background(vec3 color) {
+        g.pushLayer(0);
+        g.boxFilled(@(0, 0), aspect.x, aspect.y, color);
+        g.popLayer();
+    }
+
     fun void pop(int idx) {
         num_pimples--;
         false => active[idx];
+        (num_pimples == 0) => _finished;
     }
 
     fun void update(float dt) {
@@ -185,8 +220,8 @@ class Pimples {
         int popped; // only pop 1 at a time
 
         g.pushLayer(1);
-        for (int i; i < pimples.positions.size(); i++) {
-            pimples.positions[i] => vec2 p;
+        for (int i; i < positions.size(); i++) {
+            positions[i] => vec2 p;
             Color.WHITE => vec3 color;
             r => float mod_r;
 
@@ -213,13 +248,13 @@ class Pimples {
                     // lerp bug towards target
                     if (M.dist2(p, target) < .05) {
                         // stop, pick new target
-                        M.randomPointInArea(@(0,0), .5 * 5, .5 * g.screen_h) => vec2 target; 
+                        M.randomPointInArea(@(0,0), .5 * 5, .4 * g.screen_h) => vec2 target; 
                         target.x => rand[i].x;
                         target.y => rand[i].y;
                     } else {
                         rand[i].w => float BUG_SPEED;
-                        dt * BUG_SPEED * M.dir(p, target) + p => pimples.positions[i];
-                        pimples.positions[i] => p;
+                        dt * BUG_SPEED * M.dir(p, target) + p => positions[i];
+                        positions[i] => p;
                     }
                 }
             }
@@ -231,7 +266,7 @@ class Pimples {
                 .9 * r => mod_r;
             }
 
-            if (!popped && pimples.active[i]) {
+            if (!popped && active[i]) {
                 int collision;
 
                 if (level != Level_Clown) {
@@ -244,7 +279,7 @@ class Pimples {
                     true => popped;
                     Color.RED => color;
                     if (g.mouse_left_down) {
-                        pimples.pop(i);
+                        pop(i);
                         if (level == Level_Bubble) {
                             g.animate(p, bubble_tex, 7, 1, .05, 2* mod_r * BUBBLE_SPRITE_SCA_MODIFIER);
                         }
@@ -274,24 +309,22 @@ class Pimples {
                 }
             }
 
-            pimples.active[i] => int active;
+            active[i] => int active;
 
             // draw
-
-            if (level == 1) {
+            if (level == Level_Bubble) {
+                background(Color.BLACK);
                 if (active) {
                     g.sprite(bubble_tex, 7, 0, p, 2* mod_r * BUBBLE_SPRITE_SCA_MODIFIER);
-                    // g.square(p, 2*r * rand[i].w);
                 }
             } 
             else if (level == Level_Wrap) {
+                background(Color.BLACK);
                 g.sprite(active ? bubblewrap_unpopped : bubblewrap_popped, p, 2*r);
             }
             else if (level == Level_Bug) {
                 // white bg
-                g.pushLayer(0);
-                g.boxFilled(@(0, 0), g.screen_w, g.screen_h, Color.BEIGE);
-                g.popLayer();
+                background(Color.BEIGE);
 
                 rand[i] $ vec2 => vec2 target;
                 M.angle(p, target) + Math.pi/2 => float angle;
@@ -303,7 +336,7 @@ class Pimples {
             }
             else if (level == Level_Clown) {
                 g.pushLayer(0);
-                g.sprite(clown_tex, @(0,0), @(g.screen_w, -g.screen_h), 0);
+                g.sprite(clown_tex, @(0,0), @(aspect.x, -aspect.y), 0);
                 g.popLayer();
 
                 if (active) 
@@ -311,7 +344,7 @@ class Pimples {
             }
             else if (level == Level_Monster) {
                 g.pushLayer(0);
-                g.sprite(monster_tex, @(0,0), @(g.screen_w, -g.screen_h), 0);
+                g.sprite(monster_tex, @(0,0), @(aspect.x, -aspect.y), 0);
                 g.popLayer();
 
                 if (active) {

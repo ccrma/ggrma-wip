@@ -1,5 +1,6 @@
 @import "../minigames/throw.ck"
 @import "../minigames/face.ck"
+@import "../minigames/pimple.ck"
 @import "overlay.ck"
 
 public class Phone extends GGen {
@@ -10,12 +11,14 @@ public class Phone extends GGen {
 
     0 => static int Game_Throw;
     1 => static int Game_Face;
-    2 => static int Game_Count;
+    2 => static int Game_Pimples;
+    3 => static int Game_Count;
 
     int game_levels[Game_Count];
     // start all games at level 1
     for (int i; i < Game_Count; ++i) 1 => game_levels[i];
     // 5 => game_levels[Game_Face];
+    // 4 => game_levels[Game_Pimples];
 
     // FaceGame face_game;
 
@@ -33,6 +36,9 @@ public class Phone extends GGen {
         valid_games[Math.random2(0, valid_games.size() - 1)] 
             => next_minigame_type;
 
+        // NOCHECKIN
+        // Game_Pimples => next_minigame_type;
+
         game_levels[next_minigame_type] => int level;
 
         Minigame@ game;
@@ -42,6 +48,9 @@ public class Phone extends GGen {
         }
         else if (next_minigame_type == Game_Face) {
             return new FaceGame(level);
+        }
+        else if (next_minigame_type == Game_Pimples) {
+            return new Pimples(level);
         }
 
         <<< "ERROR Phone.nextGame() returning null" >>>;
