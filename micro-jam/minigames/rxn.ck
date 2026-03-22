@@ -78,6 +78,7 @@ public class Rxn extends Minigame
     // Parent mesh for the reaction face
     GGen reaction_parent --> this;
     reaction_parent.sca(2.5);
+    reaction_parent.scaY(-2.5);
     reaction_parent.posX(-1.2);
     reaction_parent.posY(-2.5);
     reaction_parent.posZ(1);
