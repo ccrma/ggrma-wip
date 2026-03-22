@@ -22,7 +22,6 @@ Phone phone;
 fun void startListener() {
     while(true) {
         start.startEvent => now;
-        // start.hide();
         Phone phone --> GG.scene();
         spork ~ phone.slideUp();
     }
