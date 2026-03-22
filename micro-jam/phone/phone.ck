@@ -18,7 +18,7 @@ public class Phone extends GGen {
     // start all games at level 1
     for (int i; i < Game_Count; ++i) 1 => game_levels[i];
     // 5 => game_levels[Game_Face];
-    // 4 => game_levels[Game_Pimples];
+    4 => game_levels[Game_Pimples];
 
     // FaceGame face_game;
 
@@ -37,7 +37,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        // Game_Pimples => next_minigame_type;
+        Game_Pimples => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
