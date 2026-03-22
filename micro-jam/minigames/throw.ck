@@ -4,6 +4,8 @@
 public class Throw extends Minigame {
     this.scaWorld(aspect);
 
+    int level;
+
     int throwActive;
     int throwing;
 
@@ -37,6 +39,8 @@ public class Throw extends Minigame {
     ] @=> float objAspectRatios[];
 
     fun Throw(int level) {
+        level => this.level;
+
         // TODO have all textures be loaded on start
         me.dir() + "../assets/throw/bg.png" => string bgPath;
         me.dir() + "../assets/throw/object" + level + ".png" => string objectPath;
@@ -128,6 +132,10 @@ public class Throw extends Minigame {
                 break;
             }
         }
+    }
+
+    fun int music() {
+        return Music.BREAKCORE1 + level - 1; // return the music enum
     }
 
     fun void update(float dt) { // called once per frame. put all your game logic here

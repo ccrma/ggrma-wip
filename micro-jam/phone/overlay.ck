@@ -1,8 +1,11 @@
 @import "../lib/util.ck"
+@import "hand.ck"
 
 public class Overlay extends GGen {
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
     this.scaWorld(aspect);
+
+    Hand hand;
 
     GLines border;
 
@@ -40,6 +43,11 @@ public class Overlay extends GGen {
         TextureSampler.FILTER_NEAREST => sampler.filterMag;
         TextureSampler.FILTER_NEAREST => sampler.filterMin;
         TextureSampler.FILTER_NEAREST => sampler.filterMip;
+
+        // hand
+        hand --> this;
+        hand.posZ(2.1);
+        hand.scaWorld(@(GG.camera().viewSize() * 16./9, GG.camera().viewSize(), 1));
 
         // frame
         Texture.load(me.dir() + "../assets/ui/frame.png", load_desc) @=> Texture @ frameTex;
@@ -101,6 +109,21 @@ public class Overlay extends GGen {
         batteryText.controlPoints(@(1.0, 0.5));
         batteryText.pos(@(0.3535, 0.445, 2.0));
         batteryText.color(Color.WHITE);
+    }
+
+    Shred @ twitchShred;
+
+    fun void swipe() {
+        if (twitchShred != null) {
+            twitchShred.exit();
+            null => twitchShred;
+        }
+        spork ~ hand.swipe();
+    }
+
+    fun void twitch() {
+        if (twitchShred != null) return;
+        spork ~ hand.twitch() @=> twitchShred;
     }
 
     fun void update(float dt) {

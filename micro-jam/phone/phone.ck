@@ -2,8 +2,11 @@
 @import "../minigames/face.ck"
 @import "../minigames/pimple.ck"
 @import "overlay.ck"
+@import "../lib/music.ck"
 
 public class Phone extends GGen {
+    Music music;
+
     Minigame @ minigame;
     Minigame @ nextMinigame;
     int minigame_type;
@@ -37,7 +40,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        Game_Pimples => next_minigame_type;
+        Game_Throw => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
@@ -85,6 +88,8 @@ public class Phone extends GGen {
             ease * screenHeight => float offset;
             this.posY(-screenHeight * 2 + offset * 2);
         }
+
+        music.switchTo(minigame.music());
     }
 
     fun void scroll() {
@@ -93,6 +98,8 @@ public class Phone extends GGen {
         GG.camera().viewSize() => float screenHeight;
         0.5 => float duration;
         float t;
+
+        overlay.swipe();
 
         while (t < duration) {
             GG.nextFrame() => now;
@@ -118,6 +125,10 @@ public class Phone extends GGen {
     fun void update(float dt) {
         if (scrolling) return;
 
+        if (minigame.finished()) {
+            overlay.twitch();
+        }
+
         if (GWindow.scrollY() > 1 && minigame.finished()) {
             if (minigame.win()) { // increment minigame level if won
                 ++game_levels[minigame_type];
@@ -126,6 +137,8 @@ public class Phone extends GGen {
             nextGame() @=> nextMinigame; // select random minigame for next one -- for now it's just the throw game lol
             nextMinigame --> this; // render the next minigame
             nextMinigame.posY(-GG.camera().viewSize()); // position next minigame at bottom
+
+            music.switchTo(minigame.music());
 
             spork ~ scroll();
         }

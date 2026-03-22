@@ -1,4 +1,5 @@
 @import "../lib/g2d/g2d.ck"
+@import "../lib/music.ck"
 
 public class Minigame extends GGen {
     // gruck all your game ggens to `this`
@@ -21,6 +22,10 @@ public class Minigame extends GGen {
 
     fun int finished() { // returns true when player can swipe to next screen
         return _finished;
+    }
+
+    fun int music() {
+        return Music.NONE; // return the music enum
     }
 
     fun int win() { // returns true if the minigame is finished and won
