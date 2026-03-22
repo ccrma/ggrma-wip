@@ -55,9 +55,9 @@ public class Phone extends GGen {
             t / duration => float p;
             p * (2 - p) => float ease;
 
-            ease * screenHeight => float offset;
-            minigame.posY(offset * 0.85);
-            nextMinigame.posY(-screenHeight + screenHeight * 0.15 + offset * 0.85);
+            ease * screenHeight * 0.85 => float offset;
+            minigame.posY(offset);
+            nextMinigame.posY(-screenHeight + screenHeight * 0.15 + offset);
         }
 
         minigame --< this;

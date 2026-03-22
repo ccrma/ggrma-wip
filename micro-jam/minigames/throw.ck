@@ -25,15 +25,15 @@ public class Throw extends Minigame {
         0.25,
         0.175,
         0.35,
-        0.25,
+        0.2,
         0.25
     ] @=> float objSizes[];
     [
         514/436.,
         458/232.,
         153/504., 
+        249/256., 
         514/436., // todo: change this and below when assets are made
-        514/436.,
     ] @=> float objAspectRatios[];
 
     fun Throw(int level) {

@@ -22,6 +22,7 @@ public class Start extends GGen {
     fun void hide() {
         false => active;
 
+        GG.camera().viewSize() => float screenHeight;
         1.5 => float duration;
         float t;
 
@@ -32,12 +33,17 @@ public class Start extends GGen {
             
             t / duration => float p;
 
-            Math.sin((p * Math.PI) / 2) => float ease;
+            0.75 => float c1;
+            c1 * 1.25 => float c2;
 
-            Math.map(ease, 0, 1, 1, 0) => float opacity;
+            p < 0.5
+            ? (Math.pow(2 * p, 2) * ((c2 + 1) * 2 * p - c2)) / 2
+            : (Math.pow(2 * p - 2, 2) * ((c2 + 1) * (p * 2 - 2) + c2) + 2) / 2 => float ease;
 
-            text.alpha(opacity);
-            start.alpha(opacity);            
+            ease * screenHeight => float offset;
+
+            text.posY(offset + 2);
+            start.posY(offset - 2);
         }
 
         text --< this;
