@@ -1,7 +1,7 @@
 @import "../lib/util.ck"
 
 public class Overlay extends GGen {
-    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.85 => vec3 aspect;
+    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
     this.scaWorld(aspect);
 
     GLines border;
@@ -27,7 +27,7 @@ public class Overlay extends GGen {
         border.color(Color.BLACK);
         border.width(0.015);
         border.posZ(2.0);
-        border --> this;
+        // border --> this;
 
         TextureLoadDesc load_desc;
         true => load_desc.flip_y;  // flip the texture vertically
@@ -41,38 +41,45 @@ public class Overlay extends GGen {
         TextureSampler.FILTER_NEAREST => sampler.filterMin;
         TextureSampler.FILTER_NEAREST => sampler.filterMip;
 
+        // frame
+        Texture.load(me.dir() + "../assets/ui/frame.png", load_desc) @=> Texture @ frameTex;
+        FlatMaterial frameMat;
+        frameMat.transparent(true);
+        frameMat.colorMap(frameTex);
+        GMesh frame(plane_geo, frameMat);
+        frame.posZ(2.0);
+        frame.sca(1.1);
+        frame --> this;
+
         // heart
         Texture.load(me.dir() + "../assets/ui/heart.png", load_desc) @=> heartTex;
         Texture.load(me.dir() + "../assets/ui/heart_red.png", load_desc) @=> heartRedTex;
         FlatMaterial heartMat;
-        heartMat.sampler(sampler);
         heartMat.transparent(true);
         heartMat.colorMap(heartTex);
         new GMesh(plane_geo, heartMat) @=> heart;
         heart.sca(heart.sca() * 0.025 * (6.6/10) * this.aspect);
-        heart.pos(@(0.4, -0.2, 2.0));
+        heart.pos(@(0.375, -0.2, 2.0));
         heart --> this;
 
         // comment
         Texture.load(me.dir() + "../assets/ui/comment.png", load_desc) @=> Texture @ commentTex;
         FlatMaterial commentMat;
-        commentMat.sampler(sampler);
         commentMat.transparent(true);
         commentMat.colorMap(commentTex);
         GMesh comment(plane_geo, commentMat);
         comment.sca(comment.sca() * 0.025 * (6.6/10) * this.aspect);
-        comment.pos(@(0.4, -0.275, 2.0));
+        comment.pos(@(0.375, -0.275, 2.0));
         comment --> this;
 
         // share
         Texture.load(me.dir() + "../assets/ui/share.png", load_desc) @=> Texture @ shareTex;
         FlatMaterial shareMat;
-        shareMat.sampler(sampler);
         shareMat.transparent(true);
         shareMat.colorMap(shareTex);
         GMesh share(plane_geo, shareMat);
         share.sca(share.sca() * 0.025 * (6.6/10) * this.aspect);
-        share.pos(@(0.4, -0.35, 2.0));
+        share.pos(@(0.375, -0.35, 2.0));
         share --> this;
 
         // battery
@@ -84,7 +91,7 @@ public class Overlay extends GGen {
         GMesh battery(plane_geo, batteryMat);
         battery.sca(battery.sca() * 0.015 * (6.6/10) * this.aspect);
         battery.scaX(-battery.scaX());
-        battery.pos(@(0.425, 0.48, 2.0));
+        battery.pos(@(0.4125, 0.445, 2.0));
         battery --> this;
 
         // battery percentage
@@ -92,7 +99,7 @@ public class Overlay extends GGen {
         batteryText.text(batteryPercentage + "%");
         batteryText.sca(battery.sca() / 1.5 * (6.6/10));
         batteryText.controlPoints(@(1.0, 0.5));
-        batteryText.pos(@(0.365, 0.48, 2.0));
+        batteryText.pos(@(0.3535, 0.445, 2.0));
         batteryText.color(Color.WHITE);
     }
 

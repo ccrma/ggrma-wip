@@ -68,7 +68,7 @@ public class Throw extends Minigame {
         objMat.colorMap(objTex);
         new GMesh(plane_geo, objMat) @=> obj;
         obj --> this;
-        obj.pos(@(0, -0.5, 1.1));
+        obj.pos(@(0, -0.47, 1.1));
         @(objSizes[level - 1] * 16. / 9, objSizes[level - 1] * objAspectRatios[level - 1]) => baseObjSca;
         obj.sca(baseObjSca);
 

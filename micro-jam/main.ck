@@ -17,7 +17,6 @@ GG.outputPass().tonemap(OutputPass.ToneMap_None);
 
 
 Start start;
-Phone phone;
 
 fun void startListener() {
     while(true) {
@@ -31,7 +30,7 @@ if (1) {
     start --> GG.scene();
     spork ~ startListener();
 } else {
-    phone --> GG.scene();
+    Phone phone --> GG.scene();
     spork ~ phone.slideUp();
 }
 
