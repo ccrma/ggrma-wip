@@ -28,8 +28,8 @@ public class Pimples extends Minigame {
 
     static Texture@ bubblewrap_popped;
     static Texture@ bubblewrap_unpopped;
-    5 => static int WRAP_N_COLS;
-    4 => static int WRAP_N_ROWS;
+    4 => static int WRAP_N_COLS;
+    5 => static int WRAP_N_ROWS;
 
     static Texture@ pillbug;
     static Texture@ pillbug_smushed;
@@ -52,7 +52,8 @@ public class Pimples extends Minigame {
 
     // load textures
     static int loaded;
-    if (!loaded) {
+    fun static void loadAssets() {
+        if (loaded) return;
         true => loaded;
 
         TextureLoadDesc load_desc;
@@ -113,21 +114,17 @@ public class Pimples extends Minigame {
             }
         }
         else if (level == Level_Wrap) {
-            // 1 0
-            // 2 .5
-            // 3 1
-            // 4 1.5
-            // ignores count for now
             // tile to fill the screen, player only needs to pop the unpopped ones
             -r * ((WRAP_N_COLS-1)) => float x;
-            for (int i; i < 5; i++) {
+            for (int i; i < WRAP_N_COLS; i++) {
                 -(r * (WRAP_N_ROWS -1)) => float y;
                 for (int j; j < WRAP_N_ROWS; ++j) {
+
                     // add
                     positions << @(x, y);
+
                     num_pimples++;
                     active << true;
-
                     2 * r +=> y;
                 }
                 2*r +=> x;
@@ -194,7 +191,7 @@ public class Pimples extends Minigame {
         }
     }
 
-    fun background(vec3 color) {
+    fun _background(vec3 color) {
         g.pushLayer(0);
         g.boxFilled(@(0, 0), aspect.x, aspect.y, color);
         g.popLayer();
@@ -263,6 +260,7 @@ public class Pimples extends Minigame {
                 .9 * r => mod_r;
             }
 
+
             if (!popped && active[i]) {
                 int collision;
 
@@ -308,20 +306,18 @@ public class Pimples extends Minigame {
 
             active[i] => int active;
 
+
+
             // draw
             if (level == Level_Bubble) {
-                background(Color.BLACK);
                 if (active) {
                     g.sprite(bubble_tex, 7, 0, p, 2* mod_r * BUBBLE_SPRITE_SCA_MODIFIER);
                 }
             } 
             else if (level == Level_Wrap) {
-                background(Color.BLACK);
                 g.sprite(active ? bubblewrap_unpopped : bubblewrap_popped, p, 2*r);
             }
             else if (level == Level_Bug) {
-                // white bg
-                background(Color.BEIGE);
 
                 rand[i] $ vec2 => vec2 target;
                 M.angle(p, target) + Math.pi/2 => float angle;
@@ -362,6 +358,12 @@ public class Pimples extends Minigame {
             }
         }
         g.popLayer();
+
+        // background
+        if (level == Level_Bubble || level == Level_Wrap)
+            _background(Color.BLACK);
+        else if (level == Level_Bubble)
+            _background(Color.BEIGE);
     }
 }
 

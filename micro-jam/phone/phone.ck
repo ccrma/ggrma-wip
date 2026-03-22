@@ -27,11 +27,14 @@ public class Phone extends GGen {
     // start all games at level 1
     for (int i; i < Game_Count; ++i) 1 => game_levels[i];
     // 5 => game_levels[Game_Face];
+    // 2 => game_levels[Game_Pimples];
     // 5 => game_levels[Game_Mukbang];
 
     // FaceGame face_game;
 
     // preload assets
+    FaceGame.loadAssets();
+    Pimples.loadAssets();
     Rxn.init();
     Mukbang.loadAssets();
     Balance.init();
@@ -57,7 +60,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        // Game_Mukbang => next_minigame_type;
+        // Game_Pimples => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
