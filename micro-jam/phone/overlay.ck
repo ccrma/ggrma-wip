@@ -1,7 +1,7 @@
 @import "../lib/util.ck"
 
 public class Overlay extends GGen {
-    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) => vec3 aspect;
+    @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.85 => vec3 aspect;
     this.scaWorld(aspect);
 
     GLines border;
@@ -21,7 +21,8 @@ public class Overlay extends GGen {
             @(0.5, -0.5),
             @(-0.5, -0.5),
             @(-0.5, 0.5),
-            @(0.5, 0.5)
+            @(0.5, 0.5),
+            @(0.5, -0.5)
         ]);
         border.color(Color.BLACK);
         border.width(0.015);

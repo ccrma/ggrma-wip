@@ -21,6 +21,14 @@ public class Throw extends Minigame {
 
     static Texture@ bgTex;
 
+    [
+        514/436.,
+        458/232.,
+        514/436., // todo: change this and below when assets are made
+        514/436.,
+        514/436.,
+    ] @=> float objAspectRatios[];
+
     fun Throw(int level) {
         // TODO have all textures be loaded on start
         me.dir() + "../assets/throw/bg.png" => string bgPath;
@@ -54,7 +62,7 @@ public class Throw extends Minigame {
         new GMesh(new PlaneGeometry, objMat) @=> obj;
         obj --> this;
         obj.pos(@(0, -0.5, 1.1));
-        @(0.25 * 16. / 9, 0.25 * 514/436.) => baseObjSca;
+        @(0.25 * 16. / 9, 0.25 * objAspectRatios[level - 1]) => baseObjSca;
         obj.sca(baseObjSca);
 
         Texture.load(trashPath, load_desc) @=> Texture trashTex;

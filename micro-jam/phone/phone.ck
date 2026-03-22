@@ -15,6 +15,29 @@ public class Phone extends GGen {
         // TODO impl random game selection
         new Throw(throwLevel) @=> minigame;
         minigame --> this;
+        this.posY(-GG.camera().viewSize());
+    }
+
+    fun void slideUp() {
+        GG.camera().viewSize() => float screenHeight;
+        1.5 => float duration;
+        float t;
+
+        while (t < duration) {
+            GG.nextFrame() => now;
+            GG.dt() +=> t;
+            if (t > duration) duration => t;
+            
+            t / duration => float p;
+
+            0.375 => float c1;
+            c1 + 1 => float c3;
+
+            1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2) => float ease;
+            
+            ease * screenHeight => float offset;
+            this.posY(-screenHeight * 2 + offset * 2);
+        }
     }
 
     fun void scroll() {
@@ -33,8 +56,8 @@ public class Phone extends GGen {
             p * (2 - p) => float ease;
 
             ease * screenHeight => float offset;
-            minigame.posY(offset);
-            nextMinigame.posY(-screenHeight + offset);
+            minigame.posY(offset * 0.85);
+            nextMinigame.posY(-screenHeight + screenHeight * 0.15 + offset * 0.85);
         }
 
         minigame --< this;
