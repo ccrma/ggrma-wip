@@ -10,6 +10,7 @@ public class Minigame extends GGen {
     // static TextureLoadDesc@ load_desc;
     static PlaneGeometry@ plane_geo;
     static TextureSampler@ linear_sampler;
+    static TextureSampler@ nearest_sampler;
 
     // init static 
     if (plane_geo == null) {
@@ -23,6 +24,11 @@ public class Minigame extends GGen {
         TextureSampler.Wrap_Clamp => linear_sampler.wrapU;
         TextureSampler.Wrap_Clamp => linear_sampler.wrapV;
         TextureSampler.Wrap_Clamp => linear_sampler.wrapW;
+
+        TextureSampler.nearest() @=> nearest_sampler;
+        TextureSampler.Wrap_Clamp => nearest_sampler.wrapU;
+        TextureSampler.Wrap_Clamp => nearest_sampler.wrapV;
+        TextureSampler.Wrap_Clamp => nearest_sampler.wrapW;
     }
 
 
