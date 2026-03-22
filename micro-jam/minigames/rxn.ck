@@ -282,7 +282,7 @@ public class Rxn extends Minigame
     fun void selectVideo()
     {   
         // NOCHECKIN
-        5 => max_clicks;
+        // 5 => max_clicks;
         // level_max_clicks[level] => max_clicks;
 
         // pause current video
