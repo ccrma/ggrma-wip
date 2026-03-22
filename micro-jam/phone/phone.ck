@@ -2,6 +2,7 @@
 @import "../minigames/face.ck"
 @import "../minigames/pimple.ck"
 @import "../minigames/rxn.ck"
+@import "../minigames/balance.ck"
 @import "overlay.ck"
 @import "../lib/music.ck"
 
@@ -17,18 +18,17 @@ public class Phone extends GGen {
     1 => static int Game_Face;
     2 => static int Game_Pimples;
     3 => static int Game_Rxn;
-    4 => static int Game_Count;
+    4 => static int Game_Balance;
+
+    5 => static int Game_Count;
 
     int game_levels[Game_Count];
     // start all games at level 1
     for (int i; i < Game_Count; ++i) 1 => game_levels[i];
-    // 5 => game_levels[Game_Face];
-    // 4 => game_levels[Game_Pimples];
-
-    // FaceGame face_game;
 
     // preload assets
     Rxn.init();
+    Balance.init();
 
     Overlay overlay --> this;
     int scrolling;
@@ -46,7 +46,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        // Game_Rxn => next_minigame_type;
+        // Game_Balance => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
@@ -64,6 +64,9 @@ public class Phone extends GGen {
         else if (next_minigame_type == Game_Rxn) {
             // RXN game levels go from 0-4
             return new Rxn(level - 1);
+        }
+        else if (next_minigame_type == Game_Balance) {
+            return new Balance(level);
         }
 
         <<< "ERROR Phone.nextGame() returning null" >>>;

@@ -43,16 +43,16 @@ public class Hand extends GGen {
     fun void swipe() {
         for (Texture texture : swipeTextures) {
             handMat.colorMap(texture);
-            50::ms => now;
+            75::ms => now;
         }
     }
 
     fun void twitch() {
         while (true) {
             handMat.colorMap(twitchTextures[0]);
-            150::ms => now;
+            200::ms => now;
             handMat.colorMap(twitchTextures[1]);
-            150::ms => now;
+            200::ms => now;
         }
     }
 }
