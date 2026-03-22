@@ -4,6 +4,8 @@
 public class Minigame extends GGen {
     // gruck all your game ggens to `this`
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
+    1 => aspect.z;
+
     // this.scaWorld(aspect);
 
     // static G2D@ g; // used by face.ck, pimples.ck
@@ -14,6 +16,8 @@ public class Minigame extends GGen {
 
     int _finished;
     int _win;
+
+    int stopped; // set to true when disconnected from scene (replaced with next_mini_game)
 
     static PlaneGeometry@ plane_geo;
     if (plane_geo == null) new PlaneGeometry @=> plane_geo;
@@ -34,4 +38,8 @@ public class Minigame extends GGen {
 
     fun void update(float dt) { // called once per frame. put all your game logic here
     }
+
+    // called when the minigame is ungrucked.
+    // hook into this for cleanup.
+    fun void ungruck() {}
 }
