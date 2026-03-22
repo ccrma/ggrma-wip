@@ -51,7 +51,7 @@ public class Throw extends Minigame {
         new GMesh(new PlaneGeometry, objMat) @=> obj;
         obj --> this;
         obj.pos(@(0, -0.5, 1.1));
-        obj.sca() * 0.1 * this.aspect => baseObjSca;
+        @(0.25 * 16. / 9, 0.25 * 514/436.) => baseObjSca;
         obj.sca(baseObjSca);
 
         Texture.load(trashPath, load_desc) @=> Texture trashTex;
