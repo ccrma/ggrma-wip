@@ -14,7 +14,9 @@ public class Overlay extends GGen {
     Texture @ heartRedTex;
     int liked;
 
+    GText batteryText;
     100 => int batteryPercentage;
+
     PlaneGeometry plane_geo;
 
     fun Overlay() {
@@ -103,8 +105,8 @@ public class Overlay extends GGen {
         battery --> this;
 
         // battery percentage
-        GText batteryText --> this;
-        batteryText.text(batteryPercentage + "%");
+        batteryText --> this;
+        batteryText.text("100%");
         batteryText.sca(battery.sca() / 1.5 * (6.6/10));
         batteryText.controlPoints(@(1.0, 0.5));
         batteryText.pos(@(0.3535, 0.445, 2.0));
@@ -124,6 +126,11 @@ public class Overlay extends GGen {
     fun void twitch() {
         if (twitchShred != null) return;
         spork ~ hand.twitch() @=> twitchShred;
+    }
+
+    fun void batteryDrain(int drain) {
+        drain -=> batteryPercentage;
+        batteryText.text(batteryPercentage + "%");
     }
 
     fun void update(float dt) {

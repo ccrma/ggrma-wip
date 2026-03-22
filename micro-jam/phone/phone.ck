@@ -33,6 +33,11 @@ public class Phone extends GGen {
     Overlay overlay --> this;
     int scrolling;
 
+    int batteryDrain4Count;
+    16 => int batteryDrain4Max;
+    int batteryDrain3Count;
+    12 => int batteryDrain3Max;
+
     fun Minigame@ nextGame() { 
         <<< "calling nextgame" >>>; 
         int valid_games[0];
@@ -146,6 +151,22 @@ public class Phone extends GGen {
         if (GWindow.scrollY() > 1 && minigame.finished()) {
             if (minigame.win()) { // increment minigame level if won
                 ++game_levels[minigame_type];
+                
+                true => int drain4;
+                if (maybe) {
+                    if (batteryDrain4Count >= batteryDrain4Max)
+                        false => drain4;
+                } else {
+                    if (batteryDrain3Count < batteryDrain3Max)
+                        false => drain4;
+                }
+                if (drain4) {
+                    overlay.batteryDrain(4);
+                    1 +=> batteryDrain4Count;
+                } else {
+                    overlay.batteryDrain(3);
+                    1 +=> batteryDrain3Count;
+                }
             }
 
             true => minigame.stopped;
@@ -154,7 +175,7 @@ public class Phone extends GGen {
             nextMinigame --> this; // render the next minigame
             nextMinigame.posY(-GG.camera().viewSize()); // position next minigame at bottom
 
-            music.switchTo(minigame.music());
+            music.switchTo(nextMinigame.music());
 
             spork ~ scroll();
         }
