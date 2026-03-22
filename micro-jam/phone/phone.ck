@@ -11,6 +11,7 @@ public class Phone extends GGen {
     int scrolling;
 
     fun Phone() {
+        // TODO impl random game selection
         new Throw(throwLevel) @=> minigame;
         minigame --> this;
     }

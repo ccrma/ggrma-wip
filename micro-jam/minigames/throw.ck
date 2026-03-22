@@ -2,6 +2,8 @@
 @import "../lib/util.ck"
 
 public class Throw extends Minigame {
+    this.scaWorld(aspect);
+
     int throwActive;
     int throwing;
 
