@@ -77,6 +77,7 @@ public class Overlay extends GGen {
         // battery
         Texture.load(me.dir() + "../assets/ui/battery.png", load_desc) @=> Texture @ batteryTex;
         FlatMaterial batteryMat;
+        batteryMat.sampler(sampler);
         batteryMat.colorMap(batteryTex);
         batteryMat.color(Color.WHITE);
         GMesh battery(plane_geo, batteryMat);
@@ -88,7 +89,7 @@ public class Overlay extends GGen {
         // battery percentage
         GText batteryText --> this;
         batteryText.text(batteryPercentage + "%");
-        batteryText.sca(battery.sca() / 2 * (6.6/10));
+        batteryText.sca(battery.sca() / 1.5 * (6.6/10));
         batteryText.controlPoints(@(1.0, 0.5));
         batteryText.pos(@(0.365, 0.48, 2.0));
         batteryText.color(Color.WHITE);

@@ -100,7 +100,7 @@ public class Throw extends Minigame {
             obj.pos(@(posX, posY));
 
             obj.posWorld() => vec3 posWorld;
-            if (posWorld.x >= trashLeft && posWorld.x <= trashRight && Math.fabs(posWorld.y - trashY) < 0.075) {
+            if (posWorld.x >= trashLeft && posWorld.x <= trashRight && Math.fabs(posWorld.y - trashY) < 0.2) {
                 true => _win;
                 true => _finished;
                 false => throwing;
