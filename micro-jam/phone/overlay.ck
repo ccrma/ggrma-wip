@@ -31,10 +31,20 @@ public class Overlay extends GGen {
         true => load_desc.flip_y;  // flip the texture vertically
         true => load_desc.gen_mips; // generate mip maps automatically
 
+        TextureSampler sampler;
+        TextureSampler.WRAP_CLAMP => sampler.wrapU;
+        TextureSampler.WRAP_CLAMP => sampler.wrapV;
+        TextureSampler.WRAP_CLAMP => sampler.wrapW;
+        TextureSampler.FILTER_NEAREST => sampler.filterMag;
+        TextureSampler.FILTER_NEAREST => sampler.filterMin;
+        TextureSampler.FILTER_NEAREST => sampler.filterMip;
+
         // heart
         Texture.load(me.dir() + "../assets/ui/heart.png", load_desc) @=> heartTex;
         Texture.load(me.dir() + "../assets/ui/heart_red.png", load_desc) @=> heartRedTex;
         FlatMaterial heartMat;
+        heartMat.sampler(sampler);
+        heartMat.transparent(true);
         heartMat.colorMap(heartTex);
         new GMesh(new PlaneGeometry, heartMat) @=> heart;
         heart.sca(heart.sca() * 0.025 * this.aspect);
@@ -44,6 +54,8 @@ public class Overlay extends GGen {
         // comment
         Texture.load(me.dir() + "../assets/ui/comment.png", load_desc) @=> Texture @ commentTex;
         FlatMaterial commentMat;
+        commentMat.sampler(sampler);
+        commentMat.transparent(true);
         commentMat.colorMap(commentTex);
         GMesh comment(new PlaneGeometry, commentMat);
         comment.sca(comment.sca() * 0.025 * this.aspect);
@@ -53,20 +65,30 @@ public class Overlay extends GGen {
         // share
         Texture.load(me.dir() + "../assets/ui/share.png", load_desc) @=> Texture @ shareTex;
         FlatMaterial shareMat;
+        shareMat.sampler(sampler);
+        shareMat.transparent(true);
         shareMat.colorMap(shareTex);
         GMesh share(new PlaneGeometry, shareMat);
         share.sca(share.sca() * 0.025 * this.aspect);
         share.pos(@(0.4, -0.35, 2.0));
         share --> this;
 
+        // toolbar
+        FlatMaterial toolbarMat;
+        toolbarMat.color(Color.BLACK);
+        GMesh toolbar(new PlaneGeometry, toolbarMat) --> this;
+        toolbar.pos(@(0, 0.48, 2.0));
+        toolbar.sca(@(1.0, 0.04));
+
         // battery
         Texture.load(me.dir() + "../assets/ui/battery.png", load_desc) @=> Texture @ batteryTex;
         FlatMaterial batteryMat;
         batteryMat.colorMap(batteryTex);
+        batteryMat.color(Color.WHITE);
         GMesh battery(new PlaneGeometry, batteryMat);
-        battery.sca(battery.sca() * 0.0175 * this.aspect);
+        battery.sca(battery.sca() * 0.015 * this.aspect);
         battery.scaX(-battery.scaX());
-        battery.pos(@(0.425, 0.47, 2.0));
+        battery.pos(@(0.425, 0.48, 2.0));
         battery --> this;
 
         // battery percentage
@@ -74,8 +96,8 @@ public class Overlay extends GGen {
         batteryText.text(batteryPercentage + "%");
         batteryText.sca(battery.sca() / 2);
         batteryText.controlPoints(@(1.0, 0.5));
-        batteryText.pos(@(0.365, 0.47, 2.0));
-        batteryText.color(Color.BLACK);
+        batteryText.pos(@(0.365, 0.48, 2.0));
+        batteryText.color(Color.WHITE);
     }
 
     fun void update(float dt) {

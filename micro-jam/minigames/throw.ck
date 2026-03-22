@@ -18,36 +18,53 @@ public class Throw extends Minigame {
     float trashY;
 
     fun Throw(int level) {
-        me.dir() + "../assets/throw/object_level" + level + ".png" => string objectPath;
-        me.dir() + "../assets/throw/trash_level" + level + ".png" => string trashPath;
+        me.dir() + "../assets/throw/bg.png" => string bgPath;
+        me.dir() + "../assets/throw/object" + level + ".png" => string objectPath;
+        me.dir() + "../assets/throw/bucket" + level + ".png" => string trashPath;
 
         TextureLoadDesc load_desc;
         true => load_desc.flip_y;  // flip the texture vertically
         true => load_desc.gen_mips; // generate mip maps automatically
 
-        Texture.load(objectPath, load_desc) @=> Texture objTex;
-        Texture.load(trashPath, load_desc) @=> Texture trashTex;
+        TextureSampler sampler;
+        TextureSampler.WRAP_CLAMP => sampler.wrapU;
+        TextureSampler.WRAP_CLAMP => sampler.wrapV;
+        TextureSampler.WRAP_CLAMP => sampler.wrapW;
+        TextureSampler.FILTER_NEAREST => sampler.filterMag;
+        TextureSampler.FILTER_NEAREST => sampler.filterMin;
+        TextureSampler.FILTER_NEAREST => sampler.filterMip;
 
+        Texture.load(bgPath, load_desc) @=> Texture bgTex;
+        FlatMaterial bgMat;
+        bgMat.sampler(sampler);
+        bgMat.colorMap(bgTex);
+        GMesh bg(new PlaneGeometry, bgMat) --> this;
+        bg.sca(1);
+
+        Texture.load(objectPath, load_desc) @=> Texture objTex;
         FlatMaterial objMat;
+        objMat.sampler(sampler);
+        objMat.transparent(true);
         objMat.colorMap(objTex);
         new GMesh(new PlaneGeometry, objMat) @=> obj;
-
-        FlatMaterial trashMat;
-        trashMat.colorMap(trashTex);
-        new GMesh(new PlaneGeometry, trashMat) @=> trash;
-
+        obj --> this;
         obj.pos(@(0, -0.5, 1.1));
-
         obj.sca() * 0.1 * this.aspect => baseObjSca;
         obj.sca(baseObjSca);
 
-        trash.sca(trash.sca() * 0.1 * this.aspect);
+        Texture.load(trashPath, load_desc) @=> Texture trashTex;
+        FlatMaterial trashMat;
+        trashMat.sampler(sampler);
+        trashMat.transparent(true);
+        trashMat.colorMap(trashTex);
+        new GMesh(new PlaneGeometry, trashMat) @=> trash;
+        trash --> this;
+        trash.pos(@(0, 0.35 - 0.175 * (level - 1)));
+        0.15 + 0.1 * (level - 1) => float trashSca;
+        trash.sca(@(trashSca * 16. / 9, trashSca * 534/403.));
         trash.posWorld().x - Math.fabs(trash.scaWorld().x / 2) => trashLeft;
         trash.posWorld().x + Math.fabs(trash.scaWorld().x / 2) => trashRight;
-        trash.posWorld().y + Math.fabs(trash.scaWorld().y / 2) => trashY;
-
-        obj --> this;
-        trash --> this;
+        trash.posWorld().y + Math.fabs(trash.scaWorld().y / 4) => trashY;
     }
 
     // todo: account for if the player holds then swipes. in this case, the velocity will be lower than expected since timeElapsed will be greater

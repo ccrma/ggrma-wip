@@ -11,6 +11,15 @@ public class Util {
         return Math.atan2(b.y - a.y, b.x - a.x);
     }
 
+    // returns the Hadamard product of two vec3s
+    fun static vec3 product(vec3 a, vec3 b) {
+        return @(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
+
+    fun static vec3 division(vec3 a, vec3 b) {
+        return @(a.x / b.x, a.y / b.y, a.z / b.z);
+    }
+
     fun static vec2 mousePos() {
         return GG.camera().screenCoordToWorldPos(GWindow.mousePos(), 1.0) $ vec2;
     }
