@@ -46,11 +46,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-<<<<<<< HEAD
-        Game_Throw => next_minigame_type;
-=======
         // Game_Rxn => next_minigame_type;
->>>>>>> 34efa84d8d59607931ced38b5582ca12d9cc60ea
 
         game_levels[next_minigame_type] => int level;
 
