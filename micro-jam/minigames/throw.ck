@@ -22,10 +22,17 @@ public class Throw extends Minigame {
     static Texture@ bgTex;
 
     [
+        0.25,
+        0.175,
+        0.35,
+        0.25,
+        0.25
+    ] @=> float objSizes[];
+    [
         514/436.,
         458/232.,
+        153/504., 
         514/436., // todo: change this and below when assets are made
-        514/436.,
         514/436.,
     ] @=> float objAspectRatios[];
 
@@ -62,7 +69,7 @@ public class Throw extends Minigame {
         new GMesh(new PlaneGeometry, objMat) @=> obj;
         obj --> this;
         obj.pos(@(0, -0.5, 1.1));
-        @(0.25 * 16. / 9, 0.25 * objAspectRatios[level - 1]) => baseObjSca;
+        @(objSizes[level - 1] * 16. / 9, objSizes[level - 1] * objAspectRatios[level - 1]) => baseObjSca;
         obj.sca(baseObjSca);
 
         Texture.load(trashPath, load_desc) @=> Texture trashTex;
