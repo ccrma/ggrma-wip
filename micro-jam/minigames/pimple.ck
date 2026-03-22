@@ -22,9 +22,6 @@ public class Pimples extends Minigame {
     4 => static int Level_Clown;
     5 => static int Level_Monster;
 
-    // TODO optimize only load textures once, statically
-    static TextureLoadDesc load_desc;
-    false => load_desc.flip_y;
 
     static Texture@ bubble_tex;
     2 => static float BUBBLE_SPRITE_SCA_MODIFIER;
@@ -57,6 +54,11 @@ public class Pimples extends Minigame {
     static int loaded;
     if (!loaded) {
         true => loaded;
+
+        TextureLoadDesc load_desc;
+        false => load_desc.flip_y;
+        false => load_desc.gen_mips;
+
         <<< "loading pop game textures" >>>;
         Texture.load("./assets/pimple/bubble.png", load_desc) @=> bubble_tex;
 
@@ -83,11 +85,6 @@ public class Pimples extends Minigame {
     int level;
 
     true => _win; // not loseable
-
-    // fun void sprite(Texture tex, vec2 pos, float sca) {
-    //     tex.width() $ float / tex.height() => float aspect;
-    //     g.sprite(tex, pos, sca * @(aspect, 1), 0);
-    // }
 
     fun Pimples(int level) {
         false => _finished;

@@ -6,24 +6,45 @@ public class Minigame extends GGen {
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
     1 => aspect.z;
 
-    // this.scaWorld(aspect);
+    // shared static assets
+    // static TextureLoadDesc@ load_desc;
+    static PlaneGeometry@ plane_geo;
+    static TextureSampler@ linear_sampler;
 
-    // static G2D@ g; // used by face.ck, pimples.ck
-    // if (g == null) {
-    //     new G2D @=> g;
-    //     g --> this;
-    // }
+    // init static 
+    if (plane_geo == null) {
+        // new TextureLoadDesc @=> load_desc;
+        // true => load_desc.flip_y;  // flip the texture vertically
+        // false => load_desc.gen_mips; // no mip maps (save on GPU VRam and load time)
 
+        new PlaneGeometry @=> plane_geo;
+
+        TextureSampler.linear() @=> linear_sampler;
+        TextureSampler.Wrap_Clamp => linear_sampler.wrapU;
+        TextureSampler.Wrap_Clamp => linear_sampler.wrapV;
+        TextureSampler.Wrap_Clamp => linear_sampler.wrapW;
+    }
+
+
+// == mvars ==============================
     int _finished;
     int _win;
-
     int stopped; // set to true when disconnected from scene (replaced with next_mini_game)
 
-    static PlaneGeometry@ plane_geo;
-    if (plane_geo == null) new PlaneGeometry @=> plane_geo;
+// == helper fns ==============================
+    // fun GMesh sprite(Texture@ tex) {
+    //     n => go_name;
 
-    fun void init(int level) {} // called to start minigame at level
+    //     Texture.load(me.dir() + assetPath, desc) @=> tex;
+    //     mat.colorMap(tex);
+    //     mesh.mesh(geo, mat);
+    //     mesh --> this;
+    //     mesh.posZ(layer * 0.01);
+    //     mesh.sca(@(width / 180.0, height / 180.0, 1.0));
 
+    // }
+
+// == external api ==============================
     fun int finished() { // returns true when player can swipe to next screen
         return _finished;
     }
