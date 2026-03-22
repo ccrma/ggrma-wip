@@ -27,7 +27,7 @@ fun void startListener() {
     }
 }
 
-if (0) {
+if (1) {
     start --> GG.scene();
     spork ~ startListener();
 } else {
