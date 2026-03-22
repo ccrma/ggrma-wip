@@ -58,7 +58,7 @@ public class Throw extends Minigame {
         FlatMaterial bgMat;
         bgMat.sampler(sampler);
         bgMat.colorMap(bgTex);
-        GMesh bg(new PlaneGeometry, bgMat) --> this;
+        GMesh bg(plane_geo, bgMat) --> this;
         bg.sca(1);
 
         Texture.load(objectPath, load_desc) @=> Texture objTex;
@@ -66,7 +66,7 @@ public class Throw extends Minigame {
         objMat.sampler(sampler);
         objMat.transparent(true);
         objMat.colorMap(objTex);
-        new GMesh(new PlaneGeometry, objMat) @=> obj;
+        new GMesh(plane_geo, objMat) @=> obj;
         obj --> this;
         obj.pos(@(0, -0.5, 1.1));
         @(objSizes[level - 1] * 16. / 9, objSizes[level - 1] * objAspectRatios[level - 1]) => baseObjSca;
@@ -77,7 +77,7 @@ public class Throw extends Minigame {
         trashMat.sampler(sampler);
         trashMat.transparent(true);
         trashMat.colorMap(trashTex);
-        new GMesh(new PlaneGeometry, trashMat) @=> trash;
+        new GMesh(plane_geo, trashMat) @=> trash;
         trash --> this;
         trash.pos(@(0, 0.35 - 0.175 * (level - 1)));
         0.15 + 0.1 * (level - 1) => float trashSca;

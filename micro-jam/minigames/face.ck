@@ -12,6 +12,7 @@ Lvls
 @import "../lib/g2d/g2d.ck"
 
 class Face {
+
     Texture@ features[0];
     Texture@ face;
 
@@ -38,13 +39,18 @@ class Face {
 
 public class FaceGame extends Minigame
 {
-    [
-        new Face(me.dir() + "./assets/face1"),
-        new Face(me.dir() + "./assets/face2"),
-        new Face(me.dir() + "./assets/face3"),
-        new Face(me.dir() + "./assets/face4"),
-        new Face(me.dir() + "./assets/face5"),
-    ] @=> Face faces[];
+    G2D g --> this;
+
+    static Face faces[];
+    if (faces == null) {
+        [
+            new Face(me.dir() + "../assets/face/face1"),
+            new Face(me.dir() + "../assets/face/face2"),
+            new Face(me.dir() + "../assets/face/face3"),
+            new Face(me.dir() + "../assets/face/face4"),
+            new Face(me.dir() + "../assets/face/face5"),
+        ] @=> faces;
+    }
 
     true => _win; // not loseable
 
@@ -52,26 +58,38 @@ public class FaceGame extends Minigame
     vec2 _pos;
     -1 => int face_feature_idx;
     g.DOWN => vec2 dir;
-    0 => int face_idx;
     faces[0] @=> Face@ face;
 
+    1.0 => float sca_mod;
+
+    int level;
 
     // render sprite with correct aspect ratio
     fun void sprite(Texture tex, vec2 pos, float sca) {
         tex.width() $ float / tex.height() => float aspect;
-        g.sprite(tex, pos, sca * @(aspect, 1), 0);
+        g.sprite(tex, pos, sca_mod * sca * @(aspect, 1), 0);
     }
 
-    fun void init(int level) {
+    fun FaceGame(int level) {
         false => _finished;
+        level => this.level;
 
         // reset game
-        (level - 1) % faces.size() => face_idx;
-        faces[face_idx] @=> face;
+        faces[(level - 1) % faces.size()] @=> face;
 
         -1 => face_feature_idx;
         positions.clear();
 
+        // adjust scale based on image sizes 
+        if (level == 2) {
+            .6 => sca_mod;
+        }
+        else if (level == 4) {
+            .72 => sca_mod;
+        }
+        else if (level == 5) {
+            .77 => sca_mod;
+        }
     } 
 
     fun void update(float dt) { // called once per frame. put all your game logic here
@@ -81,9 +99,11 @@ public class FaceGame extends Minigame
             if (face_feature_idx < 0) {
                 0 => face_feature_idx;
             }
-            else {
+            else if (face_feature_idx < face.features.size()) {
                 positions << _pos;
                 face_feature_idx++;
+                if (face_feature_idx >= face.features.size())
+                    true => _finished;
             }
 
             // randomize direction
@@ -107,6 +127,11 @@ public class FaceGame extends Minigame
             g.popLayer();
         }
 
+        // black background
+        if (level >= 4) {
+            g.boxFilled(@(0, 0), (9/16.0) * g.screen_h, g.screen_h, Color.BLACK);
+        }
+
         sprite(face.face, @(0, 0), 10);
         // draw features
         g.pushLayer(1);
@@ -118,7 +143,7 @@ public class FaceGame extends Minigame
     }
 }
 
-if (1)
+if (0)
 {
 
 while (1) {

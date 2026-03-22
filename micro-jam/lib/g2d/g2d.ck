@@ -1727,7 +1727,7 @@ class ScreenFlashEffect extends Effect {
 }
 
 // plays an animation through
-class AnimationEffect extends Effect {
+public class AnimationEffect extends Effect {
 	int n_frames;
 	float time_per_frame_secs;
 	vec2 pos;
@@ -1738,6 +1738,7 @@ class AnimationEffect extends Effect {
 	// private
 	int _frame;
 	float cd;
+	vec2 _frame_sca; // for non-square sprites
 	
 	fun @construct(
 		Texture@ sprite,
@@ -1753,6 +1754,10 @@ class AnimationEffect extends Effect {
 		color => this.color;
 		time_per_frame_secs => cd;
 		start => _frame;
+
+		sprite.width() $ float / n_frames => float frame_w;
+		@(frame_w / sprite.height(), 1) => _frame_sca;
+
 	}
 
 	fun int update(G2D g, float dt) {
@@ -1764,9 +1769,7 @@ class AnimationEffect extends Effect {
 			_frame++;
 		}
 
-		g.pushColor(color);
-		g.sprite(sprite, n_frames, _frame, pos, size);
-		g.popColor();
+		g.sprite(sprite, @(n_frames, 1), @(_frame$float / n_frames, 0), pos, size * _frame_sca, 0, color);
 
 		return STILL_GOING;
 	}
