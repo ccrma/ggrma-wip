@@ -499,6 +499,7 @@ public class Mukbang extends Minigame
     fun GGen sprite(Texture tex, float width, float height, float layer)
     {
         FlatMaterial mat; 
+        true => mat.transparent;
         mat.sampler(linear_sampler);
 
         mat.colorMap(tex);
