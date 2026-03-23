@@ -467,6 +467,7 @@ public class Balance extends Minigame {
         }
 
         true => _finished;
+        SFX.play(SFX.BALANCE_CHEER, Math.random2f(0.9, 1.1));
     }
 
     fun void selectAnswer2()
@@ -528,6 +529,7 @@ public class Balance extends Minigame {
             if (GWindow.mouseLeftDown() && !bool_answer1)
             {
                 selectAnswer1();
+                SFX.play(SFX.BALANCE_SELECT, Math.random2f(0.9, 1.1));
             }
         }
         else
@@ -553,6 +555,7 @@ public class Balance extends Minigame {
             if (GWindow.mouseLeftDown() && !bool_answer2)
             {
                 selectAnswer2();
+                SFX.play(SFX.BALANCE_SELECT, Math.random2f(0.9, 1.1));
             }
         }
         else

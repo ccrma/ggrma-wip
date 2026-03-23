@@ -347,7 +347,12 @@ public class Rxn extends Minigame
             Math.clampf(current_progress, 0, 1) => current_progress;
             reactionMeter();
             // win condition
-            if (current_progress >= 1) true => _finished;
+            if (current_progress >= 1) 
+            {
+                true => _finished;
+                SFX.play(SFX.REACTION_COMPLETE);
+            }
+            SFX.play(SFX.REACTION_CLICK);
         }
 
         // decay

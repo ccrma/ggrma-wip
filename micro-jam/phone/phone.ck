@@ -5,6 +5,7 @@
 @import "../minigames/balance.ck"
 @import "overlay.ck"
 @import "../lib/music.ck"
+@import "../lib/sfx.ck"
 @import "../minigames/mukbang.ck"
 
 public class Phone extends GGen {
@@ -92,6 +93,7 @@ public class Phone extends GGen {
     }
 
     fun Phone() {
+        SFX.init();
         // TODO impl random game selection
         nextGame() @=> minigame;
         next_minigame_type => minigame_type;
