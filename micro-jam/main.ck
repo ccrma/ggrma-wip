@@ -11,24 +11,55 @@ GG.scene().backgroundColor(Color.WHITE);
 // disable skybox
 null => GG.scene().skybox;
 // disable tonemapping / HDR
-GG.outputPass().tonemap(OutputPass.ToneMap_None);
+// GG.outputPass().tonemap(OutputPass.ToneMap_None);
 // disable gamma
 // GG.outputPass().gamma(false);
 
 Phone phone;
 Start start;
+Event fadeInEvent;
 
 fun void startListener() {
     while(true) {
         start.startEvent => now;
+        spork ~ fadeIn();
+    }
+}
+
+fun void fadeInListener() {
+    while(true) {
+        fadeInEvent => now;
         phone --> GG.scene();
         spork ~ phone.slideUp();
     }
 }
 
+fun void fadeIn() {
+    3 => float duration;
+    float t;
+
+    while (t < duration) {
+        GG.nextFrame() => now;
+        GG.dt() +=> t;
+        if (t > duration) duration => t;
+        
+        t / duration => float p;
+
+        0.75 => float c1;
+        c1 * 1.25 => float c2;
+
+        Math.sin((p * Math.PI) / 2) => float ease;
+
+        GG.outputPass().exposure(ease);
+    }
+
+    fadeInEvent.broadcast();
+}
+
 if (1) {
     start --> GG.scene();
     spork ~ startListener();
+    spork ~ fadeInListener();
 } else {
     phone --> GG.scene();
     spork ~ phone.slideUp();
