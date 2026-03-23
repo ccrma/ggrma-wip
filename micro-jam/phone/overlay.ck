@@ -5,6 +5,8 @@ public class Overlay extends GGen {
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
     this.scaWorld(aspect);
 
+    GGen actualOverlay --> this;
+
     Hand hand;
 
     GLines border;
@@ -70,7 +72,7 @@ public class Overlay extends GGen {
         new GMesh(plane_geo, heartMat) @=> heart;
         heart.sca(heart.sca() * 0.025 * (6.6/10) * this.aspect);
         heart.pos(@(0.375, -0.2, 2.0));
-        heart --> this;
+        heart --> actualOverlay;
 
         // comment
         Texture.load(me.dir() + "../assets/ui/comment.png", load_desc) @=> Texture @ commentTex;
@@ -80,7 +82,7 @@ public class Overlay extends GGen {
         GMesh comment(plane_geo, commentMat);
         comment.sca(comment.sca() * 0.025 * (6.6/10) * this.aspect);
         comment.pos(@(0.375, -0.275, 2.0));
-        comment --> this;
+        comment --> actualOverlay;
 
         // share
         Texture.load(me.dir() + "../assets/ui/share.png", load_desc) @=> Texture @ shareTex;
@@ -90,7 +92,7 @@ public class Overlay extends GGen {
         GMesh share(plane_geo, shareMat);
         share.sca(share.sca() * 0.025 * (6.6/10) * this.aspect);
         share.pos(@(0.375, -0.35, 2.0));
-        share --> this;
+        share --> actualOverlay;
 
         // battery
         Texture.load(me.dir() + "../assets/ui/battery.png", load_desc) @=> Texture @ batteryTex;
@@ -102,10 +104,10 @@ public class Overlay extends GGen {
         battery.sca(battery.sca() * 0.015 * (6.6/10) * this.aspect);
         battery.scaX(-battery.scaX());
         battery.pos(@(0.4125, 0.445, 2.0));
-        battery --> this;
+        battery --> actualOverlay;
 
         // battery percentage
-        batteryText --> this;
+        batteryText --> actualOverlay;
         batteryText.text("100%");
         batteryText.sca(battery.sca() / 1.5 * (6.6/10));
         batteryText.controlPoints(@(1.0, 0.5));
