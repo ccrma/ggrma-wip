@@ -46,7 +46,7 @@ public class Reflection extends Minigame
     fun Reflection(int level) {
         reflect_mat.colorMap(tex[level-1]);
 
-        true => _win;
+        false => _win;
     }
 
     float t;

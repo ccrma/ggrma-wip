@@ -22,6 +22,9 @@ public class Rxn extends Minigame
 
     // Number of clicks it takes to complete the level
     50 => float max_clicks;
+    [
+        25, 30, 35, 40, 45
+    ] @=> int level_max_clicks[];
 
     aspect.y / aspect.x => float aspect_ratio;
     aspect.x => float frame_width;
@@ -263,6 +266,7 @@ public class Rxn extends Minigame
     fun Rxn(int lvl)
     {
         lvl => active_level;
+        level_max_clicks[active_level] => max_clicks;
         lvl * .00025 + .0001 => progress_decay;
         selectVideo();
         selectReaction("neutral", 0);
@@ -275,9 +279,7 @@ public class Rxn extends Minigame
         videos[active_level][active_video_index].rate(0.0);
     }
 
-    [
-        25, 30, 35, 40, 40
-    ] @=> int level_max_clicks[];
+
     fun void selectVideo()
     {   
         // NOCHECKIN
