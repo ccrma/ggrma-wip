@@ -41,6 +41,11 @@ public class FaceGame extends Minigame
 
     static Face faces[];
 
+    // black plane
+    FlatMaterial bg_mat;
+    GMesh bg(plane_geo, bg_mat) --> this;
+    bg.sca(@(aspect.x, aspect.y));
+
     fun static void loadAssets() {
         if (faces == null) {
             [
@@ -99,6 +104,8 @@ public class FaceGame extends Minigame
         if (level == 2)      .6 => sca_mod;
         else if (level == 4) .72 => sca_mod;
         else if (level == 5) .77 => sca_mod;
+
+        if (level > 2) Color.BLACK => bg_mat.color;
 
         // init face sprites
         sprite(faces[level-1].face, false) @=> go_face;

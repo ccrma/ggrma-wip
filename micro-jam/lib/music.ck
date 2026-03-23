@@ -26,22 +26,14 @@ public class Music {
     ] @=> static string filePaths[];
 
     fun void switchTo(int index) {
-        if (index == NONE) return;
-        buf.read(me.dir() + "../assets/audio/" + filePaths[index]);
-        if (playShred != null) {
-            playShred.exit();
-            null => playShred;
+        if (index == NONE) {
+            buf.rate(0); // pause
+            return;
         }
-        spork ~ play() @=> playShred;
-    }
-
-    fun void play() {
+        buf.read(me.dir() + "../assets/audio/" + filePaths[index]);
         buf.pos(0);
         buf.rate(1);
         buf.loop(true);
-        while (true) {
-            100::ms => now;
-        }
     }
 
     -1 => static int NONE;

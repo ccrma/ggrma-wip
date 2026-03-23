@@ -6,6 +6,7 @@
 @import "overlay.ck"
 @import "../lib/music.ck"
 @import "../minigames/mukbang.ck"
+@import "../minigames/reflection.ck"
 
 public class Phone extends GGen {
     Music music;
@@ -21,7 +22,8 @@ public class Phone extends GGen {
     3 => static int Game_Rxn;
     4 => static int Game_Mukbang;
     5 => static int Game_Balance;
-    6 => static int Game_Count;
+    6 => static int Game_Reflection;
+    7 => static int Game_Count;
 
     int game_levels[Game_Count];
     // start all games at level 1
@@ -30,14 +32,13 @@ public class Phone extends GGen {
     // 5 => game_levels[Game_Pimples];
     // 5 => game_levels[Game_Mukbang];
 
-    // FaceGame face_game;
-
     // preload assets
     FaceGame.loadAssets();
     Pimples.loadAssets();
     Rxn.init();
     Mukbang.loadAssets();
     Balance.init();
+    Reflection.loadAssets();
 
     Overlay overlay --> this;
     int scrolling;
@@ -47,11 +48,36 @@ public class Phone extends GGen {
     int batteryDrain3Count;
     12 => int batteryDrain3Max;
 
+    int games_played; // counts NON-reflection games played
+
     fun Minigame@ nextGame() { 
-        <<< "calling nextgame" >>>; 
+        <<< "calling nextgame", games_played >>>; 
+
+        ++games_played;
+
+        if (games_played == 6) {
+            return new Reflection(1);
+            overlay --< this;
+        }
+        else if (games_played == 12) {
+            return new Reflection(2);
+            overlay --< this;
+        }
+        else if (games_played == 18) {
+            return new Reflection(3);
+            overlay --< this;
+        }
+        else if (games_played == 23) {
+            return new Reflection(4);
+            overlay --< this;
+        } 
+
+        overlay --> this;
+
+
         int valid_games[0];
         for (int i; i < Game_Count; ++i) {
-            if (game_levels[i] <= 5) valid_games << i;
+            if (game_levels[i] <= 5 && i != Game_Reflection) valid_games << i;
         }
 
         // only allow games that are not level 5
@@ -60,7 +86,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        // Game_Mukbang => next_minigame_type;
+        // Game_Reflection => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
@@ -184,7 +210,9 @@ public class Phone extends GGen {
 
                 if (overlay.batteryPercentage <= 0) { // game over
                     overlay --< this;
-                    minigame --< this;
+
+                    new Reflection(5) @=> minigame;
+                    // minigame --< this;
                     if (nextMinigame.parent() != null) nextMinigame --< this;
                 }
             }
