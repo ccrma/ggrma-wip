@@ -79,7 +79,7 @@ public class Phone extends GGen {
 
         int valid_games[0];
         for (int i; i < Game_Count; ++i) {
-            if (i == Game_Balance && game_levels[i] >= 3) continue;
+            if (i == Game_Balance && game_levels[i] > 3) continue;
             if (game_levels[i] <= 5 && i != Game_Reflection) valid_games << i;
         }
 
