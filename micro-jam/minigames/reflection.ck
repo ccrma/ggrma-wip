@@ -43,7 +43,9 @@ public class Reflection extends Minigame
     reflect_mesh.sca(@(aspect.x, aspect.y));
     reflect_mesh.posZ(0);
 
+    int level;
     fun Reflection(int level) {
+        level => this.level;
         reflect_mat.colorMap(tex[level-1]);
 
         false => _win;
@@ -62,6 +64,10 @@ public class Reflection extends Minigame
 
         if (t > 5) {
             true => _finished;
+
+            if (level == 5 && t > 7) {
+                Math.randomf() * Color.WHITE => reflect_mat.color;
+            }
         }
     }
 }

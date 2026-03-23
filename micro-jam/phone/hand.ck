@@ -52,12 +52,18 @@ public class Hand extends GGen {
         }
     }
 
+    200::ms => dur twitch_timing;
+    int game_end;
     fun void twitch() {
         while (true) {
             handMat.colorMap(twitchTextures[0]);
-            200::ms => now;
+            twitch_timing => now;
             handMat.colorMap(twitchTextures[1]);
-            200::ms => now;
+            twitch_timing => now;
+
+            if (game_end) {
+                Math.max(16, .94 * twitch_timing/ms)::ms => twitch_timing;
+            }
         }
     }
 }

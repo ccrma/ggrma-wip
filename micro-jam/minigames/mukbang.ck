@@ -137,7 +137,7 @@ public class Mukbang extends Minigame
     0 => int currentScrap;
     0 => int currentHumanAnim;
     20 => int numReactions;
-    6.0 => float initialGameTime;
+    10.0 => float initialGameTime;
     int level; 
 
     fun Mukbang(int lvl) {

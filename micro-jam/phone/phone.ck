@@ -9,8 +9,13 @@
 @import "../minigames/mukbang.ck"
 @import "../minigames/reflection.ck"
 
+@import "../lib/M.ck"
+
 public class Phone extends GGen {
     Music music;
+
+    SndBuf end_music(me.dir() + "../assets/audio/music/ending.wav") => dac;
+    end_music.rate(0);
 
     PulseOsc pulse => blackhole;
     3 => pulse.freq;
@@ -66,9 +71,22 @@ public class Phone extends GGen {
 
     int games_played; // counts NON-reflection games played
 
+    Balance balance_games[0];
+
+
+    // spawn random dudes
+
+    // randomize(new GSphere);
+    // randomize(balance.go_answerFace2_arr[1]);
+
     fun Minigame@ nextGame() { 
         ++games_played;
 
+        if (overlay.batteryPercentage <= 0) {
+            overlay.actualOverlay --< overlay;
+            if (!end_scene_init) spork ~ endScene();
+            return new Reflection(5);
+        }
         if (games_played == 6) {
             overlay.actualOverlay --< overlay;
             return new Reflection(1);
@@ -124,7 +142,8 @@ public class Phone extends GGen {
             return new Mukbang(level-1);
         }
         else if (next_minigame_type == Game_Balance) {
-            return new Balance(level);
+            balance_games << new Balance(level);
+            return balance_games[-1];
         }
 
         <<< "ERROR Phone.nextGame() returning null" >>>;
@@ -137,6 +156,7 @@ public class Phone extends GGen {
         nextGame() @=> minigame;
         Minigame.mouse_click --> minigame;
         Minigame.mouse_click.posX(4.5);
+        Minigame.mouse_click.posZ(4);
         Minigame.mouse_click.sca(
             @(
             Minigame.mouse_click.scaX() * 1.5,
@@ -215,6 +235,7 @@ public class Phone extends GGen {
             if (Minigame.mouse_scroll.parent() == null) {
                 Minigame.mouse_scroll --> minigame;
                 Minigame.mouse_scroll.posX(-4.5);
+                Minigame.mouse_scroll.posZ(4);
                 Minigame.mouse_scroll.sca(
                     @(
                     Minigame.mouse_scroll.scaX() * 1.5,
@@ -248,13 +269,6 @@ public class Phone extends GGen {
                     overlay.batteryDrain(3);
                     1 +=> batteryDrain3Count;
                 }
-
-                if (overlay.batteryPercentage <= 0) { // game over
-                    overlay --< this;
-
-                    new Reflection(5) @=> minigame;
-                    if (nextMinigame.parent() != null) nextMinigame --< this;
-                }
             }
 
             true => minigame.stopped;
@@ -266,6 +280,116 @@ public class Phone extends GGen {
             music.switchTo(nextMinigame.music());
 
             spork ~ scroll();
+        }
+    }
+
+    int end_scene_init;
+    fun void endScene() {
+        true => end_scene_init;
+
+        8::second => now;
+        end_music.rate(1);
+        true => overlay.hand.game_end;
+
+        1::second => now;
+        Balance balance(2);
+        randomize(balance.go_answerFace2_arr[0].mesh);
+        randomize(balance.go_answerFace2_arr[1].mesh);
+        1::second => now;
+        Balance balance3(3);
+        randomize(balance3.go_answerFace2_arr[0].mesh);
+        randomize(balance3.go_answerFace2_arr[1].mesh);
+        1::second => now;
+        spork ~ cameraShakeEffect(.2, 10::minute, 15);
+
+        2::second => now;
+
+        1::second => dur wait;
+
+        spork ~ fadeOutEffect(7);
+        repeat(40) {
+            randomize(balance3.go_answerFace2_arr[0].mesh);
+            randomize(balance3.go_answerFace2_arr[1].mesh);
+            randomize(balance.go_answerFace2_arr[0].mesh);
+            randomize(balance.go_answerFace2_arr[1].mesh);
+            .9 *=> wait;
+            wait => now;
+        }
+
+        // Machine.crash();
+    }
+
+    fun void randomize(GMesh ggen) {
+        GMesh mesh(ggen.geo(), ggen.mat()) --> GG.scene();
+        mesh.sca(ggen.scaWorld());
+        M.randomPointInArea(@(0, 0), 6, 4) => mesh.pos;
+        Math.random2f(0, Math.pi) => mesh.rotZ;
+        2.75 => mesh.posZ; 
+    }
+
+
+    static int camera_shake_generation;
+    fun static void cameraShakeEffect(float amplitude, dur shake_dur, float hz) {
+        ++camera_shake_generation => int gen;
+        dur elapsed_time;
+
+        // generate shake params
+        shake_dur / 1::second => float shake_dur_secs;
+        vec2 camera_deltas[(hz * shake_dur_secs + 1) $ int];
+        for (int i; i < camera_deltas.size(); i++) {
+            @(Math.random2f(-amplitude, amplitude),
+            Math.random2f(-amplitude, amplitude)) => camera_deltas[i];
+        }
+        @(0,0) => camera_deltas[0]; // start from original pos
+        @(0,0) => camera_deltas[-2]; // return to original pos
+        @(0,0) => camera_deltas[-1]; // return to original pos (yes need this one too)
+
+        (1.0 / hz)::second => dur camera_delta_period; // time for 1 cycle of shake
+
+        while (true) {
+            GG.nextFrame() => now;
+            // another shake triggred, stop this one
+            if (elapsed_time > shake_dur || gen != camera_shake_generation) break;
+            // update elapsed time
+            GG.dt()::second +=> elapsed_time;
+
+            // compute fraction shake progress
+            elapsed_time / shake_dur => float progress;
+            elapsed_time / camera_delta_period => float elapsed_periods;
+            elapsed_periods $ int => int floor;
+            elapsed_periods - floor => float fract;
+
+            // clamp to end of camera_deltas
+            if (floor + 1 >= camera_deltas.size()) {
+                camera_deltas.size() - 2 => floor;
+                1.0 => fract;
+            }
+
+            // interpolate the progress
+            camera_deltas[floor] * (1.0 - fract) + camera_deltas[floor + 1] * fract => vec2 delta;
+            // update camera pos with linear decay based on progress
+            (1.0 - progress) * delta => GG.camera().pos;
+        }
+    }
+
+
+    fun void fadeOutEffect(float duration) {
+        float t;
+        while (t < duration) {
+            GG.nextFrame() => now;
+            GG.dt() +=> t;
+            if (t > duration) duration => t;
+            
+            t / duration => float p;
+
+            0.75 => float c1;
+            c1 * 1.25 => float c2;
+
+            Math.sin((p * Math.PI) / 2) => float ease;
+
+            Math.map(ease, 0, 1, 1, 0) => float opacity;
+
+            GG.outputPass().exposure(opacity);
         }
     }
 }

@@ -17,6 +17,7 @@ public class Overlay extends GGen {
     int liked;
 
     GText batteryText;
+    // NOCHECKIN
     100 => int batteryPercentage;
 
     PlaneGeometry plane_geo;
