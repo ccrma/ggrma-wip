@@ -52,8 +52,6 @@ public class Phone extends GGen {
     int games_played; // counts NON-reflection games played
 
     fun Minigame@ nextGame() { 
-        <<< "calling nextgame", games_played >>>; 
-
         ++games_played;
 
         if (games_played == 6) {
@@ -78,6 +76,7 @@ public class Phone extends GGen {
 
         int valid_games[0];
         for (int i; i < Game_Count; ++i) {
+            if (i == Game_Balance && game_levels[i] >= 3) continue;
             if (game_levels[i] <= 5 && i != Game_Reflection) valid_games << i;
         }
 
