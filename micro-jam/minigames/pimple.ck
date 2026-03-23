@@ -195,13 +195,14 @@ public class Pimples extends Minigame {
     }
 
     fun void pop(int idx) {
+        SFX.play(SFX.POP1 + (level - 1), Math.random2f(0.85, 1.15));  // level 1→POP1, 2→POP2, ..., 5→POP5
         num_pimples--;
         false => active[idx];
         (num_pimples == 0) => _finished;
     }
 
     fun int music() {
-        return Music.POPPING1 + (level - 1) % 3; // return the music enum
+        return Music.POPPING1 + (level - 1);
     }
 
     fun void update(float dt) {

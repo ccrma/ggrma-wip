@@ -93,6 +93,7 @@ public class Throw extends Minigame {
 
     // todo: account for if the player holds then swipes. in this case, the velocity will be lower than expected since timeElapsed will be greater
     fun void startThrow(float distance, float angle) {
+        SFX.play(SFX.TOSS);
         false => throwActive;
         now - startTime => dur timeElapsed;
         distance / (timeElapsed / ms) => float velocity; // ranges from 0 to approx. 0.05
@@ -120,6 +121,7 @@ public class Throw extends Minigame {
 
             obj.posWorld() => vec3 posWorld;
             if (posWorld.x >= trashLeft && posWorld.x <= trashRight && Math.fabs(posWorld.y - trashY) < 0.2) {
+                SFX.play(SFX.FACE_DONE);
                 true => _win;
                 true => _finished;
                 false => throwing;
@@ -135,7 +137,7 @@ public class Throw extends Minigame {
     }
 
     fun int music() {
-        return Music.TOSS1 + (level - 1) % 3; // return the music enum
+        return Music.TOSS1 + (level - 1);
     }
 
     fun void update(float dt) { // called once per frame. put all your game logic here

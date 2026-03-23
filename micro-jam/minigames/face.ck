@@ -115,7 +115,7 @@ public class FaceGame extends Minigame
     }
 
     fun int music() {
-        return Music.FACE1 + (level - 1) % 3; // return the music enum
+        return Music.FACE1 + (level - 1);
     }
 
     fun void update(float dt) { // called once per frame. put all your game logic here
@@ -130,9 +130,10 @@ public class FaceGame extends Minigame
 
         if (legal_drop && GWindow.mouseLeftDown() && face_feature_idx < face.features.size()) {
             face_feature_idx++;
-
+            SFX.play(SFX.FACE_HIT, 1.0 + face_feature_idx * 0.1);  // first: 1.0, subsequent: +10% each
             if (face_feature_idx >= face.features.size()) {
                 true => _finished;
+                SFX.play(SFX.FACE_DONE);
                 null @=> go_feature;
             }
             else {

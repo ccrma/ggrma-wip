@@ -292,7 +292,7 @@ public class Mukbang extends Minigame
     }
 
     fun int music() {
-        return Music.MUKBANG1 + (level - 1) % 3; // return the music enum
+        return Music.MUKBANG1 + level;
     }
 
     fun void mukbangGame() {
@@ -318,6 +318,7 @@ public class Mukbang extends Minigame
 
             if (GWindow.mouseLeftDown() && bool_mukbang_start && !bool_mukbang_fail)
             {
+                SFX.play(SFX.CHEW0 + Math.random2(0, 5));
                 if (level == 4) {
                     go_human_done --< this;
                     go_carrots_level5[currentFood] --< this;
@@ -327,6 +328,7 @@ public class Mukbang extends Minigame
                     {
                         0 => bool_mukbang_start;
                         1 => bool_mukbang_end;
+                        SFX.play(SFX.YUMMY);
                     }
 
                     // Have Scraps appear on the hankerchief
@@ -368,6 +370,7 @@ public class Mukbang extends Minigame
                         go_carrots[currentFood][currentAnim] --> this;
                         0 => bool_mukbang_start;
                         1 => bool_mukbang_end;
+                        SFX.play(SFX.YUMMY);
                     }
                     // If not, make the next frame appear.
                     else

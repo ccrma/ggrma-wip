@@ -204,7 +204,7 @@ public class Balance extends Minigame {
     bg.sca(@(1080 * scale / 180.0, 1920 * scale / 180.0, 1.0));
 
     fun int music() {
-        return Music.CHOICE1 + (level - 1) % 3; // return the music enum
+        return Music.CHOICE1 + Math.min(level - 1, 2);
     }
 
     fun Balance(int level)
@@ -467,6 +467,7 @@ public class Balance extends Minigame {
         }
 
         true => _finished;
+        SFX.play(SFX.BALANCE_CHEER, Math.random2f(0.9, 1.1));
     }
 
     fun void selectAnswer2()
@@ -528,6 +529,7 @@ public class Balance extends Minigame {
             if (GWindow.mouseLeftDown() && !bool_answer1)
             {
                 selectAnswer1();
+                SFX.play(SFX.BALANCE_SELECT, Math.random2f(0.9, 1.1));
             }
         }
         else
@@ -553,6 +555,7 @@ public class Balance extends Minigame {
             if (GWindow.mouseLeftDown() && !bool_answer2)
             {
                 selectAnswer2();
+                SFX.play(SFX.BALANCE_SELECT, Math.random2f(0.9, 1.1));
             }
         }
         else

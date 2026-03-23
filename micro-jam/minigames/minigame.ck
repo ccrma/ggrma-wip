@@ -1,5 +1,6 @@
 @import "../lib/g2d/g2d.ck"
 @import "../lib/music.ck"
+@import "../lib/sfx.ck"
 
 public class Minigame extends GGen {
     // gruck all your game ggens to `this`
