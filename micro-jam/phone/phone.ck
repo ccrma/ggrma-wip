@@ -85,8 +85,7 @@ public class Phone extends GGen {
             return new Reflection(4);
         } 
 
-        overlay.actualOverlay --> overlay;
-
+        if (games_played > 2) overlay.actualOverlay --> overlay;
 
         int valid_games[0];
         for (int i; i < Game_Count; ++i) {
@@ -145,7 +144,6 @@ public class Phone extends GGen {
         );
 
         next_minigame_type => minigame_type;
-        minigame --> this;
         this.posY(-GG.camera().viewSize());
     }
 
@@ -172,6 +170,8 @@ public class Phone extends GGen {
         
         // masked_bg --> this;
         // masked_bg.posZ(GG.camera().posZ() - .5);
+        overlay.actualOverlay --> overlay;
+        minigame --> this;
         music.switchTo(minigame.music());
     }
 

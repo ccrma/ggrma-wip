@@ -5,7 +5,7 @@ public class Overlay extends GGen {
     @(GG.camera().viewSize() * 9 / 16, GG.camera().viewSize(), 1) * 0.8 => vec3 aspect;
     this.scaWorld(aspect);
 
-    GGen actualOverlay --> this;
+    GGen actualOverlay;
 
     Hand hand;
 
@@ -20,6 +20,10 @@ public class Overlay extends GGen {
     100 => int batteryPercentage;
 
     PlaneGeometry plane_geo;
+
+    FlatMaterial black_mat;
+    Color.BLACK => black_mat.color;
+    GMesh black_bg(plane_geo, black_mat) --> this;
 
     fun Overlay() {
         // border
