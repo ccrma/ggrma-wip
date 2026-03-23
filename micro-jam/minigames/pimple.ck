@@ -202,7 +202,7 @@ public class Pimples extends Minigame {
     }
 
     fun int music() {
-        return Music.POPPING1 + (level - 1) % 3; // return the music enum
+        return Music.POPPING1 + (level - 1);
     }
 
     fun void update(float dt) {

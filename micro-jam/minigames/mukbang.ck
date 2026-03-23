@@ -292,7 +292,7 @@ public class Mukbang extends Minigame
     }
 
     fun int music() {
-        return Music.MUKBANG1 + (level - 1) % 3; // return the music enum
+        return Music.MUKBANG1 + level;
     }
 
     fun void mukbangGame() {
