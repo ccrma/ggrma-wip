@@ -27,7 +27,7 @@ public class Music {
 
     fun void switchTo(int index) {
         if (index == NONE) return;
-        buf.read(me.dir() + "../assets/audio/" + filePaths[index]);
+        buf.read(me.dir() + "../assets/audio/music/" + filePaths[index]);
         if (playShred != null) {
             playShred.exit();
             null => playShred;

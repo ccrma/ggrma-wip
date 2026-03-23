@@ -5,6 +5,7 @@
 @import "../minigames/balance.ck"
 @import "overlay.ck"
 @import "../lib/music.ck"
+@import "../lib/sfx.ck"
 @import "../minigames/mukbang.ck"
 
 public class Phone extends GGen {
@@ -27,7 +28,7 @@ public class Phone extends GGen {
     // start all games at level 1
     for (int i; i < Game_Count; ++i) 1 => game_levels[i];
     // 5 => game_levels[Game_Face];
-    // 2 => game_levels[Game_Pimples];
+    // 5 => game_levels[Game_Pimples];
     // 5 => game_levels[Game_Mukbang];
 
     // FaceGame face_game;
@@ -60,7 +61,7 @@ public class Phone extends GGen {
             => next_minigame_type;
 
         // NOCHECKIN
-        // Game_Pimples => next_minigame_type;
+        // Game_Mukbang => next_minigame_type;
 
         game_levels[next_minigame_type] => int level;
 
@@ -92,6 +93,7 @@ public class Phone extends GGen {
     }
 
     fun Phone() {
+        SFX.init();
         // TODO impl random game selection
         nextGame() @=> minigame;
         next_minigame_type => minigame_type;
@@ -161,7 +163,8 @@ public class Phone extends GGen {
             overlay.twitch();
         }
 
-        if (GWindow.scrollY() > 1 && minigame.finished()) {
+
+        if (Math.fabs(GWindow.scrollY()) > .1 && minigame.finished()) {
             if (minigame.win()) { // increment minigame level if won
                 ++game_levels[minigame_type];
                 

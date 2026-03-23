@@ -4,7 +4,7 @@
 GG.camera().orthographic();
 GG.camera().viewSize(10);
 
-GWindow.sizeLimits(1920, 1080, 0, 0, @(16, 9));
+// GWindow.sizeLimits(1920, 1080, 0, 0, @(16, 9));
 GWindow.center();
 
 GG.scene().backgroundColor(Color.WHITE);
