@@ -12,6 +12,9 @@
 public class Phone extends GGen {
     Music music;
 
+    PulseOsc pulse => blackhole;
+    3 => pulse.freq;
+
     Minigame @ minigame;
     Minigame @ nextMinigame;
     int minigame_type;
@@ -121,6 +124,15 @@ public class Phone extends GGen {
         SFX.init();
         // TODO impl random game selection
         nextGame() @=> minigame;
+        Minigame.mouse_click --> minigame;
+        Minigame.mouse_click.posX(4.5);
+        Minigame.mouse_click.sca(
+            @(
+            Minigame.mouse_click.scaX() * 1.5,
+            Minigame.mouse_click.scaY() * 1.5
+            )
+        );
+
         next_minigame_type => minigame_type;
         minigame --> this;
         this.posY(-GG.camera().viewSize());
@@ -185,9 +197,23 @@ public class Phone extends GGen {
         if (scrolling) return;
 
         if (minigame.finished()) {
+            // if first time, attach scroll instructions
+            if (Minigame.mouse_scroll.parent() == null) {
+                Minigame.mouse_scroll --> minigame;
+                Minigame.mouse_scroll.posX(-4.5);
+                Minigame.mouse_scroll.sca(
+                    @(
+                    Minigame.mouse_scroll.scaX() * 1.5,
+                    Minigame.mouse_scroll.scaY() * 1.5
+                    )
+                );
+            }
             overlay.twitch();
         }
 
+        // color flicker on mouse_scroll
+        (1 + .5 * pulse.last()) * Color.WHITE => (Minigame.mouse_scroll.mat() $ FlatMaterial).color;
+        (1 + -.5 * pulse.last()) * Color.WHITE => (Minigame.mouse_click.mat() $ FlatMaterial).color;
 
         if (Math.fabs(GWindow.scrollY()) > .1 && minigame.finished()) {
             if (minigame.win()) { // increment minigame level if won

@@ -13,12 +13,11 @@ public class Minigame extends GGen {
     static TextureSampler@ linear_sampler;
     static TextureSampler@ nearest_sampler;
 
+    static GMesh@ mouse_click;
+    static GMesh@ mouse_scroll;
+
     // init static 
     if (plane_geo == null) {
-        // new TextureLoadDesc @=> load_desc;
-        // true => load_desc.flip_y;  // flip the texture vertically
-        // false => load_desc.gen_mips; // no mip maps (save on GPU VRam and load time)
-
         new PlaneGeometry @=> plane_geo;
 
         TextureSampler.linear() @=> linear_sampler;
@@ -30,6 +29,9 @@ public class Minigame extends GGen {
         TextureSampler.Wrap_Clamp => nearest_sampler.wrapU;
         TextureSampler.Wrap_Clamp => nearest_sampler.wrapV;
         TextureSampler.Wrap_Clamp => nearest_sampler.wrapW;
+
+        sprite(me.dir() + "../assets/ui/mouseLeft.png") @=> mouse_click;
+        sprite(me.dir() + "../assets/ui/mouseScroll.png") @=> mouse_scroll;
     }
 
 
@@ -50,6 +52,27 @@ public class Minigame extends GGen {
     //     mesh.sca(@(width / 180.0, height / 180.0, 1.0));
 
     // }
+
+    fun GMesh sprite(string path) {
+        TextureLoadDesc desc;
+        true => desc.flip_y;
+        false => desc.gen_mips;
+
+        Texture.load(path, desc) @=> Texture tex;
+
+        tex.width() $ float / tex.height() => float aspect;
+
+        FlatMaterial mat;
+        mat.sampler(linear_sampler);
+        mat.colorMap(tex);
+        mat.transparent(true);
+
+        GMesh mesh(plane_geo, mat);
+        mesh.sca(@(aspect, 1));
+
+        return mesh;
+    }
+
 
 // == external api ==============================
     fun int finished() { // returns true when player can swipe to next screen

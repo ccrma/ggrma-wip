@@ -95,8 +95,8 @@ public class Balance extends Minigame {
         true => _init;
 
         true => load_desc.flip_y;
-        true => load_desc.gen_mips;
-        true => load_desc.read;
+        false => load_desc.gen_mips;
+        false => load_desc.read;
 
         me.dir() + "../assets/balance/" => string base;
 
