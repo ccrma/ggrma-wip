@@ -70,6 +70,13 @@ public class Start extends GGen {
     quit.sca(@(160./210, 210./210) * 2);
     quit --> this;
 
+    // subway bg
+    Texture.load(me.dir() + "../assets/ui/background.png", load_desc) @=> Texture @ bg_tex;
+    FlatMaterial bgMat;
+    bgMat.colorMap(bg_tex);
+    GMesh bg(plane_geo, bgMat);
+    bg.sca(10 * @( 16 / 9.0, 1.0 ));
+
     fun void hide() {
         false => active;
 
@@ -99,6 +106,8 @@ public class Start extends GGen {
         quit --< this;
         phone --< this;
 
+        bg --> this;
+        bg.posZ(-1);
         startEvent.broadcast();
     }
 
