@@ -108,7 +108,7 @@ public class FaceGame extends Minigame
     }
 
     fun int music() {
-        return Music.FACE1 + (level - 1) % 3; // return the music enum
+        return Music.FACE1 + (level - 1);
     }
 
     fun void update(float dt) { // called once per frame. put all your game logic here

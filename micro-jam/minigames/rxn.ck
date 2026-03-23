@@ -330,7 +330,7 @@ public class Rxn extends Minigame
     }
 
     fun int music() {
-        return Music.REACTION1 + (active_level - 1) % 3; // return the music enum
+        return Music.REACTION1 + active_level;
     }
 
     fun void update(float dt) // called once per frame. put all your game logic here
