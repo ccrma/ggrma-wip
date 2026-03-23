@@ -56,10 +56,20 @@ fun void fadeIn() {
     fadeInEvent.broadcast();
 }
 
+fun void playTrain() {
+    SndBuf buf(me.dir() + "assets/audio/sfx/train.wav") => dac;
+    buf.loop(true);
+    buf.gain(0.5);
+    while (true) {
+        100::ms => now;
+    }
+}
+
 if (1) {
     start --> GG.scene();
     spork ~ startListener();
     spork ~ fadeInListener();
+    spork ~ playTrain();
 } else {
     phone --> GG.scene();
     spork ~ phone.slideUp();

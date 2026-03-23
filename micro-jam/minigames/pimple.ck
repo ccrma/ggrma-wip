@@ -61,21 +61,21 @@ public class Pimples extends Minigame {
         false => load_desc.gen_mips;
 
         <<< "loading pop game textures" >>>;
-        Texture.load("./assets/pimple/bubble.png", load_desc) @=> bubble_tex;
+        Texture.load(me.dir() + "../assets/pimple/bubble.png", load_desc) @=> bubble_tex;
 
-        Texture.load("./assets/pimple/bubblewrap-popped.png", load_desc) @=> bubblewrap_popped;
-        Texture.load("./assets/pimple/bubblewrap-unpopped.png", load_desc) @=> bubblewrap_unpopped;
+        Texture.load(me.dir() + "../assets/pimple/bubblewrap-popped.png", load_desc) @=> bubblewrap_popped;
+        Texture.load(me.dir() + "../assets/pimple/bubblewrap-unpopped.png", load_desc) @=> bubblewrap_unpopped;
 
-        Texture.load("./assets/pimple/pillbug.png", load_desc) @=> pillbug;
-        Texture.load("./assets/pimple/pillbug-smushed.png", load_desc) @=> pillbug_smushed;
+        Texture.load(me.dir() + "../assets/pimple/pillbug.png", load_desc) @=> pillbug;
+        Texture.load(me.dir() + "../assets/pimple/pillbug-smushed.png", load_desc) @=> pillbug_smushed;
 
-        Texture.load("./assets/pimple/clown.png", load_desc) @=> clown_tex;
-        Texture.load("./assets/pimple/balloon.png", load_desc) @=> balloon_tex;
+        Texture.load(me.dir() + "../assets/pimple/clown.png", load_desc) @=> clown_tex;
+        Texture.load(me.dir() + "../assets/pimple/balloon.png", load_desc) @=> balloon_tex;
         balloon_tex.width() / 4.0 / balloon_tex.height() => BALLOON_ASPECT;
 
         // monster
-        Texture.load("./assets/pimple/monster.png", load_desc) @=> monster_tex;
-        Texture.load("./assets/pimple/eyeblink-no-pupil.png", load_desc) @=> eyeblink_tex;
+        Texture.load(me.dir() + "../assets/pimple/monster.png", load_desc) @=> monster_tex;
+        Texture.load(me.dir() + "../assets/pimple/eyeblink-no-pupil.png", load_desc) @=> eyeblink_tex;
     }
 
     // local stuff ====================================================
