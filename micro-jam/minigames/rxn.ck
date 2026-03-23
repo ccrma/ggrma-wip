@@ -276,7 +276,7 @@ public class Rxn extends Minigame
     }
 
     [
-        60, 40, 40, 50, 60
+        25, 30, 35, 40, 40
     ] @=> int level_max_clicks[];
     fun void selectVideo()
     {   
