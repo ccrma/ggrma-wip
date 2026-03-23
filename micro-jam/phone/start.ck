@@ -8,7 +8,7 @@ public class Start extends GGen {
 
     TextureLoadDesc load_desc;
     true => load_desc.flip_y;  // flip the texture vertically
-    true => load_desc.gen_mips; // generate mip maps automatically
+    false => load_desc.gen_mips; 
 
     TextureSampler sampler;
     TextureSampler.WRAP_CLAMP => sampler.wrapU;

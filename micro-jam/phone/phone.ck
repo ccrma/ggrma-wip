@@ -20,6 +20,17 @@ public class Phone extends GGen {
     int minigame_type;
     int next_minigame_type;
 
+
+    TextureLoadDesc load_desc;
+    true => load_desc.flip_y;  // flip the texture vertically
+    false => load_desc.gen_mips; 
+
+    Texture.load(me.dir() + "../assets/ui/background-masked.png", load_desc) @=> Texture @ masked_bg_tex;
+    FlatMaterial maskedBgMat;
+    maskedBgMat.colorMap(masked_bg_tex);
+    GMesh masked_bg(new PlaneGeometry, maskedBgMat);
+    masked_bg.sca(10 * @( 16 / 9.0, 1.0 ));
+
     0 => static int Game_Throw;
     1 => static int Game_Face;
     2 => static int Game_Pimples;
@@ -159,7 +170,9 @@ public class Phone extends GGen {
             ease * screenHeight => float offset;
             this.posY(-screenHeight * 2 + offset * 2);
         }
-
+        
+        // masked_bg --> this;
+        // masked_bg.posZ(GG.camera().posZ() - .5);
         music.switchTo(minigame.music());
     }
 
