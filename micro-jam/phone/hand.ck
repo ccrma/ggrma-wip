@@ -37,6 +37,10 @@ public class Hand extends GGen {
         handMat.colorMap(hand1Tex);
         PlaneGeometry plane_geo;
         GMesh hand(plane_geo, handMat);
+        hand.scaX(0.985);
+        hand.scaY(0.985);
+        hand.posY(-0.006);
+        hand.posZ(3.0);
         hand --> this;
     }
 
