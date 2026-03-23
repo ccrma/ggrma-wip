@@ -73,7 +73,7 @@ public class Start extends GGen {
     fun void hide() {
         false => active;
 
-        1.5 => float duration;
+        2 => float duration;
         float t;
 
         while (t < duration) {
