@@ -28,6 +28,7 @@ public class Phone extends GGen {
     Texture.load(me.dir() + "../assets/ui/background-masked.png", load_desc) @=> Texture @ masked_bg_tex;
     FlatMaterial maskedBgMat;
     maskedBgMat.colorMap(masked_bg_tex);
+    true => maskedBgMat.transparent;
     GMesh masked_bg(new PlaneGeometry, maskedBgMat);
     masked_bg.sca(10 * @( 16 / 9.0, 1.0 ));
 
@@ -168,8 +169,8 @@ public class Phone extends GGen {
             this.posY(-screenHeight * 2 + offset * 2);
         }
         
-        // masked_bg --> this;
-        // masked_bg.posZ(GG.camera().posZ() - .5);
+        masked_bg --> this;
+        masked_bg.posZ(2.5);
         overlay.actualOverlay --> overlay;
         minigame --> this;
         music.switchTo(minigame.music());
@@ -252,7 +253,6 @@ public class Phone extends GGen {
                     overlay --< this;
 
                     new Reflection(5) @=> minigame;
-                    // minigame --< this;
                     if (nextMinigame.parent() != null) nextMinigame --< this;
                 }
             }
