@@ -57,20 +57,20 @@ public class Phone extends GGen {
         ++games_played;
 
         if (games_played == 6) {
-            return new Reflection(1);
             overlay --< this;
+            return new Reflection(1);
         }
         else if (games_played == 12) {
-            return new Reflection(2);
             overlay --< this;
+            return new Reflection(2);
         }
         else if (games_played == 18) {
-            return new Reflection(3);
             overlay --< this;
+            return new Reflection(3);
         }
         else if (games_played == 23) {
-            return new Reflection(4);
             overlay --< this;
+            return new Reflection(4);
         } 
 
         overlay --> this;
