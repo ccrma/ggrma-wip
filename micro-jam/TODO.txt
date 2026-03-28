@@ -1,0 +1,5 @@
+battery life
+mukbang font size
+update to newest chugl dev branch version (has a couple crash fixes)
+
+
