@@ -4,7 +4,7 @@
 GG.camera().orthographic();
 GG.camera().viewSize(10);
 
-GWindow.sizeLimits(1920, 1080, 0, 0, @(16, 9));
+GWindow.sizeLimits(0, 0, 0, 0, @(16, 9));
 GWindow.center();
 
 GG.scene().backgroundColor(Color.WHITE);
@@ -64,6 +64,13 @@ fun void playTrain() {
         100::ms => now;
     }
 }
+
+fun void resizeListener() {
+    while (true) {
+        GWindow.resizeEvent() => now;
+        GWindow.sizeLimits(0, 0, 0, 0, @(16, 9));
+    }
+} spork ~ resizeListener();
 
 if (1) {
     start --> GG.scene();
