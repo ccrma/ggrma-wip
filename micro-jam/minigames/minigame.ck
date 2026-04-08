@@ -40,6 +40,8 @@ public class Minigame extends GGen {
     int _win;
     int stopped; // set to true when disconnected from scene (replaced with next_mini_game)
 
+    int has_white_background; // used to know how to color phone icons
+
 // == helper fns ==============================
     // fun GMesh sprite(Texture@ tex) {
     //     n => go_name;

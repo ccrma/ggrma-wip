@@ -108,6 +108,8 @@ public class Throw extends Minigame {
 
     fun void throw(float velocity, float angle) {
         float t;
+        // clamp velocity to prevent super slow throws
+        Math.max(.3, velocity) => velocity;
         while (true) {
             GG.nextFrame() => now;
             GG.dt() +=> t;

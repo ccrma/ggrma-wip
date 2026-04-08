@@ -154,6 +154,7 @@ public class Phone extends GGen {
         SFX.init();
         // TODO impl random game selection
         nextGame() @=> minigame;
+        overlay.iconColor(minigame.has_white_background ? overlay.ICON_DARK : overlay.ICON_LIGHT);
         Minigame.mouse_click --> minigame;
         Minigame.mouse_click.posX(4.5);
         Minigame.mouse_click.posZ(4);
@@ -276,6 +277,8 @@ public class Phone extends GGen {
             nextGame() @=> nextMinigame; // select random minigame for next one
             nextMinigame --> this; // render the next minigame
             nextMinigame.posY(-GG.camera().viewSize()); // position next minigame at bottom
+
+            overlay.iconColor(nextMinigame.has_white_background ? overlay.ICON_DARK : overlay.ICON_LIGHT);
 
             music.switchTo(nextMinigame.music());
 

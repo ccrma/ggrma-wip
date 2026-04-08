@@ -1,5 +1,16 @@
-battery life
-mukbang font size
-update to newest chugl dev branch version (has a couple crash fixes)
+battery life -- DONE
+heart react clears on new game -- DONE
+alex clicking game make easier -- DONE
+subway louder -- DONE
+icon color darkmode lightmode -- DONE
+clamp min vel of throw game -- DONE
+
+
+
+
+nondeterministic crash:
+initialized game 5 level 1
+[ChuGL]: ERRORMemory allocation failure. Unable to allocate 3985671655729147276 bytes
+[1]    68766 segmentation fault  chuck main.ck
 
 

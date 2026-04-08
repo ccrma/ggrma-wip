@@ -10,10 +10,6 @@ GWindow.center();
 GG.scene().backgroundColor(Color.WHITE);
 // disable skybox
 null => GG.scene().skybox;
-// disable tonemapping / HDR
-// GG.outputPass().tonemap(OutputPass.ToneMap_None);
-// disable gamma
-// GG.outputPass().gamma(false);
 
 Phone phone;
 Start start;
@@ -56,25 +52,32 @@ fun void fadeIn() {
     fadeInEvent.broadcast();
 }
 
+int train_playing;
 fun void playTrain() {
+    if (train_playing) return;
+    true => train_playing;
     SndBuf buf(me.dir() + "assets/audio/sfx/train.wav") => dac;
     buf.loop(true);
-    buf.gain(0.5);
+    buf.gain(0.8);
     while (true) {
         100::ms => now;
     }
 }
 
-if (1) {
+
+fun void startMenu() {
     start --> GG.scene();
     spork ~ startListener();
     spork ~ fadeInListener();
-    spork ~ playTrain();
-} else {
-    phone --> GG.scene();
-    spork ~ phone.slideUp();
 }
 
+
+
+spork ~ playTrain();
+startMenu();
 while(true) {
     GG.nextFrame() => now;
+
+    if (GWindow.keyDown(GWindow.Key_1)) startMenu();
+
 }

@@ -21,9 +21,9 @@ public class Rxn extends Minigame
     "bad" => string reaction_type;
 
     // Number of clicks it takes to complete the level
-    50 => float max_clicks;
+    30 => float max_clicks;
     [
-        25, 30, 35, 40, 45
+        12, 16, 20, 24, 28
     ] @=> int level_max_clicks[];
 
     aspect.y / aspect.x => float aspect_ratio;

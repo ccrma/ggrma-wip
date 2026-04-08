@@ -93,6 +93,8 @@ public class FaceGame extends Minigame
     }
 
     fun FaceGame(int level) {
+        if (level <= 2) true => has_white_background;
+
         false => _finished;
         level => this.level;
 

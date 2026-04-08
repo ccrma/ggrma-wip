@@ -131,6 +131,7 @@ public class Pimples extends Minigame {
             }
         }
         else if (level == Level_Bug) {
+            true => has_white_background;
             Math.random2(8, 12) => int count;
 
             // all spawn at center

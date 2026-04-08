@@ -141,6 +141,7 @@ public class Mukbang extends Minigame
     int level; 
 
     fun Mukbang(int lvl) {
+        true => has_white_background;
         lvl => level;
         sprite(human_tex[lvl][Human_Idle], 1080.0, 1920.0, 2) @=> go_human_idle; go_human_idle --> this;
         sprite(human_tex[lvl][Human_Eating0], 1080.0, 1920.0, 2) @=> go_human_eating[0];
