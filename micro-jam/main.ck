@@ -7,7 +7,7 @@ GG.camera().viewSize(10);
 GWindow.sizeLimits(0, 0, 0, 0, @(16, 9));
 GWindow.center();
 
-GG.scene().backgroundColor(Color.WHITE);
+GG.scene().backgroundColor(Color.BLACK);
 // disable skybox
 null => GG.scene().skybox;
 
@@ -71,19 +71,10 @@ fun void resizeListener() {
     }
 } spork ~ resizeListener();
 
-fun void startMenu() {
-    start --> GG.scene();
-    spork ~ startListener();
-    spork ~ fadeInListener();
-}
-
-
-
+start --> GG.scene();
+spork ~ startListener();
+spork ~ fadeInListener();
 spork ~ playTrain();
-startMenu();
 while(true) {
     GG.nextFrame() => now;
-
-    if (GWindow.keyDown(GWindow.Key_1)) startMenu();
-
 }
